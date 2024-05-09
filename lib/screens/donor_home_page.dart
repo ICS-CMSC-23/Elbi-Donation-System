@@ -75,7 +75,7 @@ class _DonorHomePageState extends State<DonorHomePage> {
                                   child: Image.network(
                                 organizations[index].imageUrl,
                                 fit: BoxFit.cover,
-                                width: MediaQuery.of(context).size.width / 2,
+                                width: MediaQuery.of(context).size.width / 1.5,
                               )),
                             ),
                             Center(child: Text(organizations[index].name)),
