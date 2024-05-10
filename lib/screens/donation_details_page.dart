@@ -4,14 +4,19 @@ import '../models/route_model.dart';
 class DonationDetails extends StatefulWidget {
   const DonationDetails({super.key});
 
+  // class route model
+  static final RouteModel _donationDetails = RouteModel(
+    "Donation Details",
+    "/donation-details",
+    const DonationDetails(),
+  );
+  static RouteModel get route => _donationDetails;
+
   @override
   State<DonationDetails> createState() => _DonationDetailsState();
 }
 
 class _DonationDetailsState extends State<DonationDetails> {
-  RouteModel donationDetails = RouteModel(
-      "Donation Details", "/donation-details", const DonationDetails());
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

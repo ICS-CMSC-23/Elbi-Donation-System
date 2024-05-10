@@ -4,6 +4,14 @@ import '../models/route_model.dart';
 class DonationDriveDetails extends StatefulWidget {
   const DonationDriveDetails({super.key});
 
+  // class route model
+  static final RouteModel _donationDriveDetails = RouteModel(
+    "Donation Drive Details",
+    "/donation-drive-details",
+    const DonationDriveDetails(),
+  );
+  static RouteModel get route => _donationDriveDetails;
+
   @override
   State<DonationDriveDetails> createState() => _DonationDriveDetailsState();
 }

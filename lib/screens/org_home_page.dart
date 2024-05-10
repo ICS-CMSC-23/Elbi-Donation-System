@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:elbi_donation_system/components/main_drawer.dart';
-import 'package:elbi_donation_system/models/route_model.dart';
-import 'package:elbi_donation_system/screens/log_in_page.dart';
-import 'package:elbi_donation_system/models/donation_model.dart';
-import 'package:elbi_donation_system/models/organization_model.dart';
-import 'package:elbi_donation_system/models/donation_drive_model.dart';
-import 'package:elbi_donation_system/screens/donation_details_page.dart';
-import 'package:elbi_donation_system/screens/donation_drive_details_page.dart';
+import '../components/main_drawer.dart';
+import '../models/route_model.dart';
+import '../screens/log_in_page.dart';
+import '../models/donation_model.dart';
+import '../models/organization_model.dart';
+import '../models/donation_drive_model.dart';
+import '../screens/donation_details_page.dart';
+import '../screens/donation_drive_details_page.dart';
 import 'dart:math';
 
 class OrgHomePage extends StatefulWidget {
   const OrgHomePage({super.key});
+
+  // class route model
+  static final RouteModel _orgHomePage = RouteModel(
+    "Organization Home Page",
+    "/org-home-page",
+    const OrgHomePage(),
+  );
+  static RouteModel get route => _orgHomePage;
 
   @override
   State<OrgHomePage> createState() => _OrgHomePageState();
@@ -75,7 +83,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
               // navigate to donation details page
               Navigator.pushNamed(
                 context,
-                "/donation-details",
+                DonationDetails.route.path,
               );
             },
             child: ListTile(
@@ -110,7 +118,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
               // navigate to donation drive details page
               Navigator.pushNamed(
                 context,
-                "/donation-drive-details",
+                DonationDriveDetails.route.path,
               );
             },
             child: Column(
@@ -133,7 +141,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
         RouteModel("Logout", "/", const LoginPage()),
       ]),
       appBar: AppBar(
-        title: const Text("Organization Home Page"),
+        title: Text(OrgHomePage.route.name),
       ),
       body: Form(
         key: _formKey,
