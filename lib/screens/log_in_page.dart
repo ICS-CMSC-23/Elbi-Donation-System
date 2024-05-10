@@ -13,6 +13,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  // ignore: unused_field
   final _formKey = GlobalKey<FormState>();
   RouteModel orgHomepage = RouteModel(
       "Organization Homepage", "/org-home-page", const OrgHomePage());
