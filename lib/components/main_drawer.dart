@@ -16,8 +16,9 @@ class _MainDrawerState extends State<MainDrawer> {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          const DrawerHeader(
-            child: Text(
+          DrawerHeader(
+            decoration: BoxDecoration(color: Theme.of(context).primaryColor),
+            child: const Text(
               "Elbi Donation System",
             ),
           ),
