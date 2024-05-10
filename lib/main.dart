@@ -2,6 +2,8 @@ import 'package:elbi_donation_system/screens/donor_home_page.dart';
 import 'package:elbi_donation_system/screens/log_in_page.dart';
 import 'package:elbi_donation_system/screens/org_home_page.dart';
 import 'package:elbi_donation_system/screens/sign_up_page.dart';
+import 'package:elbi_donation_system/screens/donation_details_page.dart';
+import 'package:elbi_donation_system/screens/donation_drive_details_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -26,6 +28,8 @@ class MyApp extends StatelessWidget {
         '/signup': (context) => const SignUpPage(),
         '/donor-home-page': (context) => const DonorHomePage(),
         '/org-home-page': (context) => const OrgHomePage(),
+        '/donation-details': (context) => const DonationDetails(),
+        '/donation-drive-details': (context) => const DonationDriveDetails(),
       },
     );
   }
