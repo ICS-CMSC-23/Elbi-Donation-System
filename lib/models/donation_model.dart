@@ -1,45 +1,40 @@
-import 'organization_model.dart';
-
-// Enums for donation status
-enum DonationStatus {
-  Pending,
-  Confirmed,
-  ScheduledForPickup,
-  Complete,
-  Canceled,
-}
-
-// Enum for donation item category
-enum DonationCategory {
-  Food,
-  Clothes,
-  Cash,
-  Necessities,
-  Others,
-}
-
 class Donation {
-  final Organization organization;
-  final DonationCategory category;
-  final String donorName;
-  final String donorContactNo;
-  final DateTime dateTime;
-  final String address;
-  final bool isPickup;
-  final double weightInKg;
-  final String? photoUrl; // URL of the photo uploaded by donor
-  DonationStatus status;
+  final String? id;
+  final String donorId;
+  String? donationDriveId;
+
+  String category;
+  bool isForPickup;
+  double weightInKg;
+  DateTime dateTime;
+  List<String>? photos; // photos of the items to donate
+  List<String> addresses;
+  String contactNo;
+  String status;
+
+  // CONSTANTS
+  static const String STATUS_PENDING = "Pending";
+  static const String STATUS_CONFIRMED = "Confirmed";
+  static const String STATUS_SCHEDULED_FOR_PICKUP = "Scheduled for Pickup";
+  static const String STATUS_COMPLETE = "Completed";
+  static const String STATUS_CANCELED = "Canceled";
+
+  static const String CATEGORY_FOOD = "Food";
+  static const String CATEGORY_CLOTHES = "Clothes";
+  static const String CATEGORY_CASH = "Cash";
+  static const String CATEGORY_NECESSITIES = "Necessities";
+  static const String CATEGORY_OTHERS = "Others";
 
   Donation({
-    required this.organization,
+    this.id,
+    required this.donorId,
     required this.category,
-    required this.donorName,
-    required this.donorContactNo,
-    required this.dateTime,
-    required this.address,
-    required this.isPickup,
+    required this.isForPickup,
     required this.weightInKg,
-    this.photoUrl,
-    this.status = DonationStatus.Pending,
+    required this.dateTime,
+    this.photos,
+    required this.addresses,
+    required this.contactNo,
+    this.status = STATUS_PENDING,
   });
 }
