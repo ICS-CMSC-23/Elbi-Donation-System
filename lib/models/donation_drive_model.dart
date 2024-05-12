@@ -2,19 +2,20 @@ import 'donation_model.dart';
 import 'organization_model.dart';
 
 class DonationDrive {
-  // id for firestore
-  final String id;
-  final String name;
-  final List<String> photos;
-  final List<Donation> donations;
-  // what organization is this donation drive for?
-  final Organization organization;
+  final String? id;
+  final String organizationId; // what organization is this donation drive for?
+
+  String name;
+  String description;
+  List<String>? photos;
+  bool isCompleted; // for notification
 
   DonationDrive({
-    required this.id,
+    this.id,
+    required this.organizationId,
     required this.name,
-    required this.photos,
-    required this.donations,
-    required this.organization,
+    required this.description,
+    this.photos,
+    this.isCompleted = false,
   });
 }
