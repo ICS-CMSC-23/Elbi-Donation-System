@@ -8,19 +8,16 @@ class RoundedImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Image imageType = source[0] == "/"
-        ? Image.asset(
-            source,
-            width: size,
-            height: size,
-            fit: BoxFit.cover,
-          )
-        : Image.network(
-            source,
-            width: size,
-            height: size,
-            fit: BoxFit.cover,
-          );
+    Image imageType = Image.network(
+      source,
+      width: size,
+      height: size,
+      errorBuilder: (context, error, stackTrace) {
+        return Image.asset('assets/images/portrait-placeholder.jpg',
+            fit: BoxFit.fitWidth);
+      },
+      fit: BoxFit.cover,
+    );
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(size / 2),
