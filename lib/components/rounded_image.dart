@@ -21,7 +21,11 @@ class RoundedImage extends StatelessWidget {
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(size / 2),
-      child: Expanded(child: imageType),
+      child: Column(
+        children: [
+          Expanded(child: imageType),
+        ],
+      ),
     );
   }
 }
