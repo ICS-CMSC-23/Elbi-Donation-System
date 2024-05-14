@@ -26,7 +26,12 @@ class _LoginPageState extends State<LoginPage> {
       drawer: MainDrawer(routes: [
         orgHomepage,
         donorHomePage,
-        RouteModel("Sign Up", "/signup", const SignUpPage()),
+        RouteModel(
+          "Sign Up",
+          "/signup",
+          const SignUpPage(),
+        ),
+        RouteModel("View Profile", "/donor-profile", const DonorHomePage()),
       ]),
       appBar: AppBar(
         title: const Text("Log In"),
@@ -61,11 +66,10 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
             const Padding(
-              padding: EdgeInsets.only(
-                  left: 15.0, right: 15.0, top: 15, bottom: 0),
+              padding:
+                  EdgeInsets.only(left: 15.0, right: 15.0, top: 15, bottom: 0),
               //padding: EdgeInsets.symmetric(horizontal: 15),
               child: TextField(
-
                 obscureText: true,
                 decoration: InputDecoration(
                     border: OutlineInputBorder(),
@@ -74,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
             TextButton(
-              onPressed: (){
+              onPressed: () {
                 //TODO FORGOT PASSWORD SCREEN GOES HERE
               },
               child: const Text(
@@ -85,12 +89,12 @@ class _LoginPageState extends State<LoginPage> {
             Container(
               height: 50,
               width: 250,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20)),
+              decoration:
+                  BoxDecoration(borderRadius: BorderRadius.circular(20)),
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (_) => const DonorHomePage()));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => const DonorHomePage()));
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
@@ -109,16 +113,16 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 const Text('New User?'),
-            TextButton(
-              onPressed: (){
-                Navigator.push(
-                      context, MaterialPageRoute(builder: (_) => const SignUpPage()));
-              },
-              child: const Text(
-                'Create Account',
-                style: TextStyle(color: Colors.blue, fontSize: 15),
-              ),
-            ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (_) => const SignUpPage()));
+                  },
+                  child: const Text(
+                    'Create Account',
+                    style: TextStyle(color: Colors.blue, fontSize: 15),
+                  ),
+                ),
               ],
             ),
           ],

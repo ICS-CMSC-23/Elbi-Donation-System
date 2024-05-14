@@ -71,12 +71,11 @@ class _DonorHomePageState extends State<DonorHomePage> {
                         child: Column(
                           children: [
                             Center(
-                              child: Flexible(
-                                  child: Image.network(
+                              child: Image.network(
                                 organizations[index].imageUrl,
                                 fit: BoxFit.cover,
                                 width: MediaQuery.of(context).size.width / 1.5,
-                              )),
+                              ),
                             ),
                             Center(child: Text(organizations[index].name)),
                             Center(

@@ -1,5 +1,6 @@
 class Donation {
   final String? id;
+  String description;
   final String donorId;
   String? donationDriveId;
 
@@ -27,6 +28,7 @@ class Donation {
 
   Donation({
     this.id,
+    required this.description,
     required this.donorId,
     required this.category,
     required this.isForPickup,
