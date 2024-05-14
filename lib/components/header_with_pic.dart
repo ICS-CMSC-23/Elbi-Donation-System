@@ -3,13 +3,18 @@ import 'package:elbi_donation_system/models/user_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class ProfileHeader extends StatelessWidget {
-  const ProfileHeader({
+class HeaderWithPic extends StatelessWidget {
+  final String imageUrl;
+  final String title;
+  final String subtitle;
+  final String description;
+  const HeaderWithPic({
     super.key,
-    required this.user,
+    required this.imageUrl,
+    required this.title,
+    required this.subtitle,
+    required this.description,
   });
-
-  final User user;
 
   @override
   Widget build(BuildContext context) {
@@ -17,8 +22,7 @@ class ProfileHeader extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         RoundedImage(
-            source:
-                user.profilePhoto ?? "/assets/images/portrait-placeholder.jpg",
+            source: imageUrl ?? "/assets/images/portrait-placeholder.jpg",
             size: 80),
         Flexible(
           child: Padding(
@@ -27,16 +31,16 @@ class ProfileHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  user.name,
+                  title,
                   style: const TextStyle(
                       fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  user.username,
+                  subtitle,
                   style: const TextStyle(fontStyle: FontStyle.italic),
                 ),
                 Text(
-                  user.about ?? "",
+                  description ?? "",
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 )
