@@ -22,28 +22,27 @@ class ProfileHeader extends StatelessWidget {
             size: 80),
         Flexible(
           child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: Flexible(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      user.name,
-                      style: const TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      user.username,
-                      style: const TextStyle(fontStyle: FontStyle.italic),
-                    ),
-                    Text(
-                      user.about ?? "",
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                    )
-                  ],
+            padding: const EdgeInsets.all(10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  user.name,
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-              )),
+                Text(
+                  user.username,
+                  style: const TextStyle(fontStyle: FontStyle.italic),
+                ),
+                Text(
+                  user.about ?? "",
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                )
+              ],
+            ),
+          ),
         )
       ],
     );
