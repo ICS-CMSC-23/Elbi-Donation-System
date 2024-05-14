@@ -21,7 +21,19 @@ ThemeData blueTheme() {
         style:
             ButtonStyle(foregroundColor: MaterialStatePropertyAll(baseBlue))),
     cardTheme: const CardTheme(shadowColor: deepBlue, color: lightBlue),
-    primarySwatch: MaterialColor(
+    scaffoldBackgroundColor: const Color(0xFFE3F2FD), // A very light blue shade
+    buttonTheme: const ButtonThemeData(
+      buttonColor: deepBlue,
+      textTheme: ButtonTextTheme.primary,
+    ),
+    appBarTheme: const AppBarTheme(
+      color: baseBlue,
+      iconTheme: IconThemeData(
+        color: Colors.white,
+      ),
+    ),
+    colorScheme: ColorScheme.fromSwatch(
+        primarySwatch: MaterialColor(
       baseBlue.value,
       {
         50: lightBlue,
@@ -35,17 +47,6 @@ ThemeData blueTheme() {
         800: deepBlue,
         900: const Color(0xFF1565C0), // deepest shade
       },
-    ),
-    scaffoldBackgroundColor: const Color(0xFFE3F2FD), // A very light blue shade
-    buttonTheme: const ButtonThemeData(
-      buttonColor: deepBlue,
-      textTheme: ButtonTextTheme.primary,
-    ),
-    appBarTheme: const AppBarTheme(
-      color: baseBlue,
-      iconTheme: IconThemeData(
-        color: Colors.white,
-      ),
-    ),
+    )).copyWith(error: Colors.red[400]),
   );
 }
