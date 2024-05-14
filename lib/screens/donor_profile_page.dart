@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 import '../models/route_model.dart';
 import 'log_in_page.dart';
 import 'org_home_page.dart';
-import '../components/profile_header.dart';
+import '../components/header_with_pic.dart';
 import '../components/title_detail.dart';
 import '../components/title_detail_list.dart';
 
@@ -57,7 +57,12 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                ProfileHeader(user: dummyUser),
+                HeaderWithPic(
+                  imageUrl: dummyUser.profilePhoto ?? "",
+                  title: dummyUser.name,
+                  subtitle: dummyUser.username,
+                  description: dummyUser.about ?? "No biography to display...",
+                ),
                 TitleDetailList(
                     title: "Address", detailList: dummyUser.address),
                 const TitleDetail(
@@ -84,7 +89,13 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
                                 size: 50),
                             title: Text(userDonations[index].category),
                             subtitle: Text(userDonations[index].description),
-                            trailing: const Icon(Icons.card_giftcard_outlined),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.card_giftcard_outlined),
+                              onPressed: () {
+                                Navigator.pushNamed(
+                                    context, "/donation-details");
+                              },
+                            ),
                           );
                         }),
                   ),
