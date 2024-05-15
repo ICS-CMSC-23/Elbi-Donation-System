@@ -1,9 +1,8 @@
-import 'package:elbi_donation_system/components/main_drawer.dart';
-import 'package:elbi_donation_system/models/route_model.dart';
-import 'package:elbi_donation_system/screens/donor_home_page.dart';
-import 'package:elbi_donation_system/screens/org_home_page.dart';
-import 'package:elbi_donation_system/screens/sign_up_page.dart';
+import 'package:elbi_donation_system/providers/user_list_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../models/user_model.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -15,63 +14,54 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   // ignore: unused_field
   final _formKey = GlobalKey<FormState>();
-  RouteModel orgHomepage = RouteModel(
-      "Organization Homepage", "/org-home-page", const OrgHomePage());
-  RouteModel donorHomePage =
-      RouteModel("Donor Homepage", "/donor-home-page", const DonorHomePage());
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController.addListener(() {});
+    _passwordController.addListener(() {});
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: MainDrawer(routes: [
-        orgHomepage,
-        donorHomePage,
-        RouteModel(
-          "Sign Up",
-          "/signup",
-          const SignUpPage(),
-        ),
-        RouteModel("View Profile", "/donor-profile", const DonorHomePage()),
-      ]),
       appBar: AppBar(
         title: const Text("Log In"),
       ),
-      // body: Form(
-      //   key: _formKey,
-      //   child: const Center(child: Text("Insert something here")),
-      // ),
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
             const Padding(
               padding: EdgeInsets.only(top: 60.0),
-              // child: Center(
-              //   child: Container(
-              //       width: 200,
-              //       height: 150,
-              //       /*decoration: BoxDecoration(
-              //           color: Colors.red,
-              //           borderRadius: BorderRadius.circular(50.0)),*/
-              //       child: Image.asset('asset/images/1.png')),
-              // ),
             ),
-            const Padding(
+            Padding(
               //padding: const EdgeInsets.only(left:15.0,right: 15.0,top:0,bottom: 0),
               padding: EdgeInsets.symmetric(horizontal: 15),
               child: TextField(
-                decoration: InputDecoration(
+                controller: _emailController,
+                decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Email',
                     hintText: 'Enter email'),
               ),
             ),
-            const Padding(
+            Padding(
               padding:
                   EdgeInsets.only(left: 15.0, right: 15.0, top: 15, bottom: 0),
               //padding: EdgeInsets.symmetric(horizontal: 15),
               child: TextField(
+                controller: _passwordController,
                 obscureText: true,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Password',
                     hintText: 'Enter password'),
@@ -81,9 +71,10 @@ class _LoginPageState extends State<LoginPage> {
               onPressed: () {
                 //TODO FORGOT PASSWORD SCREEN GOES HERE
               },
-              child: const Text(
+              child: Text(
                 'Forgot Password',
-                style: TextStyle(color: Colors.blue, fontSize: 15),
+                style: TextStyle(
+                    color: Theme.of(context).primaryColor, fontSize: 15),
               ),
             ),
             Container(
@@ -93,11 +84,16 @@ class _LoginPageState extends State<LoginPage> {
                   BoxDecoration(borderRadius: BorderRadius.circular(20)),
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (_) => const DonorHomePage()));
+                  User currentUser = context
+                      .read<UserListProvider>()
+                      .changeCurrentUser(
+                          _emailController.text, _passwordController.text);
+                  if (currentUser.role != "guest") {
+                    Navigator.pushNamed(context, "/");
+                  }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
+                  backgroundColor: Theme.of(context).primaryColor,
                   elevation: 0,
                 ),
                 child: const Text(
@@ -115,12 +111,12 @@ class _LoginPageState extends State<LoginPage> {
                 const Text('New User?'),
                 TextButton(
                   onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => const SignUpPage()));
+                    Navigator.pushNamed(context, "/signup");
                   },
-                  child: const Text(
+                  child: Text(
                     'Create Account',
-                    style: TextStyle(color: Colors.blue, fontSize: 15),
+                    style: TextStyle(
+                        color: Theme.of(context).primaryColor, fontSize: 15),
                   ),
                 ),
               ],

@@ -9,10 +9,11 @@ class User {
   final String? id;
   String name;
   String username;
+  String email;
   String password;
   List<String> address;
   String contactNo;
-  String role; // donor, organization, admin
+  String role; // donor, organization, admin, guest
   String? profilePhoto; // avatar/ profile picture (optional)
 
   // for organization only
@@ -25,6 +26,7 @@ class User {
     this.id,
     required this.name,
     required this.username,
+    required this.email,
     required this.password,
     required this.address,
     required this.contactNo,

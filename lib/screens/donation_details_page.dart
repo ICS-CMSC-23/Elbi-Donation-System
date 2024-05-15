@@ -1,4 +1,5 @@
 import 'package:elbi_donation_system/components/header_with_pic.dart';
+import 'package:elbi_donation_system/components/main_drawer.dart';
 import 'package:elbi_donation_system/components/title_detail.dart';
 import 'package:elbi_donation_system/components/title_detail_list.dart';
 import 'package:elbi_donation_system/dummy_data/dummy_donations.dart';
@@ -16,7 +17,6 @@ class DonationDetails extends StatefulWidget {
   static final RouteModel _donationDetails = RouteModel(
     "Donation Details",
     "/donation-details",
-    const DonationDetails(),
   );
   static RouteModel get route => _donationDetails;
 
@@ -65,6 +65,10 @@ class _DonationDetailsState extends State<DonationDetails> {
     }
 
     return Scaffold(
+      drawer: MainDrawer(routes: [
+        RouteModel("Home", "/"),
+        RouteModel("Logout", "/login"),
+      ]),
       appBar: AppBar(
         title: const Text("Donation Details"),
       ),
