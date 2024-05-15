@@ -22,6 +22,7 @@ class _DonorHomePageState extends State<DonorHomePage> {
     return Scaffold(
       drawer: MainDrawer(routes: [
         RouteModel("Home", "/"),
+        RouteModel("Profile", "/donor-profile"),
         RouteModel("Logout", "/login"),
       ]),
       appBar: AppBar(
