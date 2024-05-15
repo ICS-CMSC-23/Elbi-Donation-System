@@ -1,8 +1,6 @@
 import 'package:elbi_donation_system/components/main_drawer.dart';
 import 'package:elbi_donation_system/dummy_data/dummy_orgs.dart';
 import 'package:elbi_donation_system/models/route_model.dart';
-import 'package:elbi_donation_system/screens/log_in_page.dart';
-import 'package:elbi_donation_system/screens/org_home_page.dart';
 import 'package:flutter/material.dart';
 
 import '../components/page_cover.dart';

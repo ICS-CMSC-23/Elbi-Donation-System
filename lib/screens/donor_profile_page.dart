@@ -1,16 +1,12 @@
 import 'package:elbi_donation_system/components/rounded_image.dart';
 import 'package:elbi_donation_system/dummy_data/dummy_donations.dart';
 import 'package:elbi_donation_system/models/donation_model.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/widgets.dart';
 import '../models/user_model.dart';
 
 import '../components/main_drawer.dart';
 import 'package:flutter/material.dart';
 
 import '../models/route_model.dart';
-import 'log_in_page.dart';
-import 'org_home_page.dart';
 import '../components/header_with_pic.dart';
 import '../components/title_detail.dart';
 import '../components/title_detail_list.dart';
