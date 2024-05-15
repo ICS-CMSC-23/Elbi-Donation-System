@@ -14,18 +14,10 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
-  RouteModel orgHomepage =
-      RouteModel("Home", "/org-home-page", const OrgHomePage());
-  RouteModel donorHomePage =
-      RouteModel("Home", "/donor-home-page", const DonorHomePage());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: MainDrawer(routes: [
-        orgHomepage,
-        RouteModel("Logout", "/", const LoginPage()),
-      ]),
       appBar: AppBar(
         title: const Text("Sign Up"),
       ),
@@ -89,7 +81,8 @@ class _SignUpPageState extends State<SignUpPage> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                 ),
-                child: const Text('Sign Up', 
+                child: const Text(
+                  'Sign Up',
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,

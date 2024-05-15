@@ -32,6 +32,7 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
       ],
       name: "Jomar Monreal",
       username: "Jomamos",
+      email: "jpmonreal@up.edu.ph",
       password: "12345678",
       contactNo: '09762946252',
       role: 'donor',
@@ -44,8 +45,8 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
 
     return Scaffold(
         drawer: MainDrawer(routes: [
-          RouteModel("Home", "/donor-home-page", const OrgHomePage()),
-          RouteModel("Logout", "/", const LoginPage()),
+          RouteModel("Home", "/"),
+          RouteModel("Logout", "/login"),
         ]),
         appBar: AppBar(
           title: const Text("Donor Profile Page"),

@@ -1,3 +1,4 @@
+import 'package:elbi_donation_system/components/main_drawer.dart';
 import 'package:flutter/material.dart';
 import '../models/route_model.dart';
 
@@ -8,7 +9,6 @@ class DonationDriveDetails extends StatefulWidget {
   static final RouteModel _donationDriveDetails = RouteModel(
     "Donation Drive Details",
     "/donation-drive-details",
-    const DonationDriveDetails(),
   );
   static RouteModel get route => _donationDriveDetails;
 
@@ -17,12 +17,16 @@ class DonationDriveDetails extends StatefulWidget {
 }
 
 class _DonationDriveDetailsState extends State<DonationDriveDetails> {
-  RouteModel donationDriveDetails = RouteModel("Donation Details",
-      "/donation-drive-details", const DonationDriveDetails());
+  RouteModel donationDriveDetails =
+      RouteModel("Donation Details", "/donation-drive-details");
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: MainDrawer(routes: [
+        RouteModel("Home", "/"),
+        RouteModel("Logout", "/login"),
+      ]),
       appBar: AppBar(
         title: const Text("Donation Drive Details"),
       ),
