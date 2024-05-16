@@ -126,6 +126,8 @@ class _OrgHomePageState extends State<OrgHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: MainDrawer(routes: [
+        RouteModel("Profile", "/org-profile"),
+        RouteModel("Donation Drive Details Test", "/donation-drive-details"),
         RouteModel("Logout", "/login"),
       ]),
       appBar: AppBar(
