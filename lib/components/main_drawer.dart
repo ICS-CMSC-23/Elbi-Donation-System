@@ -30,6 +30,10 @@ class _MainDrawerState extends State<MainDrawer> {
                 return ListTile(
                     title: Text(widget.routes[index].name),
                     onTap: () {
+                      if (widget.routes[index].path == "/login") {
+                        Navigator.pushNamedAndRemoveUntil(
+                            context, "/login", (r) => false);
+                      }
                       Navigator.pushNamed(context, widget.routes[index].path);
                     });
               })
