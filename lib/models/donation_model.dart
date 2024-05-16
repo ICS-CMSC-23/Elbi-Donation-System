@@ -28,6 +28,7 @@ class Donation {
 
   Donation({
     this.id,
+    this.donationDriveId,
     required this.description,
     required this.donorId,
     required this.category,

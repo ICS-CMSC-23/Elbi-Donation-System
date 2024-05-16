@@ -3,6 +3,7 @@ import '../models/donation_model.dart';
 List<Donation> dummyDonations = [
   Donation(
     id: "donation_0",
+    donationDriveId: "1",
     description:
         "This is the desciption of the donation. Thank you for accepting this donation.",
     donorId: "donor_64",
@@ -22,6 +23,7 @@ List<Donation> dummyDonations = [
   ),
   Donation(
     id: "donation_1",
+    donationDriveId: "10",
     description:
         "This is the desciption of the donation. Thank you for accepting this donation.",
     donorId: "donor_6",
@@ -39,6 +41,7 @@ List<Donation> dummyDonations = [
   ),
   Donation(
     id: "donation_2",
+    donationDriveId: "1",
     description:
         "This is the desciption of the donation. Thank you for accepting this donation.",
     donorId: "donor_45",
@@ -59,6 +62,7 @@ List<Donation> dummyDonations = [
   ),
   Donation(
     id: "donation_3",
+    donationDriveId: "2",
     description:
         "This is the desciption of the donation. Thank you for accepting this donation.",
     donorId: "donor_25",
@@ -75,6 +79,7 @@ List<Donation> dummyDonations = [
   ),
   Donation(
     id: "donation_4",
+    donationDriveId: "3",
     description:
         "This is the desciption of the donation. Thank you for accepting this donation.",
     donorId: "donor_93",
@@ -92,6 +97,7 @@ List<Donation> dummyDonations = [
   ),
   Donation(
     id: "donation_5",
+    donationDriveId: "2",
     description:
         "This is the desciption of the donation. Thank you for accepting this donation.",
     donorId: "donor_24",
@@ -109,6 +115,7 @@ List<Donation> dummyDonations = [
   ),
   Donation(
     id: "donation_6",
+    donationDriveId: "3",
     description:
         "This is the desciption of the donation. Thank you for accepting this donation.",
     donorId: "donor_12",
@@ -126,6 +133,7 @@ List<Donation> dummyDonations = [
   ),
   Donation(
     id: "donation_7",
+    donationDriveId: "3",
     description:
         "This is the desciption of the donation. Thank you for accepting this donation.",
     donorId: "donor_14",
@@ -143,6 +151,7 @@ List<Donation> dummyDonations = [
   ),
   Donation(
     id: "donation_8",
+    donationDriveId: "4",
     description:
         "This is the desciption of the donation. Thank you for accepting this donation.",
     donorId: "donor_44",
@@ -161,6 +170,7 @@ List<Donation> dummyDonations = [
   ),
   Donation(
     id: "donation_9",
+    donationDriveId: "4",
     description:
         "This is the desciption of the donation. Thank you for accepting this donation.",
     donorId: "donor_76",
