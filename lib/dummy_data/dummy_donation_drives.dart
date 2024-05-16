@@ -1,6 +1,6 @@
 import '../models/donation_drive_model.dart';
 
-List<DonationDrive> drives = [
+List<DonationDrive> dummyDonationDrives = [
   DonationDrive(
     id: '1',
     organizationId: 'org1',

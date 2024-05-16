@@ -2,7 +2,7 @@ import 'package:elbi_donation_system/components/rounded_image.dart';
 import 'package:elbi_donation_system/dummy_data/dummy_donations.dart';
 import 'package:elbi_donation_system/models/donation_model.dart';
 import 'package:elbi_donation_system/providers/donation_list_provider.dart';
-import 'package:flutter/widgets.dart';
+import 'package:elbi_donation_system/providers/user_list_provider.dart';
 import 'package:provider/provider.dart';
 import '../models/user_model.dart';
 
@@ -24,21 +24,7 @@ class DonorProfilePage extends StatefulWidget {
 class _DonorProfilePageState extends State<DonorProfilePage> {
   @override
   Widget build(BuildContext context) {
-    User dummyUser = User(
-      address: [
-        "Blk 11, Lot 10, Camella Homes, Brgy. Cabuco, TMC",
-        "Brgy. Batong Malake, Men's Residence Hall",
-      ],
-      name: "Jomar Monreal",
-      username: "Jomamos",
-      email: "jpmonreal@up.edu.ph",
-      password: "12345678",
-      contactNo: '09762946252',
-      role: 'donor',
-      about: "My dream is to become a potato with crispy texture.",
-      profilePhoto:
-          "https://i.pinimg.com/originals/f5/24/e1/f524e1e728b829b039c84f5ee4f1478a.webp",
-    );
+    User user = context.watch<UserListProvider>().currentUser;
 
     List<Donation> userDonations = dummyDonations;
 
@@ -57,12 +43,12 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               HeaderWithPic(
-                imageUrl: dummyUser.profilePhoto ?? "",
-                title: dummyUser.name,
-                subtitle: dummyUser.username,
-                description: dummyUser.about ?? "No biography to display...",
+                imageUrl: user.profilePhoto ?? "",
+                title: user.name,
+                subtitle: user.username,
+                description: user.about ?? "No biography to display...",
               ),
-              TitleDetailList(title: "Address", detailList: dummyUser.address),
+              TitleDetailList(title: "Address", detailList: user.address),
               const TitleDetail(
                 title: "Contact Number",
                 detail: "09762946252",
