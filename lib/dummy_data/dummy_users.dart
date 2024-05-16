@@ -19,7 +19,7 @@ List<User> dummyUsers = [
   ),
   User(
     id: '2',
-    name: 'Jane Smith',
+    name: 'Jane Smith Organization',
     username: 'janesmith',
     password: '12345678',
     address: ['456 Oak Avenue', 'Springfield', 'IL', '62704'],
