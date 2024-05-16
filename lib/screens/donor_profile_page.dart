@@ -1,6 +1,9 @@
 import 'package:elbi_donation_system/components/rounded_image.dart';
 import 'package:elbi_donation_system/dummy_data/dummy_donations.dart';
 import 'package:elbi_donation_system/models/donation_model.dart';
+import 'package:elbi_donation_system/providers/donation_list_provider.dart';
+import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 import '../models/user_model.dart';
 
 import '../components/main_drawer.dart';
@@ -47,58 +50,53 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
         appBar: AppBar(
           title: const Text("Donor Profile Page"),
         ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                HeaderWithPic(
-                  imageUrl: dummyUser.profilePhoto ?? "",
-                  title: dummyUser.name,
-                  subtitle: dummyUser.username,
-                  description: dummyUser.about ?? "No biography to display...",
+        body: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              HeaderWithPic(
+                imageUrl: dummyUser.profilePhoto ?? "",
+                title: dummyUser.name,
+                subtitle: dummyUser.username,
+                description: dummyUser.about ?? "No biography to display...",
+              ),
+              TitleDetailList(title: "Address", detailList: dummyUser.address),
+              const TitleDetail(
+                title: "Contact Number",
+                detail: "09762946252",
+              ),
+              const Padding(
+                padding: EdgeInsets.only(top: 20),
+                child: Text(
+                  "Your Donations",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
-                TitleDetailList(
-                    title: "Address", detailList: dummyUser.address),
-                const TitleDetail(
-                  title: "Contact Number",
-                  detail: "09762946252",
-                ),
-                const Padding(
-                  padding: EdgeInsets.only(top: 20),
-                  child: Text(
-                    "Your Donations",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: SizedBox(
-                    height: 500,
-                    child: ListView.builder(
-                        itemCount: userDonations.length,
-                        itemBuilder: (context, index) {
-                          return ListTile(
-                            leading: RoundedImage(
-                                source: userDonations[index].photos![0],
-                                size: 50),
-                            title: Text(userDonations[index].category),
-                            subtitle: Text(userDonations[index].description),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.card_giftcard_outlined),
-                              onPressed: () {
-                                Navigator.pushNamed(
-                                    context, "/donation-details");
-                              },
-                            ),
-                          );
-                        }),
-                  ),
-                )
-              ],
-            ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                    itemCount: userDonations.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        leading: RoundedImage(
+                            source: userDonations[index].photos![0], size: 50),
+                        title: Text(userDonations[index].category),
+                        subtitle: Text(userDonations[index].description),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.card_giftcard_outlined),
+                          onPressed: () {
+                            context
+                                .read<DonationListProvider>()
+                                .setCurrentDonation(
+                                    userDonations[index].id ?? "donation_0");
+                            Navigator.pushNamed(context, "/donation-details");
+                          },
+                        ),
+                      );
+                    }),
+              )
+            ],
           ),
         ));
   }
