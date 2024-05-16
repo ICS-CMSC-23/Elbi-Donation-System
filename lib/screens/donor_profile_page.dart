@@ -25,8 +25,27 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
   @override
   Widget build(BuildContext context) {
     User user = context.watch<UserListProvider>().currentUser;
+    Row actionButtons;
+    if (user.role == "donor") {
+      actionButtons = Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          TextButton.icon(
+              onPressed: () {},
+              icon: const Icon(Icons.edit),
+              label: const Text("Edit Profile")),
+        ],
+      );
+    } else {
+      actionButtons = const Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [],
+      );
+    }
 
-    List<Donation> userDonations = dummyDonations;
+    List<Donation> userDonations = dummyDonations
+        .where((donation) => donation.donorId == user.id)
+        .toList();
 
     return Scaffold(
         drawer: MainDrawer(routes: [
@@ -53,6 +72,7 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
                 title: "Contact Number",
                 detail: "09762946252",
               ),
+              actionButtons,
               const Padding(
                 padding: EdgeInsets.only(top: 20),
                 child: Text(
@@ -81,7 +101,7 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
                         ),
                       );
                     }),
-              )
+              ),
             ],
           ),
         ));
