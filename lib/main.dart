@@ -1,3 +1,4 @@
+import 'package:elbi_donation_system/providers/donation_list_provider.dart';
 import 'package:elbi_donation_system/providers/user_list_provider.dart';
 import 'package:elbi_donation_system/screens/admin_home_page.dart';
 import 'package:elbi_donation_system/screens/donor_home_page.dart';
@@ -16,6 +17,7 @@ import "package:provider/provider.dart";
 void main() {
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => UserListProvider()),
+    ChangeNotifierProvider(create: (context) => DonationListProvider()),
   ], child: const MyApp()));
 }
 
