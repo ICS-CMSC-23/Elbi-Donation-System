@@ -4,10 +4,10 @@ import 'package:elbi_donation_system/components/title_detail.dart';
 import 'package:elbi_donation_system/components/title_detail_list.dart';
 import 'package:elbi_donation_system/dummy_data/dummy_donations.dart';
 import 'package:elbi_donation_system/models/donation_model.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:elbi_donation_system/providers/donation_list_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../models/route_model.dart';
 
 class DonationDetails extends StatefulWidget {
@@ -27,7 +27,8 @@ class DonationDetails extends StatefulWidget {
 class _DonationDetailsState extends State<DonationDetails> {
   @override
   Widget build(BuildContext context) {
-    Donation dummyDonation = dummyDonations[1];
+    Donation dummyDonation =
+        context.watch<DonationListProvider>().currentDonation;
     String userType = "donor"; //donor, organization, admin
     Row actionButtons;
     if (userType == "donor") {
@@ -36,12 +37,12 @@ class _DonationDetailsState extends State<DonationDetails> {
         children: [
           TextButton.icon(
               onPressed: () {},
-              icon: Icon(Icons.edit),
-              label: Text("Edit Donation")),
+              icon: const Icon(Icons.edit),
+              label: const Text("Edit Donation")),
           TextButton.icon(
             onPressed: () {},
-            icon: Icon(Icons.delete_rounded),
-            label: Text("Cancel Donation"),
+            icon: const Icon(Icons.delete_rounded),
+            label: const Text("Cancel Donation"),
             style: ButtonStyle(
                 foregroundColor: MaterialStatePropertyAll(
                     Theme.of(context).colorScheme.error)),
@@ -54,8 +55,8 @@ class _DonationDetailsState extends State<DonationDetails> {
         children: [
           TextButton.icon(
             onPressed: () {},
-            icon: Icon(Icons.delete_rounded),
-            label: Text("Cancel Donation"),
+            icon: const Icon(Icons.delete_rounded),
+            label: const Text("Cancel Donation"),
             style: ButtonStyle(
                 foregroundColor: MaterialStatePropertyAll(
                     Theme.of(context).colorScheme.error)),
@@ -120,6 +121,25 @@ class _DonationDetailsState extends State<DonationDetails> {
               ),
               TitleDetailList(
                   title: "Address", detailList: dummyDonation.addresses),
+              const Text(
+                "Photo Details",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3),
+                  itemCount: dummyDonation.photos?.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Padding(
+                        padding: const EdgeInsets.all(5.00),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10.0),
+                          child: Image.network(dummyDonation.photos![index],
+                              fit: BoxFit.cover),
+                        ));
+                  }),
               actionButtons
             ],
           ),
