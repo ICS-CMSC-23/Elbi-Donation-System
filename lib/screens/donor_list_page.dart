@@ -81,6 +81,7 @@ class _DonorListPageState extends State<DonorListPage> {
                   borderRadius: customBorder,
                 ),
                 child: InkWell(
+                  splashColor: Theme.of(context).colorScheme.primary,
                   borderRadius: customBorder,
                   onTap: () {/*for effects only*/},
                   child: Center(
@@ -96,13 +97,18 @@ class _DonorListPageState extends State<DonorListPage> {
                       ),
                       trailing: ElevatedButton(
                         style: ButtonStyle(
-                          elevation: WidgetStateProperty.all(0),
-                          shape:
-                              WidgetStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20.0)),
-                          ),
-                        ),
+                            elevation: WidgetStateProperty.all(0),
+                            shape:
+                                WidgetStateProperty.all<RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20.0)),
+                            ),
+                            overlayColor:
+                                WidgetStateProperty.resolveWith((states) {
+                              return states.contains(WidgetState.pressed)
+                                  ? Theme.of(context).cardColor
+                                  : null;
+                            })),
                         onPressed: () {
                           // Navigate to donor profile page
                         },
