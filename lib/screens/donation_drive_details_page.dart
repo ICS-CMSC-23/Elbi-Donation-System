@@ -1,5 +1,13 @@
+import 'package:elbi_donation_system/components/header_with_pic.dart';
 import 'package:elbi_donation_system/components/main_drawer.dart';
+import 'package:elbi_donation_system/components/title_detail.dart';
+import 'package:elbi_donation_system/models/donation_drive_model.dart';
+import 'package:elbi_donation_system/providers/donation_drive_list_provider.dart';
+import 'package:elbi_donation_system/providers/user_list_provider.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../models/route_model.dart';
 
 class DonationDriveDetails extends StatefulWidget {
@@ -22,6 +30,55 @@ class _DonationDriveDetailsState extends State<DonationDriveDetails> {
 
   @override
   Widget build(BuildContext context) {
+    DonationDrive donationDrive =
+        context.watch<DonationDriveListProvider>().currentDonationDrive;
+    String userType = context
+        .watch<UserListProvider>()
+        .currentUser
+        .role; //donor, organization, admin
+    Row actionButtons;
+    if (userType == "organization") {
+      actionButtons = Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Flexible(
+            child: TextButton.icon(
+                onPressed: () {},
+                icon: const Icon(Icons.edit),
+                label: const Text("Edit Donation Drive")),
+          ),
+          Flexible(
+            child: TextButton.icon(
+              onPressed: () {},
+              icon: const Icon(Icons.delete_rounded),
+              label: const Text("Delete Donation Drive"),
+              style: ButtonStyle(
+                  foregroundColor: MaterialStatePropertyAll(
+                      Theme.of(context).colorScheme.error)),
+            ),
+          )
+        ],
+      );
+    } else if (userType == "donor") {
+      actionButtons = Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          TextButton.icon(
+            onPressed: () {},
+            icon: const Icon(Icons.add),
+            label: const Text("Add Donation"),
+            style: ButtonStyle(
+                foregroundColor: MaterialStatePropertyAll(
+                    Theme.of(context).colorScheme.error)),
+          ),
+        ],
+      );
+    } else {
+      actionButtons = const Row(
+        children: [],
+      );
+    }
+
     return Scaffold(
       drawer: MainDrawer(routes: [
         RouteModel("Home", "/"),
@@ -30,7 +87,68 @@ class _DonationDriveDetailsState extends State<DonationDriveDetails> {
       appBar: AppBar(
         title: const Text("Donation Drive Details"),
       ),
-      body: const Center(child: Text("Insert something here")),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              HeaderWithPic(
+                  imageUrl: donationDrive.photos![0],
+                  title: donationDrive.name,
+                  subtitle: donationDrive.isCompleted
+                      ? "Event Finished"
+                      : "Event Ongoing",
+                  description:
+                      "Organization: ${context.read<UserListProvider>().userList.firstWhere((user) => user.id == donationDrive.organizationId).name}"),
+              TitleDetail(
+                title: "Description",
+                detail: donationDrive.description,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: TitleDetail(
+                        title: "Start Date",
+                        detail: DateFormat("yy-MM-dd")
+                            .format(donationDrive.startDate)),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: TitleDetail(
+                        title: "End Date",
+                        detail: DateFormat("yy-MM-dd")
+                            .format(donationDrive.endDate)),
+                  ),
+                ],
+              ),
+              const Text(
+                "Photo Details",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3),
+                  itemCount: donationDrive.photos?.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Padding(
+                        padding: const EdgeInsets.all(5.00),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10.0),
+                          child: Image.network(donationDrive.photos![index],
+                              fit: BoxFit.cover),
+                        ));
+                  }),
+              actionButtons
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

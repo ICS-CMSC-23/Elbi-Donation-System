@@ -6,6 +6,7 @@ import 'package:elbi_donation_system/screens/donor_home_page.dart';
 import 'package:elbi_donation_system/screens/donor_profile_page.dart';
 import 'package:elbi_donation_system/screens/log_in_page.dart';
 import 'package:elbi_donation_system/screens/org_home_page.dart';
+import 'package:elbi_donation_system/screens/org_profile_page.dart';
 import 'package:elbi_donation_system/screens/sign_up_page.dart';
 import 'package:elbi_donation_system/screens/donation_details_page.dart';
 import 'package:elbi_donation_system/screens/donation_drive_details_page.dart';
@@ -31,7 +32,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Elbi Donation System',
-      initialRoute: '/login',
+      initialRoute: '/',
       theme: blueTheme(),
       routes: {
         '/': (context) => context.watch<UserListProvider>().homeElement,
@@ -41,6 +42,7 @@ class MyApp extends StatelessWidget {
         '/org-home-page': (context) => const OrgHomePage(),
         '/donation-details': (context) => const DonationDetails(),
         '/donor-profile': (context) => const DonorProfilePage(),
+        '/org-profile': (context) => const OrgProfilePage(),
         '/donation-drive-details': (context) => const DonationDriveDetails(),
       },
     );

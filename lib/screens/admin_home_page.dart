@@ -14,6 +14,8 @@ class _AdminHomePageState extends State<AdminHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         drawer: MainDrawer(routes: [
+          RouteModel("Org Profile Test", "/org-profile"),
+          RouteModel("Donor Profile Test", "/donor-profile"),
           RouteModel("Logout", "/login"),
         ]),
         appBar: AppBar(
