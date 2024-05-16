@@ -10,7 +10,8 @@ List<User> dummyUsers = [
     contactNo: '123-456-7890',
     role: 'donor',
     email: 'donor@example.com',
-    profilePhoto: 'avatar1.jpg',
+    profilePhoto:
+        'https://i.pinimg.com/originals/f5/24/e1/f524e1e728b829b039c84f5ee4f1478a.webp',
     about: 'A kind-hearted donor',
     proofsOfLegitimacy: ['legitimacy1.jpg'],
     isApproved: true,
@@ -25,7 +26,8 @@ List<User> dummyUsers = [
     contactNo: '987-654-3210',
     role: 'organization',
     email: 'organization@example.com',
-    profilePhoto: 'avatar2.jpg',
+    profilePhoto:
+        'https://i.pinimg.com/originals/f5/24/e1/f524e1e728b829b039c84f5ee4f1478a.webp',
     about: 'Helping hands organization',
     proofsOfLegitimacy: ['proof1.jpg', 'proof2.jpg'],
     isApproved: true,
@@ -40,7 +42,8 @@ List<User> dummyUsers = [
     contactNo: '555-123-4567',
     role: 'admin',
     email: 'admin@example.com',
-    profilePhoto: 'avatar3.jpg',
+    profilePhoto:
+        'https://i.pinimg.com/originals/f5/24/e1/f524e1e728b829b039c84f5ee4f1478a.webp',
     about: 'Admin of the platform',
     proofsOfLegitimacy: ['adminproof1.jpg'],
     isApproved: true,
@@ -55,7 +58,8 @@ List<User> dummyUsers = [
     contactNo: '555-765-4321',
     role: 'donor',
     email: 'bobbrown@example.com',
-    profilePhoto: 'avatar4.jpg',
+    profilePhoto:
+        'https://i.pinimg.com/originals/f5/24/e1/f524e1e728b829b039c84f5ee4f1478a.webp',
     about: 'Enthusiastic donor',
     proofsOfLegitimacy: ['legitimacy2.jpg'],
     isApproved: true,
@@ -70,7 +74,8 @@ List<User> dummyUsers = [
     contactNo: '555-234-5678',
     role: 'organization',
     email: 'carolw@example.com',
-    profilePhoto: 'avatar5.jpg',
+    profilePhoto:
+        'https://i.pinimg.com/originals/f5/24/e1/f524e1e728b829b039c84f5ee4f1478a.webp',
     about: 'Food for All initiative',
     proofsOfLegitimacy: ['proof3.jpg', 'proof4.jpg'],
     isApproved: true,
@@ -85,7 +90,8 @@ List<User> dummyUsers = [
     contactNo: '555-345-6789',
     role: 'admin',
     email: 'davidg@example.com',
-    profilePhoto: 'avatar6.jpg',
+    profilePhoto:
+        'https://i.pinimg.com/originals/f5/24/e1/f524e1e728b829b039c84f5ee4f1478a.webp',
     about: 'Senior admin',
     proofsOfLegitimacy: ['adminproof2.jpg'],
     isApproved: true,
@@ -100,7 +106,8 @@ List<User> dummyUsers = [
     contactNo: '555-456-7890',
     role: 'donor',
     email: 'evab@example.com',
-    profilePhoto: 'avatar7.jpg',
+    profilePhoto:
+        'https://i.pinimg.com/originals/f5/24/e1/f524e1e728b829b039c84f5ee4f1478a.webp',
     about: 'Charity supporter',
     proofsOfLegitimacy: ['legitimacy3.jpg'],
     isApproved: true,
@@ -115,7 +122,8 @@ List<User> dummyUsers = [
     contactNo: '555-567-8901',
     role: 'organization',
     email: 'frankb@example.com',
-    profilePhoto: 'avatar8.jpg',
+    profilePhoto:
+        'https://i.pinimg.com/originals/f5/24/e1/f524e1e728b829b039c84f5ee4f1478a.webp',
     about: 'Clothes for Everyone',
     proofsOfLegitimacy: ['proof5.jpg', 'proof6.jpg'],
     isApproved: true,
@@ -130,7 +138,8 @@ List<User> dummyUsers = [
     contactNo: '555-678-9012',
     role: 'donor',
     email: 'gracer@example.com',
-    profilePhoto: 'avatar9.jpg',
+    profilePhoto:
+        'https://i.pinimg.com/originals/f5/24/e1/f524e1e728b829b039c84f5ee4f1478a.webp',
     about: 'Regular donor',
     proofsOfLegitimacy: ['legitimacy4.jpg'],
     isApproved: true,
@@ -145,7 +154,8 @@ List<User> dummyUsers = [
     contactNo: '555-789-0123',
     role: 'admin',
     email: 'henryp@example.com',
-    profilePhoto: 'avatar10.jpg',
+    profilePhoto:
+        'https://i.pinimg.com/originals/f5/24/e1/f524e1e728b829b039c84f5ee4f1478a.webp',
     about: 'Platform admin',
     proofsOfLegitimacy: ['adminproof3.jpg'],
     isApproved: true,

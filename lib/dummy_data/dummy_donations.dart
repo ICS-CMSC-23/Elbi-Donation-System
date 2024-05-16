@@ -6,7 +6,7 @@ List<Donation> dummyDonations = [
     donationDriveId: "1",
     description:
         "This is the desciption of the donation. Thank you for accepting this donation.",
-    donorId: "donor_64",
+    donorId: "1",
     category: "Clothes",
     isForPickup: false,
     weightInKg: 48.0,
@@ -26,7 +26,7 @@ List<Donation> dummyDonations = [
     donationDriveId: "10",
     description:
         "This is the desciption of the donation. Thank you for accepting this donation.",
-    donorId: "donor_6",
+    donorId: "1",
     category: "Food",
     isForPickup: false,
     weightInKg: 47.0,
@@ -44,7 +44,7 @@ List<Donation> dummyDonations = [
     donationDriveId: "1",
     description:
         "This is the desciption of the donation. Thank you for accepting this donation.",
-    donorId: "donor_45",
+    donorId: "2",
     category: "Necessities",
     isForPickup: false,
     weightInKg: 38.0,
@@ -65,7 +65,7 @@ List<Donation> dummyDonations = [
     donationDriveId: "2",
     description:
         "This is the desciption of the donation. Thank you for accepting this donation.",
-    donorId: "donor_25",
+    donorId: "2",
     category: "Cash",
     isForPickup: false,
     weightInKg: 18.0,
@@ -82,7 +82,7 @@ List<Donation> dummyDonations = [
     donationDriveId: "3",
     description:
         "This is the desciption of the donation. Thank you for accepting this donation.",
-    donorId: "donor_93",
+    donorId: "3",
     category: "Clothes",
     isForPickup: true,
     weightInKg: 3.0,
@@ -100,7 +100,7 @@ List<Donation> dummyDonations = [
     donationDriveId: "2",
     description:
         "This is the desciption of the donation. Thank you for accepting this donation.",
-    donorId: "donor_24",
+    donorId: "3",
     category: "Cash",
     isForPickup: true,
     weightInKg: 36.0,
@@ -118,7 +118,7 @@ List<Donation> dummyDonations = [
     donationDriveId: "3",
     description:
         "This is the desciption of the donation. Thank you for accepting this donation.",
-    donorId: "donor_12",
+    donorId: "3",
     category: "Necessities",
     isForPickup: true,
     weightInKg: 31.0,
@@ -136,7 +136,7 @@ List<Donation> dummyDonations = [
     donationDriveId: "3",
     description:
         "This is the desciption of the donation. Thank you for accepting this donation.",
-    donorId: "donor_14",
+    donorId: "1",
     category: "Cash",
     isForPickup: true,
     weightInKg: 36.0,
@@ -151,7 +151,7 @@ List<Donation> dummyDonations = [
   ),
   Donation(
     id: "donation_8",
-    donationDriveId: "4",
+    donationDriveId: "3",
     description:
         "This is the desciption of the donation. Thank you for accepting this donation.",
     donorId: "donor_44",
@@ -173,7 +173,7 @@ List<Donation> dummyDonations = [
     donationDriveId: "4",
     description:
         "This is the desciption of the donation. Thank you for accepting this donation.",
-    donorId: "donor_76",
+    donorId: "3",
     category: "Food",
     isForPickup: false,
     weightInKg: 24.0,
