@@ -6,6 +6,7 @@ import '../../dummy_data/dummy_users.dart';
 import '../../components/bottom_scroll_view_widget.dart';
 import '../../components/list_page_sliver_app_bar.dart';
 import '../../components/list_page_header.dart';
+import '../../components/custom_tile_container.dart';
 
 class DonorListPage extends StatefulWidget {
   const DonorListPage({super.key});
@@ -32,81 +33,50 @@ class _DonorListPageState extends State<DonorListPage> {
 
   @override
   Widget build(BuildContext context) {
-    BorderRadius customBorder = const BorderRadius.only(
-      topLeft: Radius.circular(30),
-      topRight: Radius.circular(4),
-      bottomLeft: Radius.circular(4),
-      bottomRight: Radius.circular(30),
-    );
-
-    BorderRadius customBorderAlt = const BorderRadius.only(
-      topLeft: Radius.circular(4),
-      topRight: Radius.circular(30),
-      bottomLeft: Radius.circular(30),
-      bottomRight: Radius.circular(4),
-    );
-
     // build a widget that returns a list of donors
     Widget displayDonorList() {
       return SliverList(
         delegate: SliverChildBuilderDelegate(
           (BuildContext context, int index) {
-            return Padding(
-              padding: const EdgeInsets.only(
-                  left: 10, right: 10, top: 4, bottom: 10),
-              child: Container(
-                height: 100,
-                decoration: BoxDecoration(
-                  borderRadius:
-                      (index % 2 == 0) ? customBorder : customBorderAlt,
-                  color: Theme.of(context).colorScheme.surface, // white
-                ),
-                child: Card(
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        (index % 2 == 0) ? customBorder : customBorderAlt,
-                  ),
-                  child: InkWell(
-                    splashColor: Theme.of(context).colorScheme.primary,
-                    borderRadius:
-                        (index % 2 == 0) ? customBorder : customBorderAlt,
-                    onTap: () {/*for effects only*/},
-                    child: Center(
-                      child: ListTile(
-                        leading: RoundedImage(
-                          source: donors[index].profilePhoto!,
-                          size: 50,
-                        ),
-                        title: Text(donors[index].name),
-                        subtitle: Text(
-                          donors[index].username,
-                          style: const TextStyle(fontStyle: FontStyle.italic),
-                        ),
-                        trailing: ElevatedButton(
-                          style: ButtonStyle(
-                            elevation: WidgetStateProperty.all(0),
-                            shape:
-                                WidgetStateProperty.all<RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20.0),
-                              ),
-                            ),
-                            overlayColor: WidgetStateProperty.resolveWith(
-                              (states) {
-                                return states.contains(WidgetState.pressed)
-                                    ? Theme.of(context).cardColor
-                                    : null;
-                              },
-                            ),
+            return CustomTileContainer(
+              customBorder: CustomTileContainer.customBorderOne,
+              customBorderAlt: CustomTileContainer.customBorderTwo,
+              context: context,
+              index: index,
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 20, bottom: 20),
+                  child: ListTile(
+                    leading: RoundedImage(
+                      source: donors[index].profilePhoto!,
+                      size: 50,
+                    ),
+                    title: Text(donors[index].name),
+                    subtitle: Text(
+                      donors[index].username,
+                      style: const TextStyle(fontStyle: FontStyle.italic),
+                    ),
+                    trailing: ElevatedButton(
+                      style: ButtonStyle(
+                        elevation: WidgetStateProperty.all(0),
+                        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0),
                           ),
-                          onPressed: () {
-                            // Navigate to donor's profile page
-                            Navigator.pushNamed(context, '/donation-list-page');
+                        ),
+                        overlayColor: WidgetStateProperty.resolveWith(
+                          (states) {
+                            return states.contains(WidgetState.pressed)
+                                ? Theme.of(context).cardColor
+                                : null;
                           },
-                          child: const Text('View Profile'),
                         ),
                       ),
+                      onPressed: () {
+                        // Navigate to donor's profile page
+                        Navigator.pushNamed(context, '/donation-list-page');
+                      },
+                      child: const Text('View Profile'),
                     ),
                   ),
                 ),
