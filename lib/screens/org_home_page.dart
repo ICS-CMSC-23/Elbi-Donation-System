@@ -1,3 +1,5 @@
+import 'package:elbi_donation_system/components/main_drawer.dart';
+import 'package:elbi_donation_system/models/route_model.dart';
 import 'package:elbi_donation_system/providers/donation_drive_list_provider.dart';
 import '../screens/donor_profile_page.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +18,10 @@ class OrgHomePage extends StatelessWidget {
         Provider.of<DonationDriveListProvider>(context);
 
     return Scaffold(
+      drawer: MainDrawer(routes: [
+        RouteModel("Home", "/"),
+        RouteModel("Logout", "/login"),
+      ]),
       appBar: AppBar(
         title: const Text('Organization Home Page'),
       ),
