@@ -80,10 +80,15 @@ class _DonorHomePageState extends State<DonorHomePage> {
                             Center(
                                 child: Text(organizations[index].description)),
                             Center(
-                              child: TextButton.icon(
-                                  onPressed: () {},
-                                  icon: const Icon(Icons.handshake_rounded),
-                                  label: const Text("Donate")),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pushNamed(
+                                    context,
+                                    '/org-profile',
+                                  );
+                                },
+                                child: const Text("View Org"),
+                              ),
                             )
                           ],
                         ),
