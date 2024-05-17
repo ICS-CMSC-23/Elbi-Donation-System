@@ -181,7 +181,50 @@ class _DonationListPageState extends State<DonationListPage> {
       );
     }
 
-    displayAppBar() {
+    Widget displayAddDonationButton() {
+      if (currentUser.role == 'donor') {
+        return SizedBox(
+          height: 30,
+          child: ElevatedButton(
+            onPressed: () {
+              // Implement the functionality to add a donation
+            },
+            style: ButtonStyle(
+              shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.zero,
+                ),
+              ),
+              elevation: WidgetStateProperty.all<double>(0),
+              backgroundColor: WidgetStateProperty.resolveWith<Color>(
+                (Set<WidgetState> states) {
+                  if (states.contains(WidgetState.pressed)) {
+                    return Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withOpacity(0.8);
+                  }
+                  return Theme.of(context).colorScheme.surface;
+                },
+              ),
+            ),
+            child: const Center(
+              child: Text(
+                'Add Donation',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        );
+      } else {
+        return const SizedBox(); // Return an empty SizedBox if the user is not a donor
+      }
+    }
+
+    Widget displayAppBar() {
       return const ListPageSliverAppBar(
           title: 'Donations',
           backgroundWidget: ListPageHeader(
@@ -191,15 +234,22 @@ class _DonationListPageState extends State<DonationListPage> {
     }
 
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          displayAppBar(),
-          const SliverToBoxAdapter(
-            child: SizedBox(height: 10),
+      body: Column(
+        children: [
+          Expanded(
+            child: CustomScrollView(
+              slivers: [
+                displayAppBar(),
+                const SliverToBoxAdapter(
+                  child: SizedBox(height: 10),
+                ),
+                displayDonationList(),
+                BottomScrollViewWidget(
+                    listTitle: 'Donations', listLength: donations.length),
+              ],
+            ),
           ),
-          displayDonationList(),
-          BottomScrollViewWidget(
-              listTitle: 'Donations', listLength: donations.length),
+          displayAddDonationButton(),
         ],
       ),
     );
