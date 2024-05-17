@@ -69,10 +69,6 @@ class _DonationDetailsState extends State<DonationDetails> {
     }
 
     return Scaffold(
-      drawer: MainDrawer(routes: [
-        RouteModel("Home", "/"),
-        RouteModel("Logout", "/login"),
-      ]),
       appBar: AppBar(
         title: const Text("Donation Details"),
       ),

@@ -49,8 +49,8 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
 
     return Scaffold(
         drawer: MainDrawer(routes: [
-          RouteModel("Home", "/"),
           RouteModel("Logout", "/login"),
+          RouteModel("Home", "/"),
         ]),
         appBar: AppBar(
           title: const Text("Donor Profile Page"),

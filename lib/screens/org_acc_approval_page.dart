@@ -19,9 +19,9 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: MainDrawer(routes: [
-        RouteModel("Home", "/"),
-        RouteModel("Profile", "/donor-profile"),
         RouteModel("Logout", "/login"),
+        RouteModel("Profile", "/donor-profile"),
+        RouteModel("Home", "/"),
       ]),
       appBar: AppBar(
         title: const Text("Organization Account Approval Page"),

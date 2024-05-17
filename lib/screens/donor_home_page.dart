@@ -21,9 +21,9 @@ class _DonorHomePageState extends State<DonorHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: MainDrawer(routes: [
+        RouteModel("Logout", "/login"),
         RouteModel("Home", "/"),
         RouteModel("Profile", "/donor-profile"),
-        RouteModel("Logout", "/login"),
       ]),
       appBar: AppBar(
         title: const Text("Donor Home Page"),

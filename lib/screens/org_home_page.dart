@@ -19,8 +19,8 @@ class OrgHomePage extends StatelessWidget {
 
     return Scaffold(
       drawer: MainDrawer(routes: [
-        RouteModel("Home", "/"),
         RouteModel("Logout", "/login"),
+        RouteModel("Home", "/"),
       ]),
       appBar: AppBar(
         title: const Text('Organization Home Page'),

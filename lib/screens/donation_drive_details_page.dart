@@ -88,10 +88,6 @@ class _DonationDriveDetailsState extends State<DonationDriveDetails> {
     }
 
     return Scaffold(
-      drawer: MainDrawer(routes: [
-        RouteModel("Home", "/"),
-        RouteModel("Logout", "/login"),
-      ]),
       appBar: AppBar(
         title: const Text("Donation Drive Details"),
       ),
