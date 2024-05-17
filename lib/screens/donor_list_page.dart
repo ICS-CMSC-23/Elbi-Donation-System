@@ -159,7 +159,7 @@ class _DonorListPageState extends State<DonorListPage> {
               title: AnimatedOpacity(
                 duration: const Duration(milliseconds: 10),
                 opacity: top <= kToolbarHeight + 50 ? 1.0 : 0.0,
-                child: const Text("Donation List Page"),
+                child: Text(DonorListPage.route.name),
               ),
               centerTitle: false,
               background: displayHeader(),
