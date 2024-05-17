@@ -56,8 +56,13 @@ class OrgHomePage extends StatelessWidget {
                     trailing: SizedBox(
                       width: 50,
                       child: IconButton(
-                        icon: Icon(Icons.add_box),
+                        icon: const Icon(Icons.more_vert),
                         onPressed: () {
+                          context
+                              .read<DonationDriveListProvider>()
+                              .setCurrentDonationDrive(donationDriveListProvider
+                                      .donationDriveList[index].id ??
+                                  "1");
                           Navigator.pushNamed(
                               context, "/donation-drive-details");
                         },
