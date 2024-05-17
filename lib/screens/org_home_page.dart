@@ -12,26 +12,12 @@ class OrgHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Accessing DonationDriveListProvider
-    final donationDriveListProvider = Provider.of<DonationDriveListProvider>(context);
+    final donationDriveListProvider =
+        Provider.of<DonationDriveListProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Organization Home Page'),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              onPressed: () {
-                // Navigate to Donor Profile Page
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const DonorProfilePage()),
-                );
-              },
-              child: const Text('Profile'),
-            ),
-          ),
-        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -43,7 +29,8 @@ class OrgHomePage extends StatelessWidget {
                 // Navigate to Donor Profile Page
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const DonorProfilePage()),
+                  MaterialPageRoute(
+                      builder: (context) => const DonorProfilePage()),
                 );
               },
               child: const Text('Profile Page'),
@@ -53,7 +40,8 @@ class OrgHomePage extends StatelessWidget {
             child: ListView.builder(
               itemCount: donationDriveListProvider.donationDriveList.length,
               itemBuilder: (context, index) {
-                final donationDrive = donationDriveListProvider.donationDriveList[index];
+                final donationDrive =
+                    donationDriveListProvider.donationDriveList[index];
                 return Card(
                   child: ListTile(
                     title: Text(donationDrive.name),
@@ -65,16 +53,15 @@ class OrgHomePage extends StatelessWidget {
                         fit: BoxFit.cover,
                       ),
                     ),
-                    trailing: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const DonationDriveDetails(),
-                          ),
-                        );
-                      },
-                      child: const Text('View Donation Drive'),
+                    trailing: SizedBox(
+                      width: 50,
+                      child: IconButton(
+                        icon: Icon(Icons.add_box),
+                        onPressed: () {
+                          Navigator.pushNamed(
+                              context, "/donation-drive-details");
+                        },
+                      ),
                     ),
                   ),
                 );
