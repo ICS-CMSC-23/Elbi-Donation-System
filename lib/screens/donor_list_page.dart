@@ -19,14 +19,6 @@ class DonorListPage extends StatefulWidget {
 }
 
 class _DonorListPageState extends State<DonorListPage> {
-  // page specifications
-  // List of donors
-  // Each tile/card must have
-  //   Donor image
-  //   Donor Name
-  //   View Donor button
-  //   Link to Donor Profile Page
-
   // get dummy data for donors
   List<User> users = dummyUsers;
   // only get the donors
@@ -178,20 +170,21 @@ class _DonorListPageState extends State<DonorListPage> {
     }
 
     Widget displayFooter() {
-      return Container(
-        height: 20,
-        decoration: BoxDecoration(color: Theme.of(context).cardColor),
-        child: Center(
-          child: Text(
-            "Donors: ${donors.length}",
-            style: const TextStyle(fontSize: 12),
+      return SliverToBoxAdapter(
+        child: Container(
+          height: 20,
+          decoration: BoxDecoration(color: Theme.of(context).cardColor),
+          child: Center(
+            child: Text(
+              "Donors: ${donors.length}",
+              style: const TextStyle(fontSize: 12),
+            ),
           ),
         ),
       );
     }
 
     return Scaffold(
-      // appBar: AppBar(title: const Text('Donation List Page')),
       body: CustomScrollView(
         slivers: [
           displayAppBar(),
@@ -199,9 +192,7 @@ class _DonorListPageState extends State<DonorListPage> {
             child: SizedBox(height: 10),
           ),
           displayDonorList(),
-          SliverToBoxAdapter(
-            child: displayFooter(),
-          ),
+          displayFooter(),
         ],
       ),
     );
