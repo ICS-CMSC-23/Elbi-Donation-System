@@ -162,7 +162,36 @@ class _DonationListPageState extends State<DonationListPage> {
                               IconButton(
                                 icon: const Icon(Icons.delete),
                                 onPressed: () {
-                                  // Implement delete functionality
+                                  // Show confirmation dialog before deletion
+                                  showDialog(
+                                    context: context,
+                                    barrierDismissible: false,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: const Text('Confirm Deletion'),
+                                        content: const Text(
+                                            'Are you sure you want to delete this donation?'),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              // Dismiss the dialog
+                                              Navigator.pop(context);
+                                            },
+                                            child: const Text('Cancel'),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              // Implement delete functionality
+                                              // not yet implemented
+                                              // Close the dialog
+                                              Navigator.pop(context);
+                                            },
+                                            child: const Text('Delete'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
                                 },
                               ),
                             ],
