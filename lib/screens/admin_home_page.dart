@@ -23,14 +23,6 @@ class _AdminHomePageState extends State<AdminHomePage> {
       ),
       appBar: AppBar(
         title: const Text("Admin Home Page"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.person),
-            onPressed: () {
-              // Navigate to Profile Page
-            },
-          ),
-        ],
       ),
       body: ListView.builder(
         itemCount: dummyOrgs.length,
