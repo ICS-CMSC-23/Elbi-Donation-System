@@ -91,7 +91,7 @@ class _DonorListPageState extends State<DonorListPage> {
       );
     }
 
-    displayAppBar() {
+    Widget displayAppBar() {
       return const ListPageSliverAppBar(
           title: "Donors",
           backgroundWidget:
