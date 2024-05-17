@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import '../../models/route_model.dart';
 import '../../models/donation_model.dart';
 import '../../dummy_data/dummy_donations.dart';
+import '../../providers/user_list_provider.dart';
+import '../../models/user_model.dart';
+import 'package:provider/provider.dart';
 
 class DonationListPage extends StatefulWidget {
   const DonationListPage({super.key});
@@ -23,6 +26,10 @@ class _DonationListPageState extends State<DonationListPage> {
 
   @override
   Widget build(BuildContext context) {
+    // get dummy user data
+    final userListProvider = context.watch<UserListProvider>();
+    User currentUser = userListProvider.currentUser;
+
     BorderRadius customBorder = const BorderRadius.only(
       topLeft: Radius.circular(30),
       topRight: Radius.circular(4),
@@ -151,7 +158,7 @@ class _DonationListPageState extends State<DonationListPage> {
                                     TextSpan(
                                       text: 'Donor $index\n',
                                     ),
-                                    TextSpan(
+                                    const TextSpan(
                                       text: 'Status: ',
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
@@ -163,7 +170,7 @@ class _DonationListPageState extends State<DonationListPage> {
                                         fontStyle: FontStyle.italic,
                                       ),
                                     ),
-                                    TextSpan(
+                                    const TextSpan(
                                       text: 'Description: ',
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
@@ -187,18 +194,19 @@ class _DonationListPageState extends State<DonationListPage> {
                                   onPressed: () {
                                     // Implement view full details functionality
                                   },
-                                  child: Text('View Full Details'),
+                                  child: const Text('View Full Details'),
                                 ),
                                 Row(
                                   children: [
+                                    if (currentUser.role == 'donor')
+                                      IconButton(
+                                        icon: const Icon(Icons.edit),
+                                        onPressed: () {
+                                          // Implement edit functionality
+                                        },
+                                      ),
                                     IconButton(
-                                      icon: Icon(Icons.edit),
-                                      onPressed: () {
-                                        // Implement edit functionality
-                                      },
-                                    ),
-                                    IconButton(
-                                      icon: Icon(Icons.delete),
+                                      icon: const Icon(Icons.delete),
                                       onPressed: () {
                                         // Implement delete functionality
                                       },
