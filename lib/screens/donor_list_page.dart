@@ -99,6 +99,7 @@ class _DonorListPageState extends State<DonorListPage> {
                           ),
                           onPressed: () {
                             // Navigate to donor's profile page
+                            Navigator.pushNamed(context, '/donation-list-page');
                           },
                           child: const Text('View Profile'),
                         ),
@@ -151,11 +152,16 @@ class _DonorListPageState extends State<DonorListPage> {
         pinned: true,
         centerTitle: false,
         expandedHeight: 200,
+        stretch: true,
         flexibleSpace: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
             var top = constraints.biggest.height;
             return FlexibleSpaceBar(
-              collapseMode: CollapseMode.parallax,
+              // stretchModes: const [
+              //   StretchMode.zoomBackground,
+              //   // StretchMode.blurBackground
+              // ],
+              // collapseMode: CollapseMode.parallax,
               title: AnimatedOpacity(
                 duration: const Duration(milliseconds: 10),
                 opacity: top <= kToolbarHeight + 50 ? 1.0 : 0.0,
@@ -170,22 +176,26 @@ class _DonorListPageState extends State<DonorListPage> {
     }
 
     Widget displayFooter() {
-      return SliverToBoxAdapter(
-        child: Container(
-          height: 20,
-          decoration: BoxDecoration(color: Theme.of(context).cardColor),
-          child: Center(
-            child: Text(
-              "Donors: ${donors.length}",
-              style: const TextStyle(fontSize: 12),
+      return SliverList(
+        delegate: SliverChildListDelegate(
+          [
+            Container(
+              decoration: BoxDecoration(color: Theme.of(context).cardColor),
+              child: Center(
+                child: Text(
+                  "Donors: ${donors.length}",
+                  style: const TextStyle(fontSize: 12),
+                ),
+              ),
             ),
-          ),
+          ],
         ),
       );
     }
 
     return Scaffold(
       body: CustomScrollView(
+        // physics: const BouncingScrollPhysics(),
         slivers: [
           displayAppBar(),
           const SliverToBoxAdapter(
