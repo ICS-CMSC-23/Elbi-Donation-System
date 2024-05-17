@@ -11,6 +11,8 @@ import 'package:elbi_donation_system/screens/org_profile_page.dart';
 import 'package:elbi_donation_system/screens/sign_up_page.dart';
 import 'package:elbi_donation_system/screens/donation_details_page.dart';
 import 'package:elbi_donation_system/screens/donation_drive_details_page.dart';
+import 'package:elbi_donation_system/themes/dark_purple_theme.dart';
+import 'package:elbi_donation_system/themes/purple_theme.dart';
 import 'package:elbi_donation_system/themes/sample_theme._2.dart';
 import 'package:elbi_donation_system/themes/sample_theme.dart';
 import 'package:elbi_donation_system/themes/sample_theme_3.dart';
@@ -34,7 +36,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Elbi Donation System',
       initialRoute: '/',
-      theme: blueTheme(),
+      theme: darkPurpleTheme(),
       routes: {
         '/': (context) => context.watch<UserListProvider>().homeElement,
         '/login': (context) => const LoginPage(),
