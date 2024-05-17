@@ -1,5 +1,5 @@
-import 'package:elbi_donation_system/models/route_model.dart';
 import 'package:flutter/material.dart';
+import '../models/route_model.dart';
 
 class MainDrawer extends StatefulWidget {
   final List<RouteModel> routes;
@@ -16,8 +16,9 @@ class _MainDrawerState extends State<MainDrawer> {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          const DrawerHeader(
-            child: Text(
+          DrawerHeader(
+            decoration: BoxDecoration(color: Theme.of(context).primaryColor),
+            child: const Text(
               "Elbi Donation System",
             ),
           ),
@@ -29,6 +30,10 @@ class _MainDrawerState extends State<MainDrawer> {
                 return ListTile(
                     title: Text(widget.routes[index].name),
                     onTap: () {
+                      if (widget.routes[index].path == "/login") {
+                        Navigator.pushNamedAndRemoveUntil(
+                            context, "/login", (r) => false);
+                      }
                       Navigator.pushNamed(context, widget.routes[index].path);
                     });
               })

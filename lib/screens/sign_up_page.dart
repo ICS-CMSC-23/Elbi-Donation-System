@@ -111,6 +111,8 @@
 //     );
 //   }
 // }
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 import '../components/main_drawer.dart';
 import '../models/route_model.dart';
 import 'donor_home_page.dart';
@@ -135,11 +137,22 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController orgNameController = TextEditingController();
   // final TextEditingController proofController = TextEditingController();
   bool isDonor = true;
+  File? _image;
 
-  RouteModel orgHomepage =
-      RouteModel("Home", "/org-home-page", const OrgHomePage());
-  RouteModel donorHomePage =
-      RouteModel("Home", "/donor-home-page", const DonorHomePage());
+  // RouteModel orgHomepage =
+  //     RouteModel("Home", "/org-home-page", const OrgHomePage());
+  // RouteModel donorHomePage =
+  //     RouteModel("Home", "/donor-home-page", const DonorHomePage());
+
+  Future<void> _pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        _image = File(image.path);
+      });
+    }
+  }
 
   void _resetForm() {
     _formKey.currentState?.reset();
@@ -149,16 +162,15 @@ class _SignUpPageState extends State<SignUpPage> {
     addressController.clear();
     contactNumberController.clear();
     orgNameController.clear();
-    proofController.clear();
+    // proofController.clear();
+    setState(() {
+      _image = null;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: MainDrawer(routes: [
-        orgHomepage,
-        RouteModel("Logout", "/", const LoginPage()),
-      ]),
       appBar: AppBar(
         title: const Text("Sign Up"),
       ),
@@ -235,6 +247,18 @@ class _SignUpPageState extends State<SignUpPage> {
                     }
                     return null;
                   },
+                ),
+                const SizedBox(height: 16),
+                GestureDetector(
+                  onTap: _pickImage,
+                  child: Container(
+                    height: 150,
+                    width: 150,
+                    color: Colors.grey[300],
+                    child: _image != null
+                        ? Image.file(_image!, fit: BoxFit.cover)
+                        : const Icon(Icons.camera_alt, color: Colors.grey),
+                  ),
                 ),
                 // const SizedBox(height: 16),
                 // TextFormField(
