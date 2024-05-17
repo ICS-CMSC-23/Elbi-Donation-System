@@ -4,6 +4,8 @@ import '../../models/user_model.dart';
 import '../../components/rounded_image.dart';
 import '../../dummy_data/dummy_users.dart';
 import '../../components/bottom_scroll_view_widget.dart';
+import '../../components/list_page_sliver_app_bar.dart';
+import '../../components/list_page_header.dart';
 
 class DonorListPage extends StatefulWidget {
   const DonorListPage({super.key});
@@ -116,64 +118,11 @@ class _DonorListPageState extends State<DonorListPage> {
       );
     }
 
-    Widget displayHeader() {
-      return Container(
-        decoration: BoxDecoration(color: Theme.of(context).cardColor),
-        child: Column(
-          children: [
-            const SizedBox(height: 75),
-            Row(
-              children: [
-                SizedBox(
-                  width: MediaQuery.of(context).size.width / 3,
-                  height: 125,
-                  child: const Center(
-                      child: Icon(
-                    Icons.people_rounded,
-                    size: 100,
-                  )),
-                ),
-                const Flexible(
-                  child: Text(
-                    "Manage Donors",
-                    style: TextStyle(fontSize: 30),
-                  ),
-                )
-              ],
-            ),
-          ],
-        ),
-      );
-    }
-
     displayAppBar() {
-      return SliverAppBar(
-        automaticallyImplyLeading: true,
-        elevation: 0,
-        pinned: true,
-        centerTitle: false,
-        expandedHeight: 200,
-        stretch: true,
-        flexibleSpace: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-            var top = constraints.biggest.height;
-            return FlexibleSpaceBar(
-              // stretchModes: const [
-              //   StretchMode.zoomBackground,
-              //   // StretchMode.blurBackground
-              // ],
-              // collapseMode: CollapseMode.parallax,
-              title: AnimatedOpacity(
-                duration: const Duration(milliseconds: 10),
-                opacity: top <= kToolbarHeight + 50 ? 1.0 : 0.0,
-                child: Text(DonorListPage.route.name),
-              ),
-              centerTitle: false,
-              background: displayHeader(),
-            );
-          },
-        ),
-      );
+      return const ListPageSliverAppBar(
+          title: "Donors",
+          backgroundWidget:
+              ListPageHeader(title: "Manage Donors", titleIcon: Icons.people));
     }
 
     return Scaffold(
