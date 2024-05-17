@@ -22,7 +22,7 @@ class _MainDrawerState extends State<MainDrawer> {
             decoration: BoxDecoration(color: Theme.of(context).primaryColor),
             child: const Text(
               "Elbi Donation System",
-              style: TextStyle(fontSize: 40),
+              style: TextStyle(fontSize: 40, color: Colors.white),
             ),
           ),
           Row(
@@ -32,7 +32,9 @@ class _MainDrawerState extends State<MainDrawer> {
                 child: Text("Dark Mode: "),
               ),
               Switch(
-                  value: true,
+                  inactiveTrackColor: Theme.of(context).primaryColor,
+                  activeColor: Theme.of(context).primaryColor,
+                  value: context.watch<ThemeProvider>().isDarkTheme,
                   onChanged: (e) {
                     context.read<ThemeProvider>().toggleDarkTheme();
                   })
