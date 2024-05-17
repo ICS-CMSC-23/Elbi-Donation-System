@@ -61,6 +61,13 @@ class _DonorListPageState extends State<DonorListPage> {
         bottomRight: Radius.circular(30),
       );
 
+      BorderRadius customBorderAlt = const BorderRadius.only(
+        topLeft: Radius.circular(4),
+        topRight: Radius.circular(30),
+        bottomLeft: Radius.circular(30),
+        bottomRight: Radius.circular(4),
+      );
+
       return ListView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
@@ -72,17 +79,19 @@ class _DonorListPageState extends State<DonorListPage> {
             child: Container(
               height: 100,
               decoration: BoxDecoration(
-                borderRadius: customBorder,
+                borderRadius: (index % 2 == 0) ? customBorder : customBorderAlt,
                 color: Theme.of(context).colorScheme.surface, // white
               ),
               child: Card(
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: customBorder,
+                  borderRadius:
+                      (index % 2 == 0) ? customBorder : customBorderAlt,
                 ),
                 child: InkWell(
                   splashColor: Theme.of(context).colorScheme.primary,
-                  borderRadius: customBorder,
+                  borderRadius:
+                      (index % 2 == 0) ? customBorder : customBorderAlt,
                   onTap: () {/*for effects only*/},
                   child: Center(
                     child: ListTile(
