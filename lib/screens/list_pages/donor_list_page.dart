@@ -7,6 +7,7 @@ import '../../components/bottom_scroll_view_widget.dart';
 import '../../components/list_page_sliver_app_bar.dart';
 import '../../components/list_page_header.dart';
 import '../../components/custom_tile_container.dart';
+import '../../screens/donor_profile_page.dart';
 
 class DonorListPage extends StatefulWidget {
   const DonorListPage({super.key});
@@ -74,7 +75,9 @@ class _DonorListPageState extends State<DonorListPage> {
                       ),
                       onPressed: () {
                         // Navigate to donor's profile page
-                        Navigator.pushNamed(context, '/donation-list-page');
+                        Navigator.pushNamed(
+                            context, DonorProfilePage.route.path);
+                        // Navigator.pushNamed(context, '/donation-list-page'); // for testing
                       },
                       child: const Text('View Profile'),
                     ),
