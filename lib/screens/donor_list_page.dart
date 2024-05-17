@@ -158,6 +158,19 @@ class _DonorListPageState extends State<DonorListPage> {
       );
     }
 
+    Widget displayFooter() {
+      return Container(
+        height: 20,
+        decoration: BoxDecoration(color: Theme.of(context).cardColor),
+        child: Center(
+          child: Text(
+            "Donors: ${donors.length}",
+            style: const TextStyle(fontSize: 12),
+          ),
+        ),
+      );
+    }
+
     // build a widget that returns a column of widgets in singlescrollview
     Widget buildSingleChildScrollView() {
       return SingleChildScrollView(
@@ -166,6 +179,7 @@ class _DonorListPageState extends State<DonorListPage> {
             displayHeader(),
             const SizedBox(height: 20),
             displayDonorList(),
+            displayFooter(),
           ],
         ),
       );
