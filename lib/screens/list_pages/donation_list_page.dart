@@ -6,6 +6,8 @@ import '../../dummy_data/dummy_donations.dart';
 import '../../providers/user_list_provider.dart';
 import '../../models/user_model.dart';
 import '../../components/bottom_scroll_view_widget.dart';
+import '../../components/list_page_sliver_app_bar.dart';
+import '../../components/list_page_header.dart';
 
 class DonationListPage extends StatefulWidget {
   const DonationListPage({super.key});
@@ -231,66 +233,13 @@ class _DonationListPageState extends State<DonationListPage> {
       );
     }
 
-    Widget displayHeader() {
-      return Container(
-        decoration: BoxDecoration(color: Theme.of(context).cardColor),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Flexible(
-                  flex: 1,
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width / 3,
-                    child: const Center(
-                        child: Icon(
-                      Icons.volunteer_activism_rounded,
-                      size: 100,
-                    )),
-                  ),
-                ),
-                // space
-                const SizedBox(width: 10),
-                const Flexible(
-                  flex: 3,
-                  child: Text(
-                    "Manage Donations",
-                    style: TextStyle(fontSize: 30),
-                  ),
-                )
-              ],
-            ),
-          ],
-        ),
-      );
-    }
-
     displayAppBar() {
-      return SliverAppBar(
-        automaticallyImplyLeading: true,
-        elevation: 0,
-        pinned: true,
-        centerTitle: false,
-        expandedHeight: 200,
-        flexibleSpace: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-            var top = constraints.biggest.height;
-            return FlexibleSpaceBar(
-              collapseMode: CollapseMode.parallax,
-              title: AnimatedOpacity(
-                duration: const Duration(milliseconds: 10),
-                opacity: top <= kToolbarHeight + 50 ? 1.0 : 0.0,
-                child: Text(DonationListPage.route.name),
-              ),
-              centerTitle: false,
-              background: displayHeader(),
-            );
-          },
-        ),
-      );
+      return const ListPageSliverAppBar(
+          title: 'Donations',
+          backgroundWidget: ListPageHeader(
+            title: 'Manage Donations',
+            titleIcon: Icons.volunteer_activism_rounded,
+          ));
     }
 
     return Scaffold(
