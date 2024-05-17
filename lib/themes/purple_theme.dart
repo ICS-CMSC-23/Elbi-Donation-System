@@ -16,10 +16,10 @@ ThemeData purpleTheme() {
     iconTheme: const IconThemeData(color: deepPurple),
     textButtonTheme: const TextButtonThemeData(
         style:
-            ButtonStyle(foregroundColor: MaterialStatePropertyAll(basePurple))),
+            ButtonStyle(foregroundColor: WidgetStatePropertyAll(basePurple))),
     iconButtonTheme: const IconButtonThemeData(
         style:
-            ButtonStyle(foregroundColor: MaterialStatePropertyAll(basePurple))),
+            ButtonStyle(foregroundColor: WidgetStatePropertyAll(basePurple))),
     cardTheme: const CardTheme(shadowColor: deepPurple, color: lightPurple),
     scaffoldBackgroundColor:
         const Color(0xFFF3E5F5), // A very light purple shade

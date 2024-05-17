@@ -1,5 +1,6 @@
 import 'package:elbi_donation_system/providers/donation_drive_list_provider.dart';
 import 'package:elbi_donation_system/providers/donation_list_provider.dart';
+import 'package:elbi_donation_system/providers/theme_provider.dart';
 import 'package:elbi_donation_system/providers/user_list_provider.dart';
 import 'package:elbi_donation_system/screens/admin_home_page.dart';
 import 'package:elbi_donation_system/screens/donor_home_page.dart';
@@ -24,6 +25,7 @@ void main() {
     ChangeNotifierProvider(create: (context) => UserListProvider()),
     ChangeNotifierProvider(create: (context) => DonationListProvider()),
     ChangeNotifierProvider(create: (context) => DonationDriveListProvider()),
+    ChangeNotifierProvider(create: (context) => ThemeProvider())
   ], child: const MyApp()));
 }
 
@@ -36,7 +38,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Elbi Donation System',
       initialRoute: '/',
-      theme: darkPurpleTheme(),
+      theme: context.watch<ThemeProvider>().isDarkTheme
+          ? darkPurpleTheme()
+          : purpleTheme(),
       routes: {
         '/': (context) => context.watch<UserListProvider>().homeElement,
         '/login': (context) => const LoginPage(),

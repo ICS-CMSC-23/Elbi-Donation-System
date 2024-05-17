@@ -18,9 +18,17 @@ ThemeData darkPurpleTheme() {
     primaryColor: basePurple,
     cardColor: veryDarkPurple,
     iconTheme: const IconThemeData(color: lightPurple),
-    listTileTheme:
-        ListTileThemeData(textColor: Colors.white, iconColor: Colors.white),
-    drawerTheme: DrawerThemeData(backgroundColor: Colors.black),
+    listTileTheme: const ListTileThemeData(
+        textColor: Colors.white, iconColor: Colors.white),
+    drawerTheme: const DrawerThemeData(backgroundColor: Colors.black),
+    secondaryHeaderColor: deepPurple,
+    inputDecorationTheme: const InputDecorationTheme(
+        iconColor: Colors.white,
+        labelStyle: TextStyle(color: Colors.white),
+        hintStyle: TextStyle(color: Colors.white),
+        prefixIconColor: Colors.white),
+    chipTheme: ChipThemeData(labelStyle: TextStyle(color: Colors.white)),
+
     textButtonTheme: const TextButtonThemeData(
         style:
             ButtonStyle(foregroundColor: MaterialStatePropertyAll(basePurple))),
@@ -34,6 +42,10 @@ ThemeData darkPurpleTheme() {
       buttonColor: basePurple,
       textTheme: ButtonTextTheme.primary,
     ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ButtonStyle(
+            backgroundColor: WidgetStatePropertyAll(deepestPurple),
+            foregroundColor: WidgetStatePropertyAll(Colors.white))),
     appBarTheme: const AppBarTheme(
       titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
       color: deepestPurple,
@@ -44,12 +56,12 @@ ThemeData darkPurpleTheme() {
     colorScheme: ColorScheme.fromSwatch(
         primarySwatch: MaterialColor(
       basePurple.value,
-      {
+      const {
         50: lightPurple,
         100: lightPurple,
-        200: const Color(0xFFCE93D8), // slightly lighter
+        200: Color(0xFFCE93D8), // slightly lighter
         300: basePurple,
-        400: const Color(0xFFAB47BC), // darker
+        400: Color(0xFFAB47BC), // darker
         500: basePurple,
         600: deepPurple,
         700: deepPurple,
@@ -57,8 +69,8 @@ ThemeData darkPurpleTheme() {
         900: veryDarkPurple,
       },
     )).copyWith(
-      background: Color(0xFF121212),
-      surface: Color(0xFF1E1E1E), // Dark surface color
+      background: const Color(0xFF121212),
+      surface: const Color(0xFF1E1E1E), // Dark surface color
       error: Colors.red[400],
       onPrimary: Colors.white,
       onSecondary: Colors.white,

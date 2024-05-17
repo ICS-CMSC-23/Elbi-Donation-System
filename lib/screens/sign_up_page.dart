@@ -1,116 +1,3 @@
-// import '../components/main_drawer.dart';
-// import '../models/route_model.dart';
-// import 'donor_home_page.dart';
-// import 'log_in_page.dart';
-// import 'org_home_page.dart';
-// import 'package:flutter/material.dart';
-
-// class SignUpPage extends StatefulWidget {
-//   const SignUpPage({super.key});
-
-//   @override
-//   State<SignUpPage> createState() => _SignUpPageState();
-// }
-
-// class _SignUpPageState extends State<SignUpPage> {
-//   final _formKey = GlobalKey<FormState>();
-//   final TextEditingController nameController = TextEditingController();
-//   final TextEditingController userNameController = TextEditingController();
-//   final TextEditingController passwordController = TextEditingController();
-//   final TextEditingController addressController = TextEditingController();
-//   final TextEditingController contactNumberController = TextEditingController();
-//   String? errorMessage;
-
-//   RouteModel orgHomepage =
-//       RouteModel("Home", "/org-home-page", const OrgHomePage());
-//   RouteModel donorHomePage =
-//       RouteModel("Home", "/donor-home-page", const DonorHomePage());
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       drawer: MainDrawer(routes: [
-//         orgHomepage,
-//         RouteModel("Logout", "/", const LoginPage()),
-//       ]),
-//       appBar: AppBar(
-//         title: const Text("Sign Up"),
-//       ),
-//       body: Padding(
-//         padding: const EdgeInsets.all(16.0),
-//         child: Form(
-//           key: _formKey,
-//           child: Column(
-//             crossAxisAlignment: CrossAxisAlignment.stretch,
-//             children: [
-//               TextFormField(
-//                 decoration: const InputDecoration(
-//                   labelText: 'Username',
-//                   prefixIcon: Icon(Icons.person),
-//                 ),
-//                 validator: (value) {
-//                   if (value!.isEmpty) {
-//                     return 'Please enter your username';
-//                   }
-//                   return null;
-//                 },
-//               ),
-//               const SizedBox(height: 16),
-//               TextFormField(
-//                 decoration: const InputDecoration(
-//                   labelText: 'Email',
-//                   prefixIcon: Icon(Icons.email),
-//                 ),
-//                 validator: (value) {
-//                   if (value!.isEmpty) {
-//                     return 'Please enter your email';
-//                   }
-//                   // Add email validation if necessary
-//                   return null;
-//                 },
-//               ),
-//               const SizedBox(height: 16),
-//               TextFormField(
-//                 decoration: const InputDecoration(
-//                   labelText: 'Password',
-//                   prefixIcon: Icon(Icons.lock),
-//                 ),
-//                 obscureText: true,
-//                 validator: (value) {
-//                   if (value!.isEmpty) {
-//                     return 'Please enter your password';
-//                   }
-//                   // Add password strength validation if necessary
-//                   return null;
-//                 },
-//               ),
-//               const SizedBox(height: 16),
-//               ElevatedButton(
-//                 onPressed: () {
-//                   // Implement sign up logic here
-//                   if (_formKey.currentState!.validate()) {
-//                     // if the form is valid, proceed with sign up
-//                     // access form field values using _formKey.currentState
-//                   }
-//                 },
-//                 style: ElevatedButton.styleFrom(
-//                   backgroundColor: Colors.blue,
-//                 ),
-//                 child: const Text(
-//                   'Sign Up',
-//                   style: TextStyle(
-//                     color: Colors.white,
-//                     fontWeight: FontWeight.bold,
-//                   ),
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import '../components/main_drawer.dart';
@@ -138,11 +25,6 @@ class _SignUpPageState extends State<SignUpPage> {
   // final TextEditingController proofController = TextEditingController();
   bool isDonor = true;
   File? _image;
-
-  // RouteModel orgHomepage =
-  //     RouteModel("Home", "/org-home-page", const OrgHomePage());
-  // RouteModel donorHomePage =
-  //     RouteModel("Home", "/donor-home-page", const DonorHomePage());
 
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
@@ -262,20 +144,6 @@ class _SignUpPageState extends State<SignUpPage> {
                           : const Icon(Icons.camera_alt, color: Colors.grey),
                     ),
                   ),
-                  // const SizedBox(height: 16),
-                  // TextFormField(
-                  //   controller: proofController,
-                  //   decoration: const InputDecoration(
-                  //     labelText: 'Proof of Legitimacy',
-                  //     prefixIcon: Icon(Icons.verified),
-                  //   ),
-                  //   validator: (value) {
-                  //     if (value!.isEmpty) {
-                  //       return 'Please provide proof of legitimacy';
-                  //     }
-                  //     return null;
-                  //   },
-                  // ),
                 ],
                 const SizedBox(height: 16),
                 TextFormField(
@@ -349,9 +217,6 @@ class _SignUpPageState extends State<SignUpPage> {
                       //       }
                     }
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                  ),
                   child: const Text(
                     'Sign Up',
                     style: TextStyle(
