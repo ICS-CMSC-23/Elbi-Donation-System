@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../models/route_model.dart';
-import '../models/donation_model.dart';
-import '../dummy_data/dummy_donations.dart';
-import '../providers/user_list_provider.dart';
-import '../models/user_model.dart';
-import '../components/bottom_scroll_view_widget.dart';
-import '../components/list_page_sliver_app_bar.dart';
-import '../components/list_page_header.dart';
-import '../components/custom_tile_container.dart';
-import '../screens/donation_details_page.dart';
+import '../../models/route_model.dart';
+import '../../models/donation_model.dart';
+import '../../dummy_data/dummy_donations.dart';
+import '../../providers/user_list_provider.dart';
+import '../../models/user_model.dart';
+import '../../components/bottom_scroll_view_widget.dart';
+import '../../components/list_page_sliver_app_bar.dart';
+import '../../components/list_page_header.dart';
+import '../../components/custom_tile_container.dart';
+import '../../screens/donation_details_page.dart';
 
 class DonationListPage extends StatefulWidget {
   const DonationListPage({super.key});
@@ -162,36 +162,7 @@ class _DonationListPageState extends State<DonationListPage> {
                               IconButton(
                                 icon: const Icon(Icons.delete),
                                 onPressed: () {
-                                  // Show confirmation dialog before deletion
-                                  showDialog(
-                                    context: context,
-                                    barrierDismissible: false,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        title: const Text('Confirm Deletion'),
-                                        content: const Text(
-                                            'Are you sure you want to delete this donation?'),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () {
-                                              // Dismiss the dialog
-                                              Navigator.pop(context);
-                                            },
-                                            child: const Text('Cancel'),
-                                          ),
-                                          TextButton(
-                                            onPressed: () {
-                                              // Implement delete functionality
-                                              // not yet implemented
-                                              // Close the dialog
-                                              Navigator.pop(context);
-                                            },
-                                            child: const Text('Delete'),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
+                                  // Implement delete functionality
                                 },
                               ),
                             ],
@@ -210,50 +181,7 @@ class _DonationListPageState extends State<DonationListPage> {
       );
     }
 
-    Widget displayAddDonationButton() {
-      if (currentUser.role == 'donor') {
-        return SizedBox(
-          height: 30,
-          child: ElevatedButton(
-            onPressed: () {
-              // Implement the functionality to add a donation
-            },
-            style: ButtonStyle(
-              shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.zero,
-                ),
-              ),
-              elevation: WidgetStateProperty.all<double>(0),
-              backgroundColor: WidgetStateProperty.resolveWith<Color>(
-                (Set<WidgetState> states) {
-                  if (states.contains(WidgetState.pressed)) {
-                    return Theme.of(context)
-                        .colorScheme
-                        .primary
-                        .withOpacity(0.8);
-                  }
-                  return Theme.of(context).colorScheme.surface;
-                },
-              ),
-            ),
-            child: const Center(
-              child: Text(
-                'Add Donation',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        );
-      } else {
-        return const SizedBox(); // Return an empty SizedBox if the user is not a donor
-      }
-    }
-
-    Widget displayAppBar() {
+    displayAppBar() {
       return const ListPageSliverAppBar(
           title: 'Donations',
           backgroundWidget: ListPageHeader(
@@ -263,22 +191,15 @@ class _DonationListPageState extends State<DonationListPage> {
     }
 
     return Scaffold(
-      body: Column(
-        children: [
-          Expanded(
-            child: CustomScrollView(
-              slivers: [
-                displayAppBar(),
-                const SliverToBoxAdapter(
-                  child: SizedBox(height: 10),
-                ),
-                displayDonationList(),
-                BottomScrollViewWidget(
-                    listTitle: 'Donations', listLength: donations.length),
-              ],
-            ),
+      body: CustomScrollView(
+        slivers: [
+          displayAppBar(),
+          const SliverToBoxAdapter(
+            child: SizedBox(height: 10),
           ),
-          displayAddDonationButton(),
+          displayDonationList(),
+          BottomScrollViewWidget(
+              listTitle: 'Donations', listLength: donations.length),
         ],
       ),
     );
