@@ -3,6 +3,11 @@ import '../models/route_model.dart';
 import '../models/user_model.dart';
 import '../components/rounded_image.dart';
 import '../dummy_data/dummy_users.dart';
+import '../components/bottom_scroll_view_widget.dart';
+import '../components/list_page_sliver_app_bar.dart';
+import '../components/list_page_header.dart';
+import '../components/custom_tile_container.dart';
+import '../screens/donor_profile_page.dart';
 
 class DonorListPage extends StatefulWidget {
   const DonorListPage({super.key});
@@ -29,81 +34,52 @@ class _DonorListPageState extends State<DonorListPage> {
 
   @override
   Widget build(BuildContext context) {
-    BorderRadius customBorder = const BorderRadius.only(
-      topLeft: Radius.circular(30),
-      topRight: Radius.circular(4),
-      bottomLeft: Radius.circular(4),
-      bottomRight: Radius.circular(30),
-    );
-
-    BorderRadius customBorderAlt = const BorderRadius.only(
-      topLeft: Radius.circular(4),
-      topRight: Radius.circular(30),
-      bottomLeft: Radius.circular(30),
-      bottomRight: Radius.circular(4),
-    );
-
     // build a widget that returns a list of donors
     Widget displayDonorList() {
       return SliverList(
         delegate: SliverChildBuilderDelegate(
           (BuildContext context, int index) {
-            return Padding(
-              padding: const EdgeInsets.only(
-                  left: 10, right: 10, top: 4, bottom: 10),
-              child: Container(
-                height: 100,
-                decoration: BoxDecoration(
-                  borderRadius:
-                      (index % 2 == 0) ? customBorder : customBorderAlt,
-                  color: Theme.of(context).colorScheme.surface, // white
-                ),
-                child: Card(
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        (index % 2 == 0) ? customBorder : customBorderAlt,
-                  ),
-                  child: InkWell(
-                    splashColor: Theme.of(context).colorScheme.primary,
-                    borderRadius:
-                        (index % 2 == 0) ? customBorder : customBorderAlt,
-                    onTap: () {/*for effects only*/},
-                    child: Center(
-                      child: ListTile(
-                        leading: RoundedImage(
-                          source: donors[index].profilePhoto!,
-                          size: 50,
-                        ),
-                        title: Text(donors[index].name),
-                        subtitle: Text(
-                          donors[index].username,
-                          style: const TextStyle(fontStyle: FontStyle.italic),
-                        ),
-                        trailing: ElevatedButton(
-                          style: ButtonStyle(
-                            elevation: WidgetStateProperty.all(0),
-                            shape:
-                                WidgetStateProperty.all<RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20.0),
-                              ),
-                            ),
-                            overlayColor: WidgetStateProperty.resolveWith(
-                              (states) {
-                                return states.contains(WidgetState.pressed)
-                                    ? Theme.of(context).cardColor
-                                    : null;
-                              },
-                            ),
+            return CustomTileContainer(
+              customBorder: CustomTileContainer.customBorderOne,
+              customBorderAlt: CustomTileContainer.customBorderTwo,
+              context: context,
+              index: index,
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 20, bottom: 20),
+                  child: ListTile(
+                    leading: RoundedImage(
+                      source: donors[index].profilePhoto!,
+                      size: 50,
+                    ),
+                    title: Text(donors[index].name),
+                    subtitle: Text(
+                      donors[index].username,
+                      style: const TextStyle(fontStyle: FontStyle.italic),
+                    ),
+                    trailing: ElevatedButton(
+                      style: ButtonStyle(
+                        elevation: WidgetStateProperty.all(0),
+                        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0),
                           ),
-                          onPressed: () {
-                            // Navigate to donor's profile page
-                            Navigator.pushNamed(context, '/donation-list-page');
+                        ),
+                        overlayColor: WidgetStateProperty.resolveWith(
+                          (states) {
+                            return states.contains(WidgetState.pressed)
+                                ? Theme.of(context).cardColor
+                                : null;
                           },
-                          child: const Text('View Profile'),
                         ),
                       ),
+                      onPressed: () {
+                        // Navigate to donor's profile page
+                        Navigator.pushNamed(
+                            context, DonorProfilePage.route.path);
+                        // Navigator.pushNamed(context, '/donation-list-page'); // for testing
+                      },
+                      child: const Text('View Profile'),
                     ),
                   ),
                 ),
@@ -115,82 +91,11 @@ class _DonorListPageState extends State<DonorListPage> {
       );
     }
 
-    Widget displayHeader() {
-      return Container(
-        decoration: BoxDecoration(color: Theme.of(context).cardColor),
-        child: Column(
-          children: [
-            const SizedBox(height: 75),
-            Row(
-              children: [
-                SizedBox(
-                  width: MediaQuery.of(context).size.width / 3,
-                  height: 125,
-                  child: const Center(
-                      child: Icon(
-                    Icons.people_rounded,
-                    size: 100,
-                  )),
-                ),
-                const Flexible(
-                  child: Text(
-                    "Manage Donors",
-                    style: TextStyle(fontSize: 30),
-                  ),
-                )
-              ],
-            ),
-          ],
-        ),
-      );
-    }
-
     displayAppBar() {
-      return SliverAppBar(
-        automaticallyImplyLeading: true,
-        elevation: 0,
-        pinned: true,
-        centerTitle: false,
-        expandedHeight: 200,
-        stretch: true,
-        flexibleSpace: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-            var top = constraints.biggest.height;
-            return FlexibleSpaceBar(
-              // stretchModes: const [
-              //   StretchMode.zoomBackground,
-              //   // StretchMode.blurBackground
-              // ],
-              // collapseMode: CollapseMode.parallax,
-              title: AnimatedOpacity(
-                duration: const Duration(milliseconds: 10),
-                opacity: top <= kToolbarHeight + 50 ? 1.0 : 0.0,
-                child: Text(DonorListPage.route.name),
-              ),
-              centerTitle: false,
-              background: displayHeader(),
-            );
-          },
-        ),
-      );
-    }
-
-    Widget displayFooter() {
-      return SliverList(
-        delegate: SliverChildListDelegate(
-          [
-            Container(
-              decoration: BoxDecoration(color: Theme.of(context).cardColor),
-              child: Center(
-                child: Text(
-                  "Donors: ${donors.length}",
-                  style: const TextStyle(fontSize: 12),
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
+      return const ListPageSliverAppBar(
+          title: "Donors",
+          backgroundWidget:
+              ListPageHeader(title: "Manage Donors", titleIcon: Icons.people));
     }
 
     return Scaffold(
@@ -202,7 +107,8 @@ class _DonorListPageState extends State<DonorListPage> {
             child: SizedBox(height: 10),
           ),
           displayDonorList(),
-          displayFooter(),
+          BottomScrollViewWidget(
+              listTitle: 'Donors', listLength: donors.length),
         ],
       ),
     );
