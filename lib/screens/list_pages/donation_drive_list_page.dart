@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../models/route_model.dart';
 import '../../models/donation_drive_model.dart';
 import '../../dummy_data/dummy_donation_drives.dart';
+import '../../components/bottom_scroll_view_widget.dart';
 
 class DonationDriveListPage extends StatefulWidget {
   const DonationDriveListPage({super.key});
@@ -180,6 +181,10 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
                             ),
                             onPressed: () {
                               // Implement view full details functionality
+                              Navigator.pushNamed(
+                                context,
+                                '/donor-list-page',
+                              );
                             },
                             child: const Text('View Full Details'),
                           ),
@@ -251,24 +256,6 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
       );
     }
 
-    Widget displayFooter() {
-      return SliverList(
-        delegate: SliverChildListDelegate(
-          [
-            Container(
-              decoration: BoxDecoration(color: Theme.of(context).cardColor),
-              child: Center(
-                child: Text(
-                  "Donation Drives: ${donationDrives.length}",
-                  style: const TextStyle(fontSize: 12),
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
     return Scaffold(
       body: CustomScrollView(
         // physics: const BouncingScrollPhysics(),
@@ -278,7 +265,8 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
             child: SizedBox(height: 10),
           ),
           displayDonationDriveList(),
-          displayFooter(),
+          BottomScrollViewWidget(
+              listTitle: 'Donation Drives', listLength: donationDrives.length),
         ],
       ),
     );

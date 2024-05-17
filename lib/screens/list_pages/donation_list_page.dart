@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../models/route_model.dart';
 import '../../models/donation_model.dart';
 import '../../dummy_data/dummy_donations.dart';
 import '../../providers/user_list_provider.dart';
 import '../../models/user_model.dart';
-import 'package:provider/provider.dart';
+import '../../components/bottom_scroll_view_widget.dart';
 
 class DonationListPage extends StatefulWidget {
   const DonationListPage({super.key});
@@ -292,24 +293,6 @@ class _DonationListPageState extends State<DonationListPage> {
       );
     }
 
-    Widget displayFooter() {
-      return SliverList(
-        delegate: SliverChildListDelegate(
-          [
-            Container(
-              decoration: BoxDecoration(color: Theme.of(context).cardColor),
-              child: Center(
-                child: Text(
-                  "Donations: ${donations.length}",
-                  style: const TextStyle(fontSize: 12),
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -318,7 +301,8 @@ class _DonationListPageState extends State<DonationListPage> {
             child: SizedBox(height: 10),
           ),
           displayDonationList(),
-          displayFooter(),
+          BottomScrollViewWidget(
+              listTitle: 'Donations', listLength: donations.length),
         ],
       ),
     );

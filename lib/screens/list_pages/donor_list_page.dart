@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import '../models/route_model.dart';
-import '../models/user_model.dart';
-import '../components/rounded_image.dart';
-import '../dummy_data/dummy_users.dart';
+import '../../models/route_model.dart';
+import '../../models/user_model.dart';
+import '../../components/rounded_image.dart';
+import '../../dummy_data/dummy_users.dart';
+import '../../components/bottom_scroll_view_widget.dart';
 
 class DonorListPage extends StatefulWidget {
   const DonorListPage({super.key});
@@ -175,24 +176,6 @@ class _DonorListPageState extends State<DonorListPage> {
       );
     }
 
-    Widget displayFooter() {
-      return SliverList(
-        delegate: SliverChildListDelegate(
-          [
-            Container(
-              decoration: BoxDecoration(color: Theme.of(context).cardColor),
-              child: Center(
-                child: Text(
-                  "Donors: ${donors.length}",
-                  style: const TextStyle(fontSize: 12),
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
     return Scaffold(
       body: CustomScrollView(
         // physics: const BouncingScrollPhysics(),
@@ -202,7 +185,8 @@ class _DonorListPageState extends State<DonorListPage> {
             child: SizedBox(height: 10),
           ),
           displayDonorList(),
-          displayFooter(),
+          BottomScrollViewWidget(
+              listTitle: 'Donors', listLength: donors.length),
         ],
       ),
     );
