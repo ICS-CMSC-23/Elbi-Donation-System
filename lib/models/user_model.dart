@@ -16,6 +16,11 @@ class User {
   String role; // donor, organization, admin, guest
   String? profilePhoto; // avatar/ profile picture (optional)
 
+  static const String donor = "donor";
+  static const String admin = "admin";
+  static const String organization = "organization";
+  static const String guest = "guest";
+
   // for organization only
   String? about;
   List<String>? proofsOfLegitimacy; // image urls

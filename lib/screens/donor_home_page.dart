@@ -1,6 +1,8 @@
 import 'package:elbi_donation_system/components/main_drawer.dart';
 import 'package:elbi_donation_system/dummy_data/dummy_orgs.dart';
 import 'package:elbi_donation_system/models/route_model.dart';
+import 'package:elbi_donation_system/screens/donation_drive_list_page.dart';
+import 'package:elbi_donation_system/screens/list_pages/donation_list_page.dart';
 import 'package:flutter/material.dart';
 
 import '../components/page_cover.dart';
@@ -24,6 +26,8 @@ class _DonorHomePageState extends State<DonorHomePage> {
         RouteModel("Logout", "/login"),
         RouteModel("Home", "/"),
         RouteModel("Profile", "/donor-profile"),
+        DonationDriveListPage.route,
+        DonationListPage.route,
       ]),
       appBar: AppBar(
         title: const Text("Donor Home Page"),

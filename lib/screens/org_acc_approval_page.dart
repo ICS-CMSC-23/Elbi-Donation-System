@@ -1,7 +1,10 @@
+import 'package:elbi_donation_system/dummy_data/dummy_users.dart';
+import 'package:elbi_donation_system/models/user_model.dart';
+import 'package:elbi_donation_system/providers/user_list_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:elbi_donation_system/components/main_drawer.dart';
-import 'package:elbi_donation_system/dummy_data/dummy_orgs.dart';
 import 'package:elbi_donation_system/models/route_model.dart';
+import 'package:provider/provider.dart';
 
 class OrgAccApprovalPage extends StatefulWidget {
   const OrgAccApprovalPage({super.key});
@@ -13,16 +16,13 @@ class OrgAccApprovalPage extends StatefulWidget {
 class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
   final _formKey = GlobalKey<FormState>();
 
-  final organizations = dummyOrgs; // Dummy data for organizations
+  final List<User> organizations = dummyUsers
+      .where((user) => user.role == User.organization)
+      .toList(); // Dummy data for organizations
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: MainDrawer(routes: [
-        RouteModel("Logout", "/login"),
-        RouteModel("Profile", "/donor-profile"),
-        RouteModel("Home", "/"),
-      ]),
       appBar: AppBar(
         title: const Text("Organization Account Approval Page"),
       ),
@@ -44,7 +44,7 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                       child: Column(
                         children: [
                           Image.network(
-                            organizations[index].imageUrl,
+                            organizations[index].profilePhoto!,
                             fit: BoxFit.cover,
                             width: MediaQuery.of(context).size.width / 1.5,
                           ),
@@ -54,7 +54,8 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                                 fontWeight: FontWeight.bold, fontSize: 18),
                           ),
                           Text(
-                            organizations[index].description,
+                            organizations[index].about ??
+                                "This organization has no description.",
                             textAlign: TextAlign.center,
                           ),
                           Row(
@@ -62,6 +63,11 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                             children: [
                               ElevatedButton(
                                 onPressed: () {
+                                  context
+                                      .read<UserListProvider>()
+                                      .changeCurrentUser(
+                                          organizations[index].email,
+                                          organizations[index].password);
                                   Navigator.pushNamed(
                                     context,
                                     '/org-profile',

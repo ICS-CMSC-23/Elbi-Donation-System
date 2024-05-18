@@ -1,6 +1,7 @@
 import 'package:elbi_donation_system/components/rounded_image.dart';
 import 'package:elbi_donation_system/dummy_data/dummy_donations.dart';
 import 'package:elbi_donation_system/models/donation_model.dart';
+import 'package:elbi_donation_system/providers/auth_provider.dart';
 import 'package:elbi_donation_system/providers/donation_list_provider.dart';
 import 'package:elbi_donation_system/providers/user_list_provider.dart';
 import 'package:provider/provider.dart';
@@ -17,6 +18,13 @@ import '../components/title_detail_list.dart';
 class DonorProfilePage extends StatefulWidget {
   const DonorProfilePage({super.key});
 
+// class route model
+  static final RouteModel _donorProfie = RouteModel(
+    "Donor Profile Page",
+    "/donor-profile",
+  );
+  static RouteModel get route => _donorProfie;
+
   @override
   State<DonorProfilePage> createState() => _DonorProfilePageState();
 }
@@ -26,7 +34,7 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
   Widget build(BuildContext context) {
     User user = context.watch<UserListProvider>().currentUser;
     Row actionButtons;
-    if (user.role == "donor") {
+    if (context.watch<AuthProvider>().currentUser.role == User.donor) {
       actionButtons = Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -76,7 +84,7 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
               const Padding(
                 padding: EdgeInsets.only(top: 20),
                 child: Text(
-                  "Your Donations",
+                  "Donations",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
               ),

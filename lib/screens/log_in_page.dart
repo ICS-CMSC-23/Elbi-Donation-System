@@ -1,3 +1,4 @@
+import 'package:elbi_donation_system/providers/auth_provider.dart';
 import 'package:elbi_donation_system/providers/user_list_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -85,7 +86,7 @@ class _LoginPageState extends State<LoginPage> {
               child: ElevatedButton(
                 onPressed: () {
                   User currentUser = context
-                      .read<UserListProvider>()
+                      .read<AuthProvider>()
                       .changeCurrentUser(
                           _emailController.text, _passwordController.text);
                   if (currentUser.role != "guest") {

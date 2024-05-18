@@ -1,10 +1,14 @@
+import 'package:elbi_donation_system/providers/auth_provider.dart';
 import 'package:elbi_donation_system/providers/donation_drive_list_provider.dart';
 import 'package:elbi_donation_system/providers/donation_list_provider.dart';
 import 'package:elbi_donation_system/providers/theme_provider.dart';
 import 'package:elbi_donation_system/providers/user_list_provider.dart';
 import 'package:elbi_donation_system/screens/admin_home_page.dart';
+import 'package:elbi_donation_system/screens/donation_drive_list_page.dart';
 import 'package:elbi_donation_system/screens/donor_home_page.dart';
+import 'package:elbi_donation_system/screens/donor_list_page.dart';
 import 'package:elbi_donation_system/screens/donor_profile_page.dart';
+import 'package:elbi_donation_system/screens/list_pages/donation_list_page.dart';
 import 'package:elbi_donation_system/screens/log_in_page.dart';
 import 'package:elbi_donation_system/screens/org_acc_approval_page.dart';
 import 'package:elbi_donation_system/screens/org_home_page.dart';
@@ -22,6 +26,7 @@ import "package:provider/provider.dart";
 
 void main() {
   runApp(MultiProvider(providers: [
+    ChangeNotifierProvider(create: (context) => AuthProvider()),
     ChangeNotifierProvider(create: (context) => UserListProvider()),
     ChangeNotifierProvider(create: (context) => DonationListProvider()),
     ChangeNotifierProvider(create: (context) => DonationDriveListProvider()),
@@ -42,7 +47,7 @@ class MyApp extends StatelessWidget {
           ? darkPurpleTheme()
           : purpleTheme(),
       routes: {
-        '/': (context) => context.watch<UserListProvider>().homeElement,
+        '/': (context) => context.watch<AuthProvider>().homeElement,
         '/login': (context) => const LoginPage(),
         '/signup': (context) => const SignUpPage(),
         '/donor-home-page': (context) => const DonorHomePage(),
@@ -52,6 +57,9 @@ class MyApp extends StatelessWidget {
         '/org-profile': (context) => const OrgProfilePage(),
         '/donation-drive-details': (context) => const DonationDriveDetails(),
         '/org-account-approval': (context) => const OrgAccApprovalPage(),
+        '/donor-list-page': (context) => const DonorListPage(),
+        '/donation-list-page': (context) => const DonationListPage(),
+        '/donation-drive-list-page': (context) => const DonationDriveListPage()
       },
     );
   }

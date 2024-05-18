@@ -5,6 +5,7 @@ import 'package:elbi_donation_system/components/title_detail_list.dart';
 import 'package:elbi_donation_system/models/donation_model.dart';
 import 'package:elbi_donation_system/models/route_model.dart';
 import 'package:elbi_donation_system/models/user_model.dart';
+import 'package:elbi_donation_system/providers/auth_provider.dart';
 import 'package:elbi_donation_system/providers/user_list_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -22,7 +23,7 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
     User user = context.watch<UserListProvider>().currentUser;
 
     Row actionButtons;
-    if (user.role == "admin") {
+    if (context.watch<AuthProvider>().currentUser.role == "admin") {
       actionButtons = Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

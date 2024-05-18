@@ -1,4 +1,6 @@
+import 'package:elbi_donation_system/providers/user_list_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/route_model.dart';
 import '../models/user_model.dart';
 import '../components/rounded_image.dart';
@@ -24,8 +26,6 @@ class DonorListPage extends StatefulWidget {
 }
 
 class _DonorListPageState extends State<DonorListPage> {
-  // get dummy data for donors
-  List<User> users = dummyUsers;
   // only get the donors
   List<User> donors = List.generate(
           10, (context) => dummyUsers.where((user) => user.role == 'donor'))
@@ -75,6 +75,8 @@ class _DonorListPageState extends State<DonorListPage> {
                       ),
                       onPressed: () {
                         // Navigate to donor's profile page
+                        context.read<UserListProvider>().changeCurrentUser(
+                            donors[index].email, donors[index].password);
                         Navigator.pushNamed(
                             context, DonorProfilePage.route.path);
                         // Navigator.pushNamed(context, '/donation-list-page'); // for testing
@@ -100,6 +102,7 @@ class _DonorListPageState extends State<DonorListPage> {
 
     return Scaffold(
       body: CustomScrollView(
+        semanticChildCount: donors.length,
         // physics: const BouncingScrollPhysics(),
         slivers: [
           displayAppBar(),
@@ -107,8 +110,6 @@ class _DonorListPageState extends State<DonorListPage> {
             child: SizedBox(height: 10),
           ),
           displayDonorList(),
-          BottomScrollViewWidget(
-              listTitle: 'Donors', listLength: donors.length),
         ],
       ),
     );

@@ -1,12 +1,13 @@
 import 'package:elbi_donation_system/dummy_data/dummy_users.dart';
 import 'package:elbi_donation_system/models/user_model.dart';
-import 'package:elbi_donation_system/screens/admin_home_page.dart';
-import 'package:elbi_donation_system/screens/donor_home_page.dart';
-import 'package:elbi_donation_system/screens/log_in_page.dart';
-import 'package:elbi_donation_system/screens/org_home_page.dart';
 import 'package:flutter/material.dart';
 
-class UserListProvider with ChangeNotifier {
+import '../screens/admin_home_page.dart';
+import '../screens/donor_home_page.dart';
+import '../screens/log_in_page.dart';
+import '../screens/org_home_page.dart';
+
+class AuthProvider with ChangeNotifier {
   final List<User> _userList = dummyUsers;
   List<User> get userList => _userList;
   User _currentUser = User(
@@ -24,6 +25,10 @@ class UserListProvider with ChangeNotifier {
     isApproved: false,
     isOpenForDonation: false,
   );
+
+  Widget _homeElement = const LoginPage();
+
+  Widget get homeElement => _homeElement;
 
   User get currentUser => _currentUser;
 
@@ -51,6 +56,15 @@ class UserListProvider with ChangeNotifier {
           isOpenForDonation: false,
         );
 
+    if (_currentUser.role == "donor") {
+      _homeElement = const DonorHomePage();
+    } else if (_currentUser.role == "organization") {
+      _homeElement = const OrgHomePage();
+    } else if (_currentUser.role == "admin") {
+      _homeElement = const AdminHomePage();
+    } else {
+      _homeElement = const LoginPage();
+    }
     notifyListeners();
     if (foundUser == null) {
       return User(

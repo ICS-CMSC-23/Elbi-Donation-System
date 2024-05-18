@@ -25,7 +25,10 @@ class ListPageSliverAppBar extends StatelessWidget {
             title: AnimatedOpacity(
               duration: const Duration(milliseconds: 10),
               opacity: top <= kToolbarHeight + 50 ? 1.0 : 0.0,
-              child: Text(title),
+              child: Text(
+                title,
+                style: TextStyle(color: Colors.white),
+              ),
             ),
             centerTitle: false,
             background: backgroundWidget,
