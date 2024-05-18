@@ -32,9 +32,12 @@ class DonorProfilePage extends StatefulWidget {
 class _DonorProfilePageState extends State<DonorProfilePage> {
   @override
   Widget build(BuildContext context) {
-    User user = context.watch<UserListProvider>().currentUser;
+    User authUser = context.watch<AuthProvider>().currentUser;
+    User user = authUser.role == User.donor
+        ? authUser
+        : context.watch<UserListProvider>().currentUser;
     Row actionButtons;
-    if (context.watch<AuthProvider>().currentUser.role == User.donor) {
+    if (authUser.role == User.donor) {
       actionButtons = Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -56,10 +59,6 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
         .toList();
 
     return Scaffold(
-        drawer: MainDrawer(routes: [
-          RouteModel("Logout", "/login"),
-          RouteModel("Home", "/"),
-        ]),
         appBar: AppBar(
           title: const Text("Donor Profile Page"),
         ),

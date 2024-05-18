@@ -20,5 +20,6 @@ class DonationListProvider with ChangeNotifier {
 
   void setCurrentDonation(String id) {
     _currentDonation = donationList.firstWhere((donation) => donation.id == id);
+    notifyListeners();
   }
 }

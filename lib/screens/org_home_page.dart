@@ -1,6 +1,7 @@
 import 'package:elbi_donation_system/components/main_drawer.dart';
 import 'package:elbi_donation_system/models/route_model.dart';
 import 'package:elbi_donation_system/providers/donation_drive_list_provider.dart';
+import 'package:elbi_donation_system/screens/donation_drive_list_page.dart';
 import '../screens/donor_profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -21,6 +22,7 @@ class OrgHomePage extends StatelessWidget {
       drawer: MainDrawer(routes: [
         RouteModel("Logout", "/login"),
         RouteModel("Home", "/"),
+        DonationDriveListPage.route
       ]),
       appBar: AppBar(
         title: const Text('Organization Home Page'),
@@ -33,10 +35,9 @@ class OrgHomePage extends StatelessWidget {
             child: ElevatedButton(
               onPressed: () {
                 // Navigate to Donor Profile Page
-                Navigator.push(
+                Navigator.pushNamed(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => const DonorProfilePage()),
+                  "/org-profile",
                 );
               },
               child: const Text('Profile Page'),

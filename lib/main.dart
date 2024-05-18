@@ -8,7 +8,7 @@ import 'package:elbi_donation_system/screens/donation_drive_list_page.dart';
 import 'package:elbi_donation_system/screens/donor_home_page.dart';
 import 'package:elbi_donation_system/screens/donor_list_page.dart';
 import 'package:elbi_donation_system/screens/donor_profile_page.dart';
-import 'package:elbi_donation_system/screens/list_pages/donation_list_page.dart';
+import 'package:elbi_donation_system/screens/donation_list_page.dart';
 import 'package:elbi_donation_system/screens/log_in_page.dart';
 import 'package:elbi_donation_system/screens/org_acc_approval_page.dart';
 import 'package:elbi_donation_system/screens/org_home_page.dart';

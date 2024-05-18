@@ -1,3 +1,5 @@
+import 'package:elbi_donation_system/providers/auth_provider.dart';
+import 'package:elbi_donation_system/providers/donation_list_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/route_model.dart';
@@ -9,14 +11,14 @@ import '../components/bottom_scroll_view_widget.dart';
 import '../components/list_page_sliver_app_bar.dart';
 import '../components/list_page_header.dart';
 import '../components/custom_tile_container.dart';
-import '../screens/donation_details_page.dart';
+import 'donation_details_page.dart';
 
 class DonationListPage extends StatefulWidget {
   const DonationListPage({super.key});
 
   // class route model
   static final RouteModel _donationListPage = RouteModel(
-    "Donation List Page",
+    "Donation List",
     "/donation-list-page",
   );
   static RouteModel get route => _donationListPage;
@@ -26,14 +28,13 @@ class DonationListPage extends StatefulWidget {
 }
 
 class _DonationListPageState extends State<DonationListPage> {
-  // get dummy data for donations
-  List<Donation> donations = dummyDonations;
-
   @override
   Widget build(BuildContext context) {
     // get dummy user data
-    final userListProvider = context.watch<UserListProvider>();
-    User currentUser = userListProvider.currentUser;
+    User user = context.watch<AuthProvider>().currentUser;
+    List<Donation> donations = dummyDonations
+        .where((donation) => user.id == donation.donorId)
+        .toList();
 
     Widget displayDonationList() {
       return SliverList(
@@ -106,7 +107,7 @@ class _DonationListPageState extends State<DonationListPage> {
                                 ),
                               ),
                               TextSpan(
-                                text: 'Donor $index\n',
+                                text: '${user.name}\n',
                               ),
                               const TextSpan(
                                 text: 'Status: ',
@@ -143,6 +144,9 @@ class _DonationListPageState extends State<DonationListPage> {
                             ),
                             onPressed: () {
                               // Implement view full details functionality
+                              context
+                                  .read<DonationListProvider>()
+                                  .setCurrentDonation(donations[index].id!);
                               Navigator.pushNamed(
                                 context,
                                 DonationDetails.route.path,
@@ -152,7 +156,7 @@ class _DonationListPageState extends State<DonationListPage> {
                           ),
                           Row(
                             children: [
-                              if (currentUser.role == 'donor')
+                              if (user.role == 'donor')
                                 IconButton(
                                   icon: const Icon(Icons.edit),
                                   onPressed: () {
@@ -162,36 +166,7 @@ class _DonationListPageState extends State<DonationListPage> {
                               IconButton(
                                 icon: const Icon(Icons.delete),
                                 onPressed: () {
-                                  // Show confirmation dialog before deletion
-                                  showDialog(
-                                    context: context,
-                                    barrierDismissible: false,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        title: const Text('Confirm Deletion'),
-                                        content: const Text(
-                                            'Are you sure you want to delete this donation?'),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () {
-                                              // Dismiss the dialog
-                                              Navigator.pop(context);
-                                            },
-                                            child: const Text('Cancel'),
-                                          ),
-                                          TextButton(
-                                            onPressed: () {
-                                              // Implement delete functionality
-                                              // not yet implemented
-                                              // Close the dialog
-                                              Navigator.pop(context);
-                                            },
-                                            child: const Text('Delete'),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
+                                  // Implement delete functionality
                                 },
                               ),
                             ],
@@ -210,50 +185,7 @@ class _DonationListPageState extends State<DonationListPage> {
       );
     }
 
-    Widget displayAddDonationButton() {
-      if (currentUser.role == 'donor') {
-        return SizedBox(
-          height: 30,
-          child: ElevatedButton(
-            onPressed: () {
-              // Implement the functionality to add a donation
-            },
-            style: ButtonStyle(
-              shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.zero,
-                ),
-              ),
-              elevation: WidgetStateProperty.all<double>(0),
-              backgroundColor: WidgetStateProperty.resolveWith<Color>(
-                (Set<WidgetState> states) {
-                  if (states.contains(WidgetState.pressed)) {
-                    return Theme.of(context)
-                        .colorScheme
-                        .primary
-                        .withOpacity(0.8);
-                  }
-                  return Theme.of(context).colorScheme.surface;
-                },
-              ),
-            ),
-            child: const Center(
-              child: Text(
-                'Add Donation',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        );
-      } else {
-        return const SizedBox(); // Return an empty SizedBox if the user is not a donor
-      }
-    }
-
-    Widget displayAppBar() {
+    displayAppBar() {
       return const ListPageSliverAppBar(
           title: 'Donations',
           backgroundWidget: ListPageHeader(
@@ -263,22 +195,15 @@ class _DonationListPageState extends State<DonationListPage> {
     }
 
     return Scaffold(
-      body: Column(
-        children: [
-          Expanded(
-            child: CustomScrollView(
-              slivers: [
-                displayAppBar(),
-                const SliverToBoxAdapter(
-                  child: SizedBox(height: 10),
-                ),
-                displayDonationList(),
-                BottomScrollViewWidget(
-                    listTitle: 'Donations', listLength: donations.length),
-              ],
-            ),
+      body: CustomScrollView(
+        slivers: [
+          displayAppBar(),
+          const SliverToBoxAdapter(
+            child: SizedBox(height: 10),
           ),
-          displayAddDonationButton(),
+          displayDonationList(),
+          BottomScrollViewWidget(
+              listTitle: 'Donations', listLength: donations.length),
         ],
       ),
     );

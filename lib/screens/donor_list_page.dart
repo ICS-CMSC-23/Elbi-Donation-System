@@ -9,7 +9,7 @@ import '../components/bottom_scroll_view_widget.dart';
 import '../components/list_page_sliver_app_bar.dart';
 import '../components/list_page_header.dart';
 import '../components/custom_tile_container.dart';
-import '../screens/donor_profile_page.dart';
+import 'donor_profile_page.dart';
 
 class DonorListPage extends StatefulWidget {
   const DonorListPage({super.key});
@@ -27,10 +27,7 @@ class DonorListPage extends StatefulWidget {
 
 class _DonorListPageState extends State<DonorListPage> {
   // only get the donors
-  List<User> donors = List.generate(
-          10, (context) => dummyUsers.where((user) => user.role == 'donor'))
-      .expand((list) => list)
-      .toList();
+  List<User> donors = dummyUsers.where((user) => user.role == 'donor').toList();
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +49,7 @@ class _DonorListPageState extends State<DonorListPage> {
                       source: donors[index].profilePhoto!,
                       size: 50,
                     ),
-                    title: Text(donors[index].name),
+                    title: Text(donors[index].email),
                     subtitle: Text(
                       donors[index].username,
                       style: const TextStyle(fontStyle: FontStyle.italic),
@@ -93,7 +90,7 @@ class _DonorListPageState extends State<DonorListPage> {
       );
     }
 
-    Widget displayAppBar() {
+    displayAppBar() {
       return const ListPageSliverAppBar(
           title: "Donors",
           backgroundWidget:
@@ -102,7 +99,7 @@ class _DonorListPageState extends State<DonorListPage> {
 
     return Scaffold(
       body: CustomScrollView(
-        semanticChildCount: donors.length,
+        semanticChildCount: 10,
         // physics: const BouncingScrollPhysics(),
         slivers: [
           displayAppBar(),

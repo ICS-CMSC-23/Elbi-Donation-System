@@ -7,6 +7,7 @@ import 'package:elbi_donation_system/models/route_model.dart';
 import 'package:elbi_donation_system/models/user_model.dart';
 import 'package:elbi_donation_system/providers/auth_provider.dart';
 import 'package:elbi_donation_system/providers/user_list_provider.dart';
+import 'package:elbi_donation_system/screens/donation_drive_list_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -23,7 +24,8 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
     User user = context.watch<UserListProvider>().currentUser;
 
     Row actionButtons;
-    if (context.watch<AuthProvider>().currentUser.role == User.admin) {
+    String userType = context.watch<AuthProvider>().currentUser.role;
+    if (userType == User.admin) {
       actionButtons = Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -41,6 +43,18 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
           )
         ],
       );
+    } else if (userType == User.donor) {
+      actionButtons = Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          TextButton.icon(
+              onPressed: () {
+                Navigator.pushNamed(context, DonationDriveListPage.route.path);
+              },
+              icon: const Icon(Icons.real_estate_agent_rounded),
+              label: const Text("View Donation Drives")),
+        ],
+      );
     } else {
       actionButtons = Row(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -54,10 +68,6 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
     }
 
     return Scaffold(
-        drawer: MainDrawer(routes: [
-          RouteModel("Logout", "/login"),
-          RouteModel("Home", "/"),
-        ]),
         appBar: AppBar(
           title: const Text("Organization Profile Page"),
         ),

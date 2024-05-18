@@ -20,5 +20,6 @@ class DonationDriveListProvider with ChangeNotifier {
   void setCurrentDonationDrive(String id) {
     _currentDonationDrive =
         donationDriveList.firstWhere((donationDrive) => donationDrive.id == id);
+    notifyListeners();
   }
 }

@@ -1,9 +1,13 @@
 import 'package:elbi_donation_system/components/main_drawer.dart';
 import 'package:elbi_donation_system/dummy_data/dummy_orgs.dart';
+import 'package:elbi_donation_system/dummy_data/dummy_users.dart';
 import 'package:elbi_donation_system/models/route_model.dart';
+import 'package:elbi_donation_system/models/user_model.dart';
+import 'package:elbi_donation_system/providers/user_list_provider.dart';
 import 'package:elbi_donation_system/screens/donation_drive_list_page.dart';
-import 'package:elbi_donation_system/screens/list_pages/donation_list_page.dart';
+import 'package:elbi_donation_system/screens/donation_list_page.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../components/page_cover.dart';
 
@@ -17,7 +21,8 @@ class DonorHomePage extends StatefulWidget {
 class _DonorHomePageState extends State<DonorHomePage> {
   final _formKey = GlobalKey<FormState>();
 
-  final organizations = dummyOrgs;
+  final List<User> organizations =
+      dummyUsers.where((user) => user.role == User.organization).toList();
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +31,6 @@ class _DonorHomePageState extends State<DonorHomePage> {
         RouteModel("Logout", "/login"),
         RouteModel("Home", "/"),
         RouteModel("Profile", "/donor-profile"),
-        DonationDriveListPage.route,
         DonationListPage.route,
       ]),
       appBar: AppBar(
@@ -75,20 +79,26 @@ class _DonorHomePageState extends State<DonorHomePage> {
                           children: [
                             Center(
                               child: Image.network(
-                                organizations[index].imageUrl,
+                                organizations[index].profilePhoto!,
                                 fit: BoxFit.cover,
                                 width: MediaQuery.of(context).size.width / 1.5,
                               ),
                             ),
                             Center(child: Text(organizations[index].name)),
                             Center(
-                                child: Text(organizations[index].description)),
+                                child: Text(organizations[index].about ??
+                                    "This organization has no tagline.")),
                             Center(
                               child: ElevatedButton(
                                 onPressed: () {
+                                  context
+                                      .read<UserListProvider>()
+                                      .changeCurrentUser(
+                                          organizations[index].email,
+                                          organizations[index].password);
                                   Navigator.pushNamed(
                                     context,
-                                    '/org-profile',
+                                    "/org-profile",
                                   );
                                 },
                                 child: const Text("View Org"),
