@@ -23,7 +23,7 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
     User user = context.watch<UserListProvider>().currentUser;
 
     Row actionButtons;
-    if (context.watch<AuthProvider>().currentUser.role == "admin") {
+    if (context.watch<AuthProvider>().currentUser.role == User.admin) {
       actionButtons = Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

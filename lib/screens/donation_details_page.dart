@@ -4,6 +4,8 @@ import 'package:elbi_donation_system/components/title_detail.dart';
 import 'package:elbi_donation_system/components/title_detail_list.dart';
 import 'package:elbi_donation_system/dummy_data/dummy_donations.dart';
 import 'package:elbi_donation_system/models/donation_model.dart';
+import 'package:elbi_donation_system/models/user_model.dart';
+import 'package:elbi_donation_system/providers/auth_provider.dart';
 import 'package:elbi_donation_system/providers/donation_list_provider.dart';
 import 'package:elbi_donation_system/providers/user_list_provider.dart';
 import 'package:flutter/material.dart';
@@ -30,11 +32,11 @@ class _DonationDetailsState extends State<DonationDetails> {
   Widget build(BuildContext context) {
     Donation donation = context.watch<DonationListProvider>().currentDonation;
     String userType = context
-        .watch<UserListProvider>()
+        .watch<AuthProvider>()
         .currentUser
         .role; //donor, organization, admin
     Row actionButtons;
-    if (userType == "donor") {
+    if (userType == User.donor) {
       actionButtons = Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

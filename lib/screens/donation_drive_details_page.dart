@@ -3,6 +3,8 @@ import 'package:elbi_donation_system/components/main_drawer.dart';
 import 'package:elbi_donation_system/components/rounded_image.dart';
 import 'package:elbi_donation_system/components/title_detail.dart';
 import 'package:elbi_donation_system/models/donation_drive_model.dart';
+import 'package:elbi_donation_system/models/user_model.dart';
+import 'package:elbi_donation_system/providers/auth_provider.dart';
 import 'package:elbi_donation_system/providers/donation_drive_list_provider.dart';
 import 'package:elbi_donation_system/providers/donation_list_provider.dart';
 import 'package:elbi_donation_system/providers/user_list_provider.dart';
@@ -41,11 +43,11 @@ class _DonationDriveDetailsState extends State<DonationDriveDetails> {
         .where((donation) => donation.donationDriveId == donationDrive.id)
         .toList();
     String userType = context
-        .watch<UserListProvider>()
+        .watch<AuthProvider>()
         .currentUser
         .role; //donor, organization, admin
     Row actionButtons;
-    if (userType == "organization") {
+    if (userType == User.organization) {
       actionButtons = Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
