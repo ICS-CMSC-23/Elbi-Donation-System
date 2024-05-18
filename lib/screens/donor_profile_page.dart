@@ -33,9 +33,7 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
   @override
   Widget build(BuildContext context) {
     User authUser = context.watch<AuthProvider>().currentUser;
-    User user = authUser.role == User.donor
-        ? authUser
-        : context.watch<UserListProvider>().currentUser;
+    User user = context.watch<UserListProvider>().currentUser;
     Row actionButtons;
     if (authUser.role == User.donor) {
       actionButtons = Row(
@@ -60,7 +58,7 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
 
     return Scaffold(
         appBar: AppBar(
-          title: const Text("Donor Profile Page"),
+          title: Text(user.name),
         ),
         body: Padding(
           padding: const EdgeInsets.all(20.0),

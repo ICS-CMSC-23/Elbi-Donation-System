@@ -30,7 +30,6 @@ class _DonorHomePageState extends State<DonorHomePage> {
       drawer: MainDrawer(routes: [
         RouteModel("Logout", "/login"),
         RouteModel("Home", "/"),
-        RouteModel("Profile", "/donor-profile"),
         DonationListPage.route,
       ]),
       appBar: AppBar(

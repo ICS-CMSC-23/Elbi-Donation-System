@@ -21,11 +21,11 @@ class OrgProfilePage extends StatefulWidget {
 class _OrgProfilePageState extends State<OrgProfilePage> {
   @override
   Widget build(BuildContext context) {
+    User authUser = context.watch<AuthProvider>().currentUser;
     User user = context.watch<UserListProvider>().currentUser;
 
     Row actionButtons;
-    String userType = context.watch<AuthProvider>().currentUser.role;
-    if (userType == User.admin) {
+    if (authUser.role == User.admin) {
       actionButtons = Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -43,7 +43,7 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
           )
         ],
       );
-    } else if (userType == User.donor) {
+    } else if (authUser.role == User.donor) {
       actionButtons = Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -69,7 +69,7 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
 
     return Scaffold(
         appBar: AppBar(
-          title: const Text("Organization Profile Page"),
+          title: Text(user.name),
         ),
         body: Padding(
           padding: const EdgeInsets.all(20.0),
