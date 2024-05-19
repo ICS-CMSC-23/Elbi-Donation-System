@@ -39,22 +39,42 @@ class DonationProvider with ChangeNotifier {
   }
 
   void addDonation(Donation donation) async {
-    String message = await firebaseService.addDonation(donation);
-    print(message);
-    notifyListeners();
+    try {
+      String message = await firebaseService.addDonation(donation);
+      print(message);
+      notifyListeners();
+    } on FirebaseException catch (e) {
+      print("Failed to add donation: ${e.message}");
+    }
   }
 
   void updateDonation(Donation donation) async {
-    String message =
-        await firebaseService.updateDonation(donation.id!, donation.toJson());
-    print(message);
-    notifyListeners();
+    if (_selectedDonation != null) {
+      try {
+        String message = await firebaseService.updateDonation(
+            donation.id!, donation.toJson());
+        print(message);
+        notifyListeners();
+      } on FirebaseException catch (e) {
+        print("Failed to update donation: ${e.message}");
+      }
+    } else {
+      print("No donation selected for update");
+    }
   }
 
   void deleteDonation() async {
-    String message =
-        await firebaseService.deleteDonation(_selectedDonation!.id!);
-    print(message);
-    notifyListeners();
+    if (_selectedDonation != null && _selectedDonation!.id != null) {
+      try {
+        String message =
+            await firebaseService.deleteDonation(_selectedDonation!.id!);
+        print(message);
+        notifyListeners();
+      } on FirebaseException catch (e) {
+        print("Failed to delete donation: ${e.message}");
+      }
+    } else {
+      print("No donation selected for deletion");
+    }
   }
 }
