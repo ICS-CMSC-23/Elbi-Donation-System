@@ -7,6 +7,8 @@ class FirebaseDonationAPI {
   Future<String> addDonation(Donation donation) async {
     try {
       final docRef = await db.collection("donations").add(donation.toJson());
+      await db.collection("donations").doc(docRef.id).update({"id": docRef.id});
+
       return "Successfully added donation!";
     } on FirebaseException catch (e) {
       return "Failed to add donation: ${e.message}";
