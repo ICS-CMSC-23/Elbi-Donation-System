@@ -19,4 +19,18 @@ class DonationDrive {
     this.photos,
     this.isCompleted = false,
   });
+
+  // convert DonationDrive object to json for Firestore
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'organizationId': organizationId,
+      'startDate': startDate,
+      'endDate': endDate,
+      'name': name,
+      'description': description,
+      'photos': photos,
+      'isCompleted': isCompleted,
+    };
+  }
 }

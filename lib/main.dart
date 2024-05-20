@@ -23,8 +23,20 @@ import 'package:elbi_donation_system/themes/sample_theme.dart';
 import 'package:elbi_donation_system/themes/sample_theme_3.dart';
 import 'package:flutter/material.dart';
 import "package:provider/provider.dart";
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() {
+// necessary packages for firebase integration
+// flutter pub add firebase_core
+// flutter pub add cloud_firestore
+// flutter pub add firebase_auth
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => AuthProvider()),
     ChangeNotifierProvider(create: (context) => UserListProvider()),
