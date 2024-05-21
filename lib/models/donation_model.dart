@@ -40,4 +40,22 @@ class Donation {
     required this.contactNo,
     this.status = STATUS_PENDING,
   });
+
+  // convert Donation object to json for Firestore
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'description': description,
+      'donorId': donorId,
+      'donationDriveId': donationDriveId,
+      'category': category,
+      'isForPickup': isForPickup,
+      'weightInKg': weightInKg,
+      'dateTime': dateTime,
+      'photos': photos,
+      'addresses': addresses,
+      'contactNo': contactNo,
+      'status': status,
+    };
+  }
 }

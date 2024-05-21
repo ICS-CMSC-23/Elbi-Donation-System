@@ -5,7 +5,9 @@ import 'package:elbi_donation_system/components/title_detail_list.dart';
 import 'package:elbi_donation_system/models/donation_model.dart';
 import 'package:elbi_donation_system/models/route_model.dart';
 import 'package:elbi_donation_system/models/user_model.dart';
+import 'package:elbi_donation_system/providers/auth_provider.dart';
 import 'package:elbi_donation_system/providers/user_list_provider.dart';
+import 'package:elbi_donation_system/screens/donation_drive_list_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -19,10 +21,11 @@ class OrgProfilePage extends StatefulWidget {
 class _OrgProfilePageState extends State<OrgProfilePage> {
   @override
   Widget build(BuildContext context) {
+    User authUser = context.watch<AuthProvider>().currentUser;
     User user = context.watch<UserListProvider>().currentUser;
 
     Row actionButtons;
-    if (user.role == "admin") {
+    if (authUser.role == User.admin) {
       actionButtons = Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -40,6 +43,18 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
           )
         ],
       );
+    } else if (authUser.role == User.donor) {
+      actionButtons = Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          TextButton.icon(
+              onPressed: () {
+                Navigator.pushNamed(context, DonationDriveListPage.route.path);
+              },
+              icon: const Icon(Icons.real_estate_agent_rounded),
+              label: const Text("View Donation Drives")),
+        ],
+      );
     } else {
       actionButtons = Row(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -53,12 +68,8 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
     }
 
     return Scaffold(
-        drawer: MainDrawer(routes: [
-          RouteModel("Home", "/"),
-          RouteModel("Logout", "/login"),
-        ]),
         appBar: AppBar(
-          title: const Text("Organization Profile Page"),
+          title: Text(user.name),
         ),
         body: Padding(
           padding: const EdgeInsets.all(20.0),

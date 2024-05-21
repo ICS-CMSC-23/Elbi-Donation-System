@@ -1,4 +1,7 @@
+import 'package:elbi_donation_system/components/main_drawer.dart';
+import 'package:elbi_donation_system/models/route_model.dart';
 import 'package:elbi_donation_system/providers/donation_drive_list_provider.dart';
+import 'package:elbi_donation_system/screens/donation_drive_list_page.dart';
 import '../screens/donor_profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -12,48 +15,39 @@ class OrgHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Accessing DonationDriveListProvider
-    final donationDriveListProvider = Provider.of<DonationDriveListProvider>(context);
+    final donationDriveListProvider =
+        Provider.of<DonationDriveListProvider>(context);
 
     return Scaffold(
+      drawer: MainDrawer(routes: [
+        RouteModel("Logout", "/login"),
+        RouteModel("Home", "/"),
+        DonationDriveListPage.route
+      ]),
       appBar: AppBar(
         title: const Text('Organization Home Page'),
         actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              onPressed: () {
-                // Navigate to Donor Profile Page
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const DonorProfilePage()),
-                );
-              },
-              child: const Text('Profile'),
-            ),
+          IconButton(
+            icon: const Icon(Icons.person),
+            onPressed: () {
+              // Navigate to Donor Profile Page
+              Navigator.pushNamed(
+                context,
+                "/org-profile",
+              );
+            },
           ),
         ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              onPressed: () {
-                // Navigate to Donor Profile Page
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const DonorProfilePage()),
-                );
-              },
-              child: const Text('Profile Page'),
-            ),
-          ),
           Expanded(
             child: ListView.builder(
               itemCount: donationDriveListProvider.donationDriveList.length,
               itemBuilder: (context, index) {
-                final donationDrive = donationDriveListProvider.donationDriveList[index];
+                final donationDrive =
+                    donationDriveListProvider.donationDriveList[index];
                 return Card(
                   child: ListTile(
                     title: Text(donationDrive.name),
@@ -65,16 +59,20 @@ class OrgHomePage extends StatelessWidget {
                         fit: BoxFit.cover,
                       ),
                     ),
-                    trailing: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const DonationDriveDetails(),
-                          ),
-                        );
-                      },
-                      child: const Text('View Donation Drive'),
+                    trailing: SizedBox(
+                      width: 50,
+                      child: IconButton(
+                        icon: const Icon(Icons.more_vert),
+                        onPressed: () {
+                          context
+                              .read<DonationDriveListProvider>()
+                              .setCurrentDonationDrive(donationDriveListProvider
+                                      .donationDriveList[index].id ??
+                                  "1");
+                          Navigator.pushNamed(
+                              context, "/donation-drive-details");
+                        },
+                      ),
                     ),
                   ),
                 );

@@ -1,4 +1,6 @@
+import 'package:elbi_donation_system/providers/theme_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/route_model.dart';
 
 class MainDrawer extends StatefulWidget {
@@ -20,7 +22,23 @@ class _MainDrawerState extends State<MainDrawer> {
             decoration: BoxDecoration(color: Theme.of(context).primaryColor),
             child: const Text(
               "Elbi Donation System",
+              style: TextStyle(fontSize: 40, color: Colors.white),
             ),
+          ),
+          Row(
+            children: [
+              const Padding(
+                padding: EdgeInsets.only(top: 8, left: 15),
+                child: Text("Dark Mode: "),
+              ),
+              Switch(
+                  inactiveTrackColor: Theme.of(context).primaryColor,
+                  activeColor: Theme.of(context).primaryColor,
+                  value: context.watch<ThemeProvider>().isDarkTheme,
+                  onChanged: (e) {
+                    context.read<ThemeProvider>().toggleDarkTheme();
+                  })
+            ],
           ),
           ListView.builder(
               reverse: true,
