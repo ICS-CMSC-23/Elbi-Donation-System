@@ -2,9 +2,8 @@ import 'package:elbi_donation_system/dummy_data/dummy_users.dart';
 import 'package:elbi_donation_system/models/user_model.dart';
 import 'package:elbi_donation_system/providers/user_list_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:elbi_donation_system/components/main_drawer.dart';
-import 'package:elbi_donation_system/models/route_model.dart';
 import 'package:provider/provider.dart';
+import 'package:elbi_donation_system/themes/purple_theme.dart';
 
 class OrgAccApprovalPage extends StatefulWidget {
   const OrgAccApprovalPage({super.key});
@@ -24,13 +23,21 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Organization Account Approval Page"),
+        title: const Text("Org Account Approval"),
       ),
       body: SingleChildScrollView(
         child: Form(
           key: _formKey,
           child: Column(
             children: [
+              const Padding(
+                padding: EdgeInsets.all(20),
+                child: Text(
+                  "This is where you approve or disapprove organization accounts as an admin.",
+                  style: TextStyle(fontSize: 16),
+                  textAlign: TextAlign.center,
+                ),
+              ),
               ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -61,7 +68,7 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              ElevatedButton(
+                              ElevatedButton.icon(
                                 onPressed: () {
                                   context
                                       .read<UserListProvider>()
@@ -74,31 +81,46 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                                     arguments: organizations[index],
                                   );
                                 },
-                                child: const Text("View Org Details"),
+                                icon: const Icon(Icons.info),
+                                label: const Text("View Org Details"),
                               ),
                               ElevatedButton(
                                 onPressed: () {
-                                  // Approve action
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                          "${organizations[index].name} approved"),
-                                    ),
+                                  _showConfirmationDialog(
+                                    context,
+                                    organizations[index].name,
+                                    "approve",
+                                    () {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                              "${organizations[index].name} approved"),
+                                        ),
+                                      );
+                                      Navigator.of(context).pop();
+                                    },
                                   );
                                 },
-                                child: const Text("Approve"),
+                                child: const Icon(Icons.check, color: Colors.green),
                               ),
                               ElevatedButton(
                                 onPressed: () {
-                                  // Disapprove action
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                          "${organizations[index].name} disapproved"),
-                                    ),
+                                  _showConfirmationDialog(
+                                    context,
+                                    organizations[index].name,
+                                    "disapprove",
+                                    () {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                              "${organizations[index].name} disapproved"),
+                                        ),
+                                      );
+                                      Navigator.of(context).pop();
+                                    },
                                   );
                                 },
-                                child: const Text("Disapprove"),
+                                child: const Icon(Icons.close, color: Colors.red),
                               ),
                             ],
                           ),
@@ -112,6 +134,45 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showConfirmationDialog(BuildContext context, String orgName, String action, VoidCallback onConfirm) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Theme(
+          data: purpleTheme(),
+          child: AlertDialog(
+            title: Text(
+              "Confirm $action",
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+            content: Text(
+              "Are you sure you want to $action $orgName?",
+              style: const TextStyle(color: Colors.white),
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text(
+                  "Cancel",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              TextButton(
+                onPressed: onConfirm,
+                child: const Text(
+                  "Confirm",
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

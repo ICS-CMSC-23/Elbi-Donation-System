@@ -26,23 +26,22 @@ class OrgHomePage extends StatelessWidget {
       ]),
       appBar: AppBar(
         title: const Text('Organization Home Page'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.person),
+            onPressed: () {
+              // Navigate to Donor Profile Page
+              Navigator.pushNamed(
+                context,
+                "/org-profile",
+              );
+            },
+          ),
+        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              onPressed: () {
-                // Navigate to Donor Profile Page
-                Navigator.pushNamed(
-                  context,
-                  "/org-profile",
-                );
-              },
-              child: const Text('Profile Page'),
-            ),
-          ),
           Expanded(
             child: ListView.builder(
               itemCount: donationDriveListProvider.donationDriveList.length,
