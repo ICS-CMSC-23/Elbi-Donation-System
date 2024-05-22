@@ -374,6 +374,23 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                   ),
                 ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    const Text('Already a User?'),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, "/login");
+                      },
+                      child: Text(
+                        'Login',
+                        style: TextStyle(
+                            color: Theme.of(context).primaryColor,
+                            fontSize: 15),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
