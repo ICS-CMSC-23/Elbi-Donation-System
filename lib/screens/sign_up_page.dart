@@ -21,6 +21,7 @@ class _SignUpPageState extends State<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController userNameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
   final TextEditingController contactNumberController = TextEditingController();
@@ -150,6 +151,20 @@ class _SignUpPageState extends State<SignUpPage> {
                 ],
                 const SizedBox(height: 16),
                 TextFormField(
+                  controller: emailController,
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
+                    prefixIcon: Icon(Icons.email),
+                  ),
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Please enter your email';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
                   controller: passwordController,
                   decoration: const InputDecoration(
                     labelText: 'Password',
@@ -195,24 +210,26 @@ class _SignUpPageState extends State<SignUpPage> {
                 ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                      // context.read<AuthProvider>().signUp(User(
-                      //       name: "James Boi",
-                      //       username: "James",
-                      //       email: "donor@example.com",
-                      //       password:
-                      //           '12345678', // Don't store password locally
-                      //       address: ["addressniJames"],
-                      //       contactNo: "09985338845",
-                      //       role: "donor",
-                      //       profilePhoto:
-                      //           "https://i.pinimg.com/originals/f5/24/e1/f524e1e728b829b039c84f5ee4f1478a.webp",
-                      //       about: "A donor na igop",
-                      //       proofsOfLegitimacy: [
-                      //         "https://i.pinimg.com/originals/f5/24/e1/f524e1e728b829b039c84f5ee4f1478a.webp"
-                      //       ],
-                      //       isApproved: false,
-                      //       isOpenForDonation: false,
-                      //     ));
+                      context.read<AuthProvider>().signUp(User(
+                            name: isDonor
+                                ? nameController.text
+                                : orgNameController.text,
+                            username: userNameController.text,
+                            email: emailController.text,
+                            password: passwordController
+                                .text, // Don't store password locally
+                            address: [addressController.text],
+                            contactNo: contactNumberController.text,
+                            role: isDonor ? "donor" : "organization",
+                            profilePhoto:
+                                "https://i.pinimg.com/originals/f5/24/e1/f524e1e728b829b039c84f5ee4f1478a.webp",
+                            about: "A donor na igop",
+                            proofsOfLegitimacy: [
+                              "https://i.pinimg.com/originals/f5/24/e1/f524e1e728b829b039c84f5ee4f1478a.webp"
+                            ],
+                            isApproved: false,
+                            isOpenForDonation: false,
+                          ));
                     }
                   },
                   child: const Text(
