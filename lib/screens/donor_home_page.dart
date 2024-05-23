@@ -41,7 +41,7 @@ class _DonorHomePageState extends State<DonorHomePage> {
               // Navigate to Donor Profile Page
               Navigator.pushNamed(
                 context,
-                "/org-profile",
+                "/donor-profile",
               );
             },
           ),

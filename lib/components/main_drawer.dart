@@ -1,3 +1,4 @@
+import 'package:elbi_donation_system/providers/auth_provider.dart';
 import 'package:elbi_donation_system/providers/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -49,6 +50,7 @@ class _MainDrawerState extends State<MainDrawer> {
                     title: Text(widget.routes[index].name),
                     onTap: () {
                       if (widget.routes[index].path == "/login") {
+                        context.read<AuthProvider>().signOut();
                         Navigator.pushNamedAndRemoveUntil(
                             context, "/login", (r) => false);
                       }

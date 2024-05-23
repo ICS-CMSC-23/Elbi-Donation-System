@@ -86,13 +86,11 @@ class _LoginPageState extends State<LoginPage> {
                   BoxDecoration(borderRadius: BorderRadius.circular(20)),
               child: ElevatedButton(
                 onPressed: () {
-                  User currentUser = context
+                  context
                       .read<AuthProvider>()
-                      .changeCurrentUser(
-                          _emailController.text, _passwordController.text);
-                  context.read<UserListProvider>().changeCurrentUser(
-                      _emailController.text, _passwordController.text);
-                  if (currentUser.role != "guest") {
+                      .signIn(_emailController.text, _passwordController.text);
+                  if (context.read<AuthProvider>().currentUser.role !=
+                      "guest") {
                     Navigator.pushNamed(context, "/");
                   }
                 },
