@@ -32,6 +32,24 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  void _forgotPassword() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Forgot Password"),
+          content: const Text("Password reset not yet implemented."),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,92 +58,121 @@ class _LoginPageState extends State<LoginPage> {
         title: const Text("Log In"),
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            const Padding(
-              padding: EdgeInsets.only(top: 60.0),
-            ),
-            Padding(
-              //padding: const EdgeInsets.only(left:15.0,right: 15.0,top:0,bottom: 0),
-              padding: EdgeInsets.symmetric(horizontal: 15),
-              child: TextField(
-                controller: _emailController,
-                decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Email',
-                    hintText: 'Enter email'),
-              ),
-            ),
-            Padding(
-              padding:
-                  EdgeInsets.only(left: 15.0, right: 15.0, top: 15, bottom: 0),
-              //padding: EdgeInsets.symmetric(horizontal: 15),
-              child: TextField(
-                controller: _passwordController,
-                obscureText: true,
-                decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Password',
-                    hintText: 'Enter password'),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                //TODO FORGOT PASSWORD SCREEN GOES HERE
-              },
-              child: Text(
-                'Forgot Password',
-                style: TextStyle(
-                    color: Theme.of(context).primaryColor, fontSize: 15),
-              ),
-            ),
-            Container(
-              height: 50,
-              width: 250,
-              decoration:
-                  BoxDecoration(borderRadius: BorderRadius.circular(20)),
-              child: ElevatedButton(
-                onPressed: () {
-                  User currentUser = context
-                      .read<AuthProvider>()
-                      .changeCurrentUser(
-                          _emailController.text, _passwordController.text);
-                  context.read<UserListProvider>().changeCurrentUser(
-                      _emailController.text, _passwordController.text);
-                  if (currentUser.role != "guest") {
-                    Navigator.pushNamed(context, "/");
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor,
-                  elevation: 0,
-                ),
-                child: const Text(
-                  'Login',
-                  style: TextStyle(color: Colors.white, fontSize: 25),
-                ),
-              ),
-            ),
-            const SizedBox(
-              height: 130,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
               children: <Widget>[
-                const Text('New User?'),
+                const Padding(
+                  padding: EdgeInsets.only(top: 60.0, bottom: 20),
+                  child: CircleAvatar(
+                    radius: 50,
+                    backgroundImage:
+                        AssetImage('assets/images/portrait-placeholder.jpg'),
+                  ),
+                ),
+                Padding(
+                  //padding: const EdgeInsets.only(left:15.0,right: 15.0,top:0,bottom: 0),
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: TextFormField(
+                    controller: _emailController,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Email',
+                      hintText: 'Enter email',
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter your email';
+                      }
+                      if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                        return 'Please enter a valid email';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      left: 15.0, right: 15.0, top: 15, bottom: 0),
+                  //padding: EdgeInsets.symmetric(horizontal: 15),
+                  child: TextFormField(
+                    controller: _passwordController,
+                    obscureText: true,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Password',
+                      hintText: 'Enter password',
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter your password';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Container(
+                  height: 50,
+                  width: 250,
+                  decoration:
+                      BoxDecoration(borderRadius: BorderRadius.circular(20)),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        context.read<AuthProvider>().signIn(
+                            _emailController.text, _passwordController.text);
+                        if (context.read<AuthProvider>().currentUser.role !=
+                            "guest") {
+                          Navigator.pushNamed(context, "/");
+                        }
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      'Login',
+                      style: TextStyle(color: Colors.white, fontSize: 25),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
                 TextButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, "/signup");
-                  },
+                  onPressed: _forgotPassword,
                   child: Text(
-                    'Create Account',
+                    'Forgot Password',
                     style: TextStyle(
                         color: Theme.of(context).primaryColor, fontSize: 15),
                   ),
                 ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    const Text('New User?'),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, "/signup");
+                      },
+                      child: Text(
+                        'Create Account',
+                        style: TextStyle(
+                            color: Theme.of(context).primaryColor,
+                            fontSize: 15),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );

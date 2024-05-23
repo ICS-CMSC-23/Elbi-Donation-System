@@ -34,6 +34,10 @@ ThemeData purpleTheme() {
         color: Colors.white,
       ),
     ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ButtonStyle(
+            backgroundColor: WidgetStatePropertyAll(basePurple),
+            foregroundColor: WidgetStatePropertyAll(Colors.white))),
     colorScheme: ColorScheme.fromSwatch(
         primarySwatch: MaterialColor(
       basePurple.value,

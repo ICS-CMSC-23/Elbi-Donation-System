@@ -34,6 +34,18 @@ class _DonorHomePageState extends State<DonorHomePage> {
       ]),
       appBar: AppBar(
         title: const Text("Donor Home Page"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.person),
+            onPressed: () {
+              // Navigate to Donor Profile Page
+              Navigator.pushNamed(
+                context,
+                "/donor-profile",
+              );
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Form(

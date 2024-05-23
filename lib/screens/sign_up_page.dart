@@ -1,5 +1,8 @@
 import 'dart:io';
+import 'package:elbi_donation_system/models/user_model.dart';
+import 'package:elbi_donation_system/providers/auth_provider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import '../components/main_drawer.dart';
 import '../models/route_model.dart';
 import 'donor_home_page.dart';
@@ -192,29 +195,24 @@ class _SignUpPageState extends State<SignUpPage> {
                 ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                      // String? error =
-                      //           await context.read<UserAuthProvider>().signUp(
-                      //                 userNameController.text.trim(),
-                      //                 passwordController.text.trim(),
-                      //               );
-                      //       if (error == null) {
-                      //         // Save additional user info to Firestore
-                      //         final user = context.read<UserAuthProvider>().user;
-                      //         await FirebaseFirestore.instance
-                      //             .collection('users')
-                      //             .doc(user?.uid)
-                      //             .set({
-                      //           'Name': nameController.text.trim(),
-                      //           'Username': userNameController.text.trim(),
-                      //           'Address': addresController.text.trim(),
-                      //           'Contact Number' : contactNumberController.text.trim(),
-                      //         });
-                      //         Navigator.pop(context);
-                      //       } else {
-                      //         setState(() {
-                      //           errorMessage = error;
-                      //         });
-                      //       }
+                      // context.read<AuthProvider>().signUp(User(
+                      //       name: "James Boi",
+                      //       username: "James",
+                      //       email: "donor@example.com",
+                      //       password:
+                      //           '12345678', // Don't store password locally
+                      //       address: ["addressniJames"],
+                      //       contactNo: "09985338845",
+                      //       role: "donor",
+                      //       profilePhoto:
+                      //           "https://i.pinimg.com/originals/f5/24/e1/f524e1e728b829b039c84f5ee4f1478a.webp",
+                      //       about: "A donor na igop",
+                      //       proofsOfLegitimacy: [
+                      //         "https://i.pinimg.com/originals/f5/24/e1/f524e1e728b829b039c84f5ee4f1478a.webp"
+                      //       ],
+                      //       isApproved: false,
+                      //       isOpenForDonation: false,
+                      //     ));
                     }
                   },
                   child: const Text(
@@ -238,6 +236,23 @@ class _SignUpPageState extends State<SignUpPage> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    const Text('Already a User?'),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, "/login");
+                      },
+                      child: Text(
+                        'Login',
+                        style: TextStyle(
+                            color: Theme.of(context).primaryColor,
+                            fontSize: 15),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
