@@ -7,6 +7,7 @@ import 'package:elbi_donation_system/models/route_model.dart';
 import 'package:elbi_donation_system/models/user_model.dart';
 import 'package:elbi_donation_system/providers/auth_provider.dart';
 import 'package:elbi_donation_system/providers/user_list_provider.dart';
+import 'package:elbi_donation_system/providers/user_provider.dart';
 import 'package:elbi_donation_system/screens/donation_drive_list_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -22,7 +23,7 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
   @override
   Widget build(BuildContext context) {
     User authUser = context.watch<AuthProvider>().currentUser;
-    User user = context.watch<UserListProvider>().currentUser;
+    User user = context.watch<UserProvider>().selected;
 
     Row actionButtons;
     if (authUser.role == User.admin) {
