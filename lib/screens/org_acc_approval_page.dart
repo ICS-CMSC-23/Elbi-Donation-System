@@ -73,8 +73,8 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                                   context
                                       .read<UserListProvider>()
                                       .changeCurrentUser(
-                                          organizations[index].email,
-                                          organizations[index].password);
+                                        organizations[index].email,
+                                      );
                                   Navigator.pushNamed(
                                     context,
                                     '/org-profile',
@@ -91,7 +91,8 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                                     organizations[index].name,
                                     "approve",
                                     () {
-                                      ScaffoldMessenger.of(context).showSnackBar(
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
                                         SnackBar(
                                           content: Text(
                                               "${organizations[index].name} approved"),
@@ -101,7 +102,8 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                                     },
                                   );
                                 },
-                                child: const Icon(Icons.check, color: Colors.green),
+                                child: const Icon(Icons.check,
+                                    color: Colors.green),
                               ),
                               ElevatedButton(
                                 onPressed: () {
@@ -110,7 +112,8 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                                     organizations[index].name,
                                     "disapprove",
                                     () {
-                                      ScaffoldMessenger.of(context).showSnackBar(
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
                                         SnackBar(
                                           content: Text(
                                               "${organizations[index].name} disapproved"),
@@ -120,7 +123,8 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                                     },
                                   );
                                 },
-                                child: const Icon(Icons.close, color: Colors.red),
+                                child:
+                                    const Icon(Icons.close, color: Colors.red),
                               ),
                             ],
                           ),
@@ -137,7 +141,8 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
     );
   }
 
-  void _showConfirmationDialog(BuildContext context, String orgName, String action, VoidCallback onConfirm) {
+  void _showConfirmationDialog(BuildContext context, String orgName,
+      String action, VoidCallback onConfirm) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -146,7 +151,8 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
           child: AlertDialog(
             title: Text(
               "Confirm $action",
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  color: Colors.white, fontWeight: FontWeight.bold),
             ),
             content: Text(
               "Are you sure you want to $action $orgName?",
@@ -166,7 +172,8 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                 onPressed: onConfirm,
                 child: const Text(
                   "Confirm",
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ),
             ],

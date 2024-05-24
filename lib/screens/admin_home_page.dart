@@ -3,6 +3,7 @@ import 'package:elbi_donation_system/dummy_data/dummy_users.dart';
 import 'package:elbi_donation_system/models/route_model.dart';
 import 'package:elbi_donation_system/models/user_model.dart';
 import 'package:elbi_donation_system/providers/user_list_provider.dart';
+import 'package:elbi_donation_system/providers/user_provider.dart';
 import 'package:elbi_donation_system/screens/donor_list_page.dart';
 import 'package:elbi_donation_system/screens/org_profile_page.dart';
 import 'package:flutter/material.dart';
@@ -49,8 +50,8 @@ class _AdminHomePageState extends State<AdminHomePage> {
               trailing: ElevatedButton(
                 onPressed: () {
                   // Link Org Profile page
-                  context.read<UserListProvider>().changeCurrentUser(
-                      organization.email, organization.password);
+                  context.read<UserProvider>().changeSelectedUser(organization);
+
                   Navigator.pushNamed(context, "/org-profile");
                 },
                 child: const Text("View Org"),

@@ -1,8 +1,12 @@
+import 'package:elbi_donation_system/models/user_model.dart';
 import 'package:elbi_donation_system/providers/auth_provider.dart';
 import 'package:elbi_donation_system/providers/donation_drive_list_provider.dart';
+import 'package:elbi_donation_system/providers/donation_drive_provider.dart';
 import 'package:elbi_donation_system/providers/donation_list_provider.dart';
+import 'package:elbi_donation_system/providers/donation_provider.dart';
 import 'package:elbi_donation_system/providers/theme_provider.dart';
 import 'package:elbi_donation_system/providers/user_list_provider.dart';
+import 'package:elbi_donation_system/providers/user_provider.dart';
 import 'package:elbi_donation_system/screens/admin_home_page.dart';
 import 'package:elbi_donation_system/screens/donation_drive_list_page.dart';
 import 'package:elbi_donation_system/screens/donor_home_page.dart';
@@ -40,6 +44,9 @@ void main() async {
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => AuthProvider()),
     ChangeNotifierProvider(create: (context) => UserListProvider()),
+    ChangeNotifierProvider(create: (context) => UserProvider()),
+    ChangeNotifierProvider(create: (context) => DonationProvider()),
+    ChangeNotifierProvider(create: (context) => DonationDriveProvider()),
     ChangeNotifierProvider(create: (context) => DonationListProvider()),
     ChangeNotifierProvider(create: (context) => DonationDriveListProvider()),
     ChangeNotifierProvider(create: (context) => ThemeProvider())
@@ -52,6 +59,12 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    User currentUser = context.watch<AuthProvider>().currentUser;
+    context.read<UserListProvider>().changeCurrentUser(currentUser.email);
+    context.read<UserProvider>().changeSelectedUser(currentUser);
+    print(currentUser.email);
+    print(currentUser.password);
+
     return MaterialApp(
       title: 'Elbi Donation System',
       initialRoute: '/',

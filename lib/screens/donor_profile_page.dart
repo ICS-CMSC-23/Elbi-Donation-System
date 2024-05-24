@@ -1,9 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elbi_donation_system/components/rounded_image.dart';
 import 'package:elbi_donation_system/dummy_data/dummy_donations.dart';
 import 'package:elbi_donation_system/models/donation_model.dart';
 import 'package:elbi_donation_system/providers/auth_provider.dart';
 import 'package:elbi_donation_system/providers/donation_list_provider.dart';
+import 'package:elbi_donation_system/providers/donation_provider.dart';
 import 'package:elbi_donation_system/providers/user_list_provider.dart';
+import 'package:elbi_donation_system/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 import '../models/user_model.dart';
 
@@ -33,7 +36,9 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
   @override
   Widget build(BuildContext context) {
     User authUser = context.watch<AuthProvider>().currentUser;
-    User user = context.watch<UserListProvider>().currentUser;
+    User user = authUser.role == User.donor
+        ? authUser
+        : context.watch<UserProvider>().selected;
     Row actionButtons;
     if (authUser.role == User.donor) {
       actionButtons = Row(
@@ -52,9 +57,11 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
       );
     }
 
-    List<Donation> userDonations = dummyDonations
-        .where((donation) => donation.donorId == user.id)
-        .toList();
+    Stream<QuerySnapshot> donationsStream =
+        context.watch<DonationProvider>().donations;
+    // List<Donation> userDonations = dummyDonations
+    //     .where((donation) => donation.donorId == user.id)
+    //     .toList();
 
     return Scaffold(
         appBar: AppBar(
@@ -86,27 +93,64 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
                 ),
               ),
               Expanded(
-                child: ListView.builder(
-                    itemCount: userDonations.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        leading: RoundedImage(
-                            source: userDonations[index].photos![0], size: 50),
-                        title: Text(userDonations[index].category),
-                        subtitle: Text(userDonations[index].description),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.card_giftcard_outlined),
-                          onPressed: () {
-                            context
-                                .read<DonationListProvider>()
-                                .setCurrentDonation(
-                                    userDonations[index].id ?? "donation_0");
-                            Navigator.pushNamed(context, "/donation-details");
-                          },
-                        ),
-                      );
-                    }),
-              ),
+                  child: StreamBuilder(
+                stream: donationsStream,
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Text("Error encountered! ${snapshot.error}"),
+                    );
+                  } else if (snapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else if (!snapshot.hasData) {
+                    return const Center(
+                      child: Text("No Donations Found"),
+                    );
+                  }
+
+                  // Filter donations by donorId
+                  var filteredDonations = snapshot.data!.docs.where((doc) {
+                    var donation =
+                        Donation.fromJson(doc.data() as Map<String, dynamic>);
+                    return donation.donorId == user.id;
+                  }).toList();
+
+                  if (filteredDonations.isEmpty) {
+                    return const Center(
+                      child: Text("No Donations Found for the specified donor"),
+                    );
+                  }
+
+                  return ListView.builder(
+                      itemCount: filteredDonations.length,
+                      itemBuilder: (context, index) {
+                        Donation donation = Donation.fromJson(
+                            filteredDonations[index].data()
+                                as Map<String, dynamic>);
+                        return ListTile(
+                          leading: RoundedImage(
+                              source: donation.photos![0], size: 50),
+                          title: Text(donation.category),
+                          subtitle: Text(donation.description),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.more_vert),
+                            onPressed: () {
+                              context
+                                  .read<DonationProvider>()
+                                  .changeSelectedDonation(donation);
+                              context
+                                  .read<UserProvider>()
+                                  .fetchUserById(donation.donorId);
+                              Navigator.pushNamed(context, "/donation-details");
+                            },
+                          ),
+                        );
+                      });
+                },
+              )),
             ],
           ),
         ));

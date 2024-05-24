@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elbi_donation_system/components/header_with_pic.dart';
 import 'package:elbi_donation_system/components/main_drawer.dart';
 import 'package:elbi_donation_system/components/rounded_image.dart';
@@ -6,8 +7,11 @@ import 'package:elbi_donation_system/models/donation_drive_model.dart';
 import 'package:elbi_donation_system/models/user_model.dart';
 import 'package:elbi_donation_system/providers/auth_provider.dart';
 import 'package:elbi_donation_system/providers/donation_drive_list_provider.dart';
+import 'package:elbi_donation_system/providers/donation_drive_provider.dart';
 import 'package:elbi_donation_system/providers/donation_list_provider.dart';
+import 'package:elbi_donation_system/providers/donation_provider.dart';
 import 'package:elbi_donation_system/providers/user_list_provider.dart';
+import 'package:elbi_donation_system/providers/user_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -36,16 +40,15 @@ class _DonationDriveDetailsState extends State<DonationDriveDetails> {
   @override
   Widget build(BuildContext context) {
     DonationDrive donationDrive =
-        context.watch<DonationDriveListProvider>().currentDonationDrive;
-    List<Donation> donations = context
-        .read<DonationListProvider>()
-        .donationList
-        .where((donation) => donation.donationDriveId == donationDrive.id)
-        .toList();
+        context.watch<DonationDriveProvider>().selected;
     String userType = context
         .watch<AuthProvider>()
         .currentUser
         .role; //donor, organization, admin
+
+    Stream<QuerySnapshot> donationsStream =
+        context.watch<DonationProvider>().donations;
+
     Row actionButtons;
     if (userType == User.organization) {
       actionButtons = Row(
@@ -106,7 +109,7 @@ class _DonationDriveDetailsState extends State<DonationDriveDetails> {
                     ? "Event Finished"
                     : "Event Ongoing",
                 description:
-                    "Organization: ${context.read<UserListProvider>().userList.firstWhere((user) => user.id == donationDrive.organizationId).name}"),
+                    "Organization: ${context.watch<UserProvider>().selected.name}"),
             TitleDetail(
               title: "Description",
               detail: donationDrive.description,
@@ -160,27 +163,47 @@ class _DonationDriveDetailsState extends State<DonationDriveDetails> {
               ),
             ),
             Expanded(
-              child: ListView.builder(
-                  itemCount: donations.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      leading: RoundedImage(
-                          source: donations[index].photos![0], size: 50),
-                      title: Text(donations[index].category),
-                      subtitle: Text(donations[index].description),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.handshake),
-                        onPressed: () {
-                          context
-                              .read<DonationListProvider>()
-                              .setCurrentDonation(
-                                  donations[index].id ?? "donation_0");
-                          Navigator.pushNamed(context, "/donation-details");
-                        },
-                      ),
-                    );
-                  }),
-            ),
+                child: StreamBuilder(
+              stream: donationsStream,
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text("Error encountered! ${snapshot.error}"),
+                  );
+                } else if (snapshot.connectionState ==
+                    ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else if (!snapshot.hasData) {
+                  return const Center(
+                    child: Text("No Donations Found"),
+                  );
+                }
+                return ListView.builder(
+                    itemCount: snapshot.data!.docs.length,
+                    itemBuilder: (context, index) {
+                      Donation donation = Donation.fromJson(
+                          snapshot.data!.docs[index].data()
+                              as Map<String, dynamic>);
+                      return ListTile(
+                        leading:
+                            RoundedImage(source: donation.photos![0], size: 50),
+                        title: Text(donation.category),
+                        subtitle: Text(donation.description),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.more_vert),
+                          onPressed: () {
+                            context
+                                .read<DonationProvider>()
+                                .changeSelectedDonation(donation);
+                            Navigator.pushNamed(context, "/donation-details");
+                          },
+                        ),
+                      );
+                    });
+              },
+            )),
             actionButtons,
           ],
         ),
