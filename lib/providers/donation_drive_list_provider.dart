@@ -6,7 +6,7 @@ class DonationDriveListProvider with ChangeNotifier {
   final List<DonationDrive> _donationDriveList = dummyDonationDrives;
   List<DonationDrive> get donationDriveList => _donationDriveList;
   DonationDrive _currentDonationDrive = DonationDrive(
-      id: "undefined",
+      id: "1",
       description: 'Donation Drive Description undefined',
       organizationId: '2',
       name: 'Undefined',
@@ -20,5 +20,6 @@ class DonationDriveListProvider with ChangeNotifier {
   void setCurrentDonationDrive(String id) {
     _currentDonationDrive =
         donationDriveList.firstWhere((donationDrive) => donationDrive.id == id);
+    notifyListeners();
   }
 }

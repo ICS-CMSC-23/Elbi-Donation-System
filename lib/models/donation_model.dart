@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Donation {
   final String? id;
   String description;
@@ -40,4 +42,41 @@ class Donation {
     required this.contactNo,
     this.status = STATUS_PENDING,
   });
+
+  // convert Donation object to json for Firestore
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'description': description,
+      'donorId': donorId,
+      'donationDriveId': donationDriveId,
+      'category': category,
+      'isForPickup': isForPickup,
+      'weightInKg': weightInKg,
+      'dateTime': Timestamp.fromDate(dateTime),
+      'photos': photos,
+      'addresses': addresses,
+      'contactNo': contactNo,
+      'status': status,
+    };
+  }
+
+  static Donation fromJson(Map<String, dynamic> json) {
+    return Donation(
+      id: json['id'],
+      donationDriveId: json['donationDriveId'],
+      description: json['description'],
+      donorId: json['donorId'],
+      category: json['category'],
+      isForPickup: json['isForPickup'],
+      weightInKg: json['weightInKg'] is int
+          ? (json['weightInKg'] as int).toDouble()
+          : json['weightInKg'],
+      dateTime: (json['dateTime'] as Timestamp).toDate(),
+      photos: List<String>.from(json['photos'] ?? []),
+      addresses: List<String>.from(json['addresses']),
+      contactNo: json['contactNo'],
+      status: json['status'] ?? STATUS_PENDING,
+    );
+  }
 }

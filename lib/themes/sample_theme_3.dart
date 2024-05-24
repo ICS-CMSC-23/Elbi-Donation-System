@@ -27,6 +27,7 @@ ThemeData blueTheme() {
       textTheme: ButtonTextTheme.primary,
     ),
     appBarTheme: const AppBarTheme(
+      titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
       color: baseBlue,
       iconTheme: IconThemeData(
         color: Colors.white,

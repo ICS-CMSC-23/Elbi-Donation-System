@@ -25,16 +25,12 @@ class UserListProvider with ChangeNotifier {
     isOpenForDonation: false,
   );
 
-  Widget _homeElement = const LoginPage();
-
-  Widget get homeElement => _homeElement;
-
   User get currentUser => _currentUser;
 
-  User changeCurrentUser(String email, String password) {
+  User changeCurrentUser(String email) {
     User? foundUser;
     for (User user in _userList) {
-      if (user.email == email && user.password == password) {
+      if (user.email == email) {
         foundUser = user;
       }
     }
@@ -55,15 +51,6 @@ class UserListProvider with ChangeNotifier {
           isOpenForDonation: false,
         );
 
-    if (_currentUser.role == "donor") {
-      _homeElement = const DonorHomePage();
-    } else if (_currentUser.role == "organization") {
-      _homeElement = const OrgHomePage();
-    } else if (_currentUser.role == "admin") {
-      _homeElement = const AdminHomePage();
-    } else {
-      _homeElement = const LoginPage();
-    }
     notifyListeners();
     if (foundUser == null) {
       return User(

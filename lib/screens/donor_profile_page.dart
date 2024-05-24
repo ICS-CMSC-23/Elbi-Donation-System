@@ -1,8 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elbi_donation_system/components/rounded_image.dart';
 import 'package:elbi_donation_system/dummy_data/dummy_donations.dart';
 import 'package:elbi_donation_system/models/donation_model.dart';
+import 'package:elbi_donation_system/providers/auth_provider.dart';
 import 'package:elbi_donation_system/providers/donation_list_provider.dart';
+import 'package:elbi_donation_system/providers/donation_provider.dart';
 import 'package:elbi_donation_system/providers/user_list_provider.dart';
+import 'package:elbi_donation_system/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 import '../models/user_model.dart';
 
@@ -17,6 +21,13 @@ import '../components/title_detail_list.dart';
 class DonorProfilePage extends StatefulWidget {
   const DonorProfilePage({super.key});
 
+// class route model
+  static final RouteModel _donorProfie = RouteModel(
+    "Donor Profile Page",
+    "/donor-profile",
+  );
+  static RouteModel get route => _donorProfie;
+
   @override
   State<DonorProfilePage> createState() => _DonorProfilePageState();
 }
@@ -24,9 +35,10 @@ class DonorProfilePage extends StatefulWidget {
 class _DonorProfilePageState extends State<DonorProfilePage> {
   @override
   Widget build(BuildContext context) {
-    User user = context.watch<UserListProvider>().currentUser;
+    User authUser = context.watch<AuthProvider>().currentUser;
+    User user = context.watch<UserProvider>().selected;
     Row actionButtons;
-    if (user.role == "donor") {
+    if (authUser.role == User.donor) {
       actionButtons = Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -43,17 +55,15 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
       );
     }
 
-    List<Donation> userDonations = dummyDonations
-        .where((donation) => donation.donorId == user.id)
-        .toList();
+    Stream<QuerySnapshot> donationsStream =
+        context.watch<DonationProvider>().donations;
+    // List<Donation> userDonations = dummyDonations
+    //     .where((donation) => donation.donorId == user.id)
+    //     .toList();
 
     return Scaffold(
-        drawer: MainDrawer(routes: [
-          RouteModel("Home", "/"),
-          RouteModel("Logout", "/login"),
-        ]),
         appBar: AppBar(
-          title: const Text("Donor Profile Page"),
+          title: Text(user.name),
         ),
         body: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -76,32 +86,55 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
               const Padding(
                 padding: EdgeInsets.only(top: 20),
                 child: Text(
-                  "Your Donations",
+                  "Donations",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
               ),
               Expanded(
-                child: ListView.builder(
-                    itemCount: userDonations.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        leading: RoundedImage(
-                            source: userDonations[index].photos![0], size: 50),
-                        title: Text(userDonations[index].category),
-                        subtitle: Text(userDonations[index].description),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.card_giftcard_outlined),
-                          onPressed: () {
-                            context
-                                .read<DonationListProvider>()
-                                .setCurrentDonation(
-                                    userDonations[index].id ?? "donation_0");
-                            Navigator.pushNamed(context, "/donation-details");
-                          },
-                        ),
-                      );
-                    }),
-              ),
+                  child: StreamBuilder(
+                stream: donationsStream,
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Text("Error encountered! ${snapshot.error}"),
+                    );
+                  } else if (snapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else if (!snapshot.hasData) {
+                    return const Center(
+                      child: Text("No Donations Found"),
+                    );
+                  }
+                  return ListView.builder(
+                      itemCount: snapshot.data?.docs.length,
+                      itemBuilder: (context, index) {
+                        Donation donation = Donation.fromJson(
+                            snapshot.data!.docs[index].data()
+                                as Map<String, dynamic>);
+                        return ListTile(
+                          leading: RoundedImage(
+                              source: donation.photos![0], size: 50),
+                          title: Text(donation.category),
+                          subtitle: Text(donation.description),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.card_giftcard_outlined),
+                            onPressed: () {
+                              context
+                                  .read<DonationProvider>()
+                                  .changeSelectedDonation(donation);
+                              context
+                                  .read<UserProvider>()
+                                  .fetchUserById(donation.donorId);
+                              Navigator.pushNamed(context, "/donation-details");
+                            },
+                          ),
+                        );
+                      });
+                },
+              )),
             ],
           ),
         ));

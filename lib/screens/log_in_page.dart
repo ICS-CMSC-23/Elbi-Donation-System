@@ -1,3 +1,4 @@
+import 'package:elbi_donation_system/providers/auth_provider.dart';
 import 'package:elbi_donation_system/providers/user_list_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -53,6 +54,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false, // to remove back button
         title: const Text("Log In"),
       ),
       body: SingleChildScrollView(
@@ -122,11 +124,15 @@ class _LoginPageState extends State<LoginPage> {
                   child: ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        User currentUser = context
-                            .read<UserListProvider>()
-                            .changeCurrentUser(_emailController.text,
-                                _passwordController.text);
-                        if (currentUser.role != "guest") {
+                        context.read<AuthProvider>().signIn(
+                            _emailController.text, _passwordController.text);
+                        if (context.read<AuthProvider>().currentUser.role !=
+                            "guest") {
+                          User currentUser =
+                              context.read<AuthProvider>().currentUser;
+                          context
+                              .read<UserListProvider>()
+                              .changeCurrentUser(currentUser.email);
                           Navigator.pushNamed(context, "/");
                         }
                       }
