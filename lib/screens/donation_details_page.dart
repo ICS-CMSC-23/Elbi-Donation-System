@@ -7,6 +7,7 @@ import 'package:elbi_donation_system/models/donation_model.dart';
 import 'package:elbi_donation_system/models/user_model.dart';
 import 'package:elbi_donation_system/providers/auth_provider.dart';
 import 'package:elbi_donation_system/providers/donation_list_provider.dart';
+import 'package:elbi_donation_system/providers/donation_provider.dart';
 import 'package:elbi_donation_system/providers/user_list_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -30,7 +31,7 @@ class DonationDetails extends StatefulWidget {
 class _DonationDetailsState extends State<DonationDetails> {
   @override
   Widget build(BuildContext context) {
-    Donation donation = context.watch<DonationListProvider>().currentDonation;
+    Donation donation = context.watch<DonationProvider>().selected;
     String userType = context
         .watch<AuthProvider>()
         .currentUser
