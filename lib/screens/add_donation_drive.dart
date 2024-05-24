@@ -120,7 +120,7 @@ class _AddDonationDriveState extends State<AddDonationDrive> {
                     });
                   }
                 },
-                child: const Text('Pick Image'),
+                child: const Text('Upload Image'),
               ),
               const SizedBox(height: 20),
               Row(

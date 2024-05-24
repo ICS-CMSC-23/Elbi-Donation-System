@@ -1,14 +1,9 @@
 import 'dart:io';
-import 'package:elbi_donation_system/models/user_model.dart';
-import 'package:elbi_donation_system/providers/auth_provider.dart';
+import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import '../components/main_drawer.dart';
-import '../models/route_model.dart';
-import 'donor_home_page.dart';
-import 'log_in_page.dart';
-import 'org_home_page.dart';
-import 'package:flutter/material.dart';
+import '../models/user_model.dart' as user_model;
+import '../providers/auth_provider.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -27,14 +22,25 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController contactNumberController = TextEditingController();
   final TextEditingController orgNameController = TextEditingController();
   bool isDonor = true;
-  File? _image;
+  String? _imagePath;
+  List<File> _orgImages = [];
+  String? errorMessage;
 
   Future<void> _pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
       setState(() {
-        _image = File(image.path);
+        _imagePath = pickedFile.path;
+      });
+    }
+  }
+
+  Future<void> _pickMultipleImages() async {
+    final List<XFile>? pickedFiles = await ImagePicker().pickMultiImage();
+    if (pickedFiles != null && pickedFiles.isNotEmpty) {
+      setState(() {
+        _orgImages.addAll(pickedFiles.map((file) => File(file.path)));
       });
     }
   }
@@ -48,9 +54,9 @@ class _SignUpPageState extends State<SignUpPage> {
     addressController.clear();
     contactNumberController.clear();
     orgNameController.clear();
-    // proofController.clear();
     setState(() {
-      _image = null;
+      _imagePath = null;
+      _orgImages.clear();
     });
   }
 
@@ -94,6 +100,44 @@ class _SignUpPageState extends State<SignUpPage> {
                   ],
                 ),
                 const SizedBox(height: 16),
+                GestureDetector(
+                  onTap: _pickImage,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      _imagePath != null
+                          ? CircleAvatar(
+                              radius: 50,
+                              backgroundImage: FileImage(File(_imagePath!)),
+                            )
+                          : const CircleAvatar(
+                              radius: 50,
+                              backgroundImage: AssetImage(
+                                  'assets/images/portrait-placeholder.jpg'),
+                            ),
+                      if (_imagePath == null)
+                        Container(
+                          width: 100,
+                          height: 100,
+                          decoration: const BoxDecoration(
+                            color: Colors.black45,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Center(
+                            child: Text(
+                              'Click to Upload',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
                 if (isDonor) ...[
                   TextFormField(
                     controller: nameController,
@@ -136,18 +180,18 @@ class _SignUpPageState extends State<SignUpPage> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 16),
-                  GestureDetector(
-                    onTap: _pickImage,
-                    child: Container(
-                      height: 150,
-                      width: 150,
-                      color: Colors.grey[300],
-                      child: _image != null
-                          ? Image.file(_image!, fit: BoxFit.cover)
-                          : const Icon(Icons.camera_alt, color: Colors.grey),
-                    ),
-                  ),
+                  // const SizedBox(height: 16),
+                  // GestureDetector(
+                  //   onTap: _pickImage,
+                  //   child: Container(
+                  //     height: 150,
+                  //     width: 150,
+                  //     color: Colors.grey[300],
+                  //     child: _image != null
+                  //         ? Image.file(_image!, fit: BoxFit.cover)
+                  //         : const Icon(Icons.camera_alt, color: Colors.grey),
+                  //   ),
+                  // ),
                 ],
                 const SizedBox(height: 16),
                 TextFormField(
@@ -206,30 +250,68 @@ class _SignUpPageState extends State<SignUpPage> {
                     return null;
                   },
                 ),
+                if (!isDonor) ...[
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: _pickMultipleImages,
+                    child: const Text('Upload Proof of Legitimacy'),
+                  ),
+                  if (_orgImages.isNotEmpty) const SizedBox(height: 16),
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      crossAxisSpacing: 8,
+                      mainAxisSpacing: 8,
+                    ),
+                    itemCount: _orgImages.length,
+                    itemBuilder: (context, index) {
+                      return ClipRRect(
+                        borderRadius: BorderRadius.circular(8.0),
+                        child: Image.file(
+                          _orgImages[index],
+                          fit: BoxFit.cover,
+                        ),
+                      );
+                    },
+                  ),
+                ],
                 const SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      context.read<AuthProvider>().signUp(User(
-                            name: isDonor
-                                ? nameController.text
-                                : orgNameController.text,
-                            username: userNameController.text,
-                            email: emailController.text,
-                            password: passwordController
-                                .text, // Don't store password locally
-                            address: [addressController.text],
-                            contactNo: contactNumberController.text,
-                            role: isDonor ? "donor" : "organization",
-                            profilePhoto:
-                                "https://i.pinimg.com/originals/f5/24/e1/f524e1e728b829b039c84f5ee4f1478a.webp",
-                            about: "A donor na igop",
-                            proofsOfLegitimacy: [
-                              "https://i.pinimg.com/originals/f5/24/e1/f524e1e728b829b039c84f5ee4f1478a.webp"
-                            ],
-                            isApproved: false,
-                            isOpenForDonation: false,
-                          ));
+                      user_model.User newUser = user_model.User(
+                        name: isDonor
+                            ? nameController.text
+                            : orgNameController.text,
+                        username: userNameController.text,
+                        email: emailController.text,
+                        password: passwordController.text,
+                        address: [addressController.text],
+                        contactNo: contactNumberController.text,
+                        role: isDonor ? "donor" : "organization",
+                        profilePhoto: _imagePath != null
+                            ? _imagePath!
+                            : 'assets/images/portrait-placeholder.jpg',
+                        about: "A donor na igop",
+                        proofsOfLegitimacy: [
+                          "https://i.pinimg.com/originals/f5/24/e1/f524e1e728b829b039c84f5ee4f1478a.webp"
+                        ],
+                        isApproved: false,
+                        isOpenForDonation: false,
+                      );
+                      String? error =
+                          await context.read<AuthProvider>().signUp(newUser);
+
+                      if (error == null) {
+                        Navigator.pushReplacementNamed(context, "/login");
+                      } else {
+                        setState(() {
+                          errorMessage = error;
+                        });
+                      }
                     }
                   },
                   child: const Text(
@@ -254,6 +336,15 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                   ),
                 ),
+                if (errorMessage != null) ...[
+                  const SizedBox(height: 16),
+                  Center(
+                    child: Text(
+                      errorMessage!,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  )
+                ],
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
