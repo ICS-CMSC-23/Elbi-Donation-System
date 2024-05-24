@@ -3,6 +3,7 @@ import 'package:elbi_donation_system/dummy_data/dummy_orgs.dart';
 import 'package:elbi_donation_system/dummy_data/dummy_users.dart';
 import 'package:elbi_donation_system/models/route_model.dart';
 import 'package:elbi_donation_system/models/user_model.dart';
+import 'package:elbi_donation_system/providers/auth_provider.dart';
 import 'package:elbi_donation_system/providers/user_list_provider.dart';
 import 'package:elbi_donation_system/screens/donation_drive_list_page.dart';
 import 'package:elbi_donation_system/screens/donation_list_page.dart';
@@ -105,8 +106,8 @@ class _DonorHomePageState extends State<DonorHomePage> {
                                   context
                                       .read<UserListProvider>()
                                       .changeCurrentUser(
-                                          organizations[index].email,
-                                          organizations[index].password);
+                                        organizations[index].email,
+                                      );
                                   Navigator.pushNamed(
                                     context,
                                     "/org-profile",

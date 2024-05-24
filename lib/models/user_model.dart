@@ -44,4 +44,22 @@ class User {
     this.isApproved = false,
     this.isOpenForDonation = false,
   });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'username': username,
+      'email': email,
+      'password': password,
+      'address': address,
+      'contactNo': contactNo,
+      'role': role,
+      'profilePhoto': profilePhoto,
+      'about': about,
+      'proofsOfLegitimacy': proofsOfLegitimacy,
+      'isApproved': isApproved,
+      'isOpenForDonation': isOpenForDonation,
+    };
+  }
 }

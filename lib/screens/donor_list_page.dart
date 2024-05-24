@@ -72,8 +72,9 @@ class _DonorListPageState extends State<DonorListPage> {
                       ),
                       onPressed: () {
                         // Navigate to donor's profile page
-                        context.read<UserListProvider>().changeCurrentUser(
-                            donors[index].email, donors[index].password);
+                        context
+                            .read<UserListProvider>()
+                            .changeCurrentUser(donors[index].email);
                         Navigator.pushNamed(
                             context, DonorProfilePage.route.path);
                         // Navigator.pushNamed(context, '/donation-list-page'); // for testing

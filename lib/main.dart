@@ -1,3 +1,4 @@
+import 'package:elbi_donation_system/models/user_model.dart';
 import 'package:elbi_donation_system/providers/auth_provider.dart';
 import 'package:elbi_donation_system/providers/donation_drive_list_provider.dart';
 import 'package:elbi_donation_system/providers/donation_list_provider.dart';
@@ -52,6 +53,11 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    User currentUser = context.watch<AuthProvider>().currentUser;
+    context.read<UserListProvider>().changeCurrentUser(currentUser.email);
+    print(currentUser.email);
+    print(currentUser.password);
+
     return MaterialApp(
       title: 'Elbi Donation System',
       initialRoute: '/',

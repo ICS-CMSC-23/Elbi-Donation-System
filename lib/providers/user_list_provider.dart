@@ -27,10 +27,10 @@ class UserListProvider with ChangeNotifier {
 
   User get currentUser => _currentUser;
 
-  User changeCurrentUser(String email, String password) {
+  User changeCurrentUser(String email) {
     User? foundUser;
     for (User user in _userList) {
-      if (user.email == email && user.password == password) {
+      if (user.email == email) {
         foundUser = user;
       }
     }
