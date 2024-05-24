@@ -214,7 +214,9 @@ class _SignUpPageState extends State<SignUpPage> {
                             name: isDonor
                                 ? nameController.text
                                 : orgNameController.text,
-                            username: userNameController.text,
+                            username: isDonor
+                                ? userNameController.text
+                                : orgNameController.text,
                             email: emailController.text,
                             password: passwordController
                                 .text, // Don't store password locally
