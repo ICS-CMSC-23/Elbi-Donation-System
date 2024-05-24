@@ -33,7 +33,23 @@ class UserProvider with ChangeNotifier {
     try {
       DocumentSnapshot doc = await firebaseService.getUserById(id);
       if (doc.exists) {
-        _selectedUser = User.fromJson(doc.data() as Map<String, dynamic>);
+        Map<String, dynamic> userData = doc.data() as Map<String, dynamic>;
+        _selectedUser = User(
+          id: id,
+          name: userData['name'],
+          username: userData['username'],
+          email: userData['email'],
+          password: '', // Don't store password locally
+          address: List<String>.from(userData['address']),
+          contactNo: userData['contactNo'],
+          role: userData['role'],
+          profilePhoto: userData['profilePhoto'],
+          about: userData['about'],
+          proofsOfLegitimacy: List<String>.from(userData['proofsOfLegitimacy']),
+          isApproved: userData['isApproved'],
+          isOpenForDonation: userData['isOpenForDonation'],
+        );
+        print(_selectedUser?.name);
         notifyListeners();
       } else {
         print("No user found with the given ID");
