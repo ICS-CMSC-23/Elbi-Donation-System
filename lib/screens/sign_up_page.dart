@@ -45,6 +45,18 @@ class _SignUpPageState extends State<SignUpPage> {
     }
   }
 
+  void _remove() {
+    setState(() {
+      _imagePath = null;
+    });
+  }
+
+  void _removeImage(int index) {
+    setState(() {
+      _orgImages.removeAt(index);
+    });
+  }
+
   void _resetForm() {
     _formKey.currentState?.reset();
     nameController.clear();
@@ -105,16 +117,14 @@ class _SignUpPageState extends State<SignUpPage> {
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      _imagePath != null
-                          ? CircleAvatar(
-                              radius: 50,
-                              backgroundImage: FileImage(File(_imagePath!)),
-                            )
-                          : const CircleAvatar(
-                              radius: 50,
-                              backgroundImage: AssetImage(
-                                  'assets/images/portrait-placeholder.jpg'),
-                            ),
+                      CircleAvatar(
+                        radius: 50,
+                        backgroundImage: _imagePath != null
+                            ? FileImage(File(_imagePath!))
+                            : const AssetImage(
+                                'assets/images/portrait-placeholder.jpg',
+                              ) as ImageProvider,
+                      ),
                       if (_imagePath == null)
                         Container(
                           width: 100,
@@ -130,6 +140,26 @@ class _SignUpPageState extends State<SignUpPage> {
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ),
+                      if (_imagePath != null)
+                        Positioned(
+                          top: 10,
+                          right: 130,
+                          child: GestureDetector(
+                            onTap: () => _remove(),
+                            child: Container(
+                              padding: const EdgeInsets.all(2.0),
+                              decoration: const BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.close,
+                                size: 20,
+                                color: Colors.white,
                               ),
                             ),
                           ),
@@ -180,18 +210,6 @@ class _SignUpPageState extends State<SignUpPage> {
                       return null;
                     },
                   ),
-                  // const SizedBox(height: 16),
-                  // GestureDetector(
-                  //   onTap: _pickImage,
-                  //   child: Container(
-                  //     height: 150,
-                  //     width: 150,
-                  //     color: Colors.grey[300],
-                  //     child: _image != null
-                  //         ? Image.file(_image!, fit: BoxFit.cover)
-                  //         : const Icon(Icons.camera_alt, color: Colors.grey),
-                  //   ),
-                  // ),
                 ],
                 const SizedBox(height: 16),
                 TextFormField(
@@ -268,12 +286,38 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     itemCount: _orgImages.length,
                     itemBuilder: (context, index) {
-                      return ClipRRect(
-                        borderRadius: BorderRadius.circular(8.0),
-                        child: Image.file(
-                          _orgImages[index],
-                          fit: BoxFit.cover,
-                        ),
+                      return Stack(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8.0),
+                            child: Image.file(
+                              _orgImages[index],
+                              fit: BoxFit.cover,
+                              width: double
+                                  .infinity, // Ensures the image covers the entire grid cell
+                              height: double.infinity,
+                            ),
+                          ),
+                          Positioned(
+                            top: 0,
+                            right: 0,
+                            child: GestureDetector(
+                              onTap: () => _removeImage(index),
+                              child: Container(
+                                padding: const EdgeInsets.all(2.0),
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.close,
+                                  size: 16,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       );
                     },
                   ),
@@ -282,6 +326,8 @@ class _SignUpPageState extends State<SignUpPage> {
                 ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
+                      List<String> proofsOfLegitimacy =
+                          _orgImages.map((file) => file.path).toList();
                       user_model.User newUser = user_model.User(
                         name: isDonor
                             ? nameController.text
@@ -296,9 +342,10 @@ class _SignUpPageState extends State<SignUpPage> {
                             ? _imagePath!
                             : 'assets/images/portrait-placeholder.jpg',
                         about: "A donor na igop",
-                        proofsOfLegitimacy: [
-                          "https://i.pinimg.com/originals/f5/24/e1/f524e1e728b829b039c84f5ee4f1478a.webp"
-                        ],
+                        proofsOfLegitimacy: proofsOfLegitimacy,
+                        // [
+                        //   "https://i.pinimg.com/originals/f5/24/e1/f524e1e728b829b039c84f5ee4f1478a.webp"
+                        // ],
                         isApproved: false,
                         isOpenForDonation: false,
                       );
