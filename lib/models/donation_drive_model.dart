@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class DonationDrive {
   final String? id;
   final String organizationId; // what organization is this donation drive for?
@@ -25,12 +27,27 @@ class DonationDrive {
     return {
       'id': id,
       'organizationId': organizationId,
-      'startDate': startDate,
-      'endDate': endDate,
+      'startDate': Timestamp.fromDate(startDate),
+      'endDate': Timestamp.fromDate(endDate),
       'name': name,
       'description': description,
       'photos': photos,
       'isCompleted': isCompleted,
     };
+  }
+
+  static fromJson(Map<String, dynamic> json) {
+    return DonationDrive(
+      id: json['id'] as String?,
+      organizationId: json['organizationId'] as String,
+      startDate: (json['startDate'] as Timestamp).toDate(),
+      endDate: (json['endDate'] as Timestamp).toDate(),
+      name: json['name'] as String,
+      description: json['description'] as String,
+      photos: (json['photos'] as List<dynamic>?)
+          ?.map((photo) => photo as String)
+          .toList(),
+      isCompleted: json['isCompleted'] as bool? ?? false,
+    );
   }
 }
