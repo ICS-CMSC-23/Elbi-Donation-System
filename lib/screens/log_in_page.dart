@@ -128,6 +128,11 @@ class _LoginPageState extends State<LoginPage> {
                             _emailController.text, _passwordController.text);
                         if (context.read<AuthProvider>().currentUser.role !=
                             "guest") {
+                          User currentUser =
+                              context.read<AuthProvider>().currentUser;
+                          context
+                              .read<UserListProvider>()
+                              .changeCurrentUser(currentUser.email);
                           Navigator.pushNamed(context, "/");
                         }
                       }

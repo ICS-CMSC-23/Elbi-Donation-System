@@ -7,7 +7,9 @@ import 'package:elbi_donation_system/models/donation_model.dart';
 import 'package:elbi_donation_system/models/user_model.dart';
 import 'package:elbi_donation_system/providers/auth_provider.dart';
 import 'package:elbi_donation_system/providers/donation_list_provider.dart';
+import 'package:elbi_donation_system/providers/donation_provider.dart';
 import 'package:elbi_donation_system/providers/user_list_provider.dart';
+import 'package:elbi_donation_system/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -30,11 +32,13 @@ class DonationDetails extends StatefulWidget {
 class _DonationDetailsState extends State<DonationDetails> {
   @override
   Widget build(BuildContext context) {
-    Donation donation = context.watch<DonationListProvider>().currentDonation;
+    Donation donation = context.watch<DonationProvider>().selected;
     String userType = context
         .watch<AuthProvider>()
         .currentUser
         .role; //donor, organization, admin
+    print(donation.photos);
+    print(userType);
     Row actionButtons;
     if (userType == User.donor) {
       actionButtons = Row(
@@ -86,7 +90,8 @@ class _DonationDetailsState extends State<DonationDetails> {
                   title: donation.category,
                   subtitle: donation.status,
                   description:
-                      "Donor: ${context.read<UserListProvider>().userList.firstWhere((user) => user.id == donation.donorId).name}"),
+                      // "Donor: Try"),
+                      "Donor: ${context.read<UserProvider>().selected.name}"),
               TitleDetail(title: "Description", detail: donation.description),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,

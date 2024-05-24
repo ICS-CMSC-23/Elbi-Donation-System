@@ -49,8 +49,9 @@ class _AdminHomePageState extends State<AdminHomePage> {
               trailing: ElevatedButton(
                 onPressed: () {
                   // Link Org Profile page
-                  context.read<UserListProvider>().changeCurrentUser(
-                      organization.email, organization.password);
+                  context
+                      .read<UserListProvider>()
+                      .changeCurrentUser(organization.email);
                   Navigator.pushNamed(context, "/org-profile");
                 },
                 child: const Text("View Org"),
