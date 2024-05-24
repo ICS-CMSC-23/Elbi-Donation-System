@@ -62,4 +62,24 @@ class User {
       'isOpenForDonation': isOpenForDonation,
     };
   }
+
+  static fromJson(Map<String, dynamic> json) {
+    return User(
+      id: json['id'],
+      name: json['name'],
+      username: json['username'],
+      email: json['email'],
+      password: json['password'],
+      address: List<String>.from(json['address']),
+      contactNo: json['contactNo'],
+      role: json['role'],
+      profilePhoto: json['profilePhoto'],
+      about: json['about'],
+      proofsOfLegitimacy: json['proofsOfLegitimacy'] != null
+          ? List<String>.from(json['proofsOfLegitimacy'])
+          : null,
+      isApproved: json['isApproved'],
+      isOpenForDonation: json['isOpenForDonation'],
+    );
+  }
 }

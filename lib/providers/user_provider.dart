@@ -29,7 +29,21 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void fetchUserByDonorId(String email) {
+  Future<void> fetchUserById(String id) async {
+    try {
+      DocumentSnapshot doc = await firebaseService.getUserById(id);
+      if (doc.exists) {
+        _selectedUser = User.fromJson(doc.data() as Map<String, dynamic>);
+        notifyListeners();
+      } else {
+        print("No user found with the given ID");
+      }
+    } catch (e) {
+      print("Failed to fetch user by ID: $e");
+    }
+  }
+
+  void fetchUserByEmail(String email) {
     _userStream = firebaseService.getUserByEmail(email);
     notifyListeners();
   }
