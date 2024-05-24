@@ -12,8 +12,8 @@ class FirebaseUsersAPI {
     return db.collection("users").where("email", isEqualTo: email).snapshots();
   }
 
-  Future<DocumentSnapshot> getUserById(String id) async {
-    return await db.collection('users').doc(id).get();
+  Future<DocumentSnapshot> getUserById(String id) {
+    return db.collection('users').doc(id).get();
   }
 
   Future<String> updateUser(String id, Map<String, dynamic> updatedData) async {
