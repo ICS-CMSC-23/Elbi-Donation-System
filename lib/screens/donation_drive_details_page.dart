@@ -74,7 +74,12 @@ class _DonationDriveDetailsState extends State<DonationDriveDetails> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           TextButton.icon(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pushNamed(
+                context,
+                "/add-donation",
+              );
+            },
             icon: const Icon(Icons.add),
             label: const Text("Add Donation"),
             style: ButtonStyle(

@@ -43,6 +43,7 @@ class _SignUpPageState extends State<SignUpPage> {
     _formKey.currentState?.reset();
     nameController.clear();
     userNameController.clear();
+    emailController.clear();
     passwordController.clear();
     addressController.clear();
     contactNumberController.clear();
