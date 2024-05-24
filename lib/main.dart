@@ -29,6 +29,7 @@ import 'package:flutter/material.dart';
 import "package:provider/provider.dart";
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'screens/add_donation.dart';
 
 // necessary packages for firebase integration
 // flutter pub add firebase_core
@@ -84,7 +85,8 @@ class MyApp extends StatelessWidget {
         '/org-account-approval': (context) => const OrgAccApprovalPage(),
         '/donor-list-page': (context) => const DonorListPage(),
         '/donation-list-page': (context) => const DonationListPage(),
-        '/donation-drive-list-page': (context) => const DonationDriveListPage()
+        '/donation-drive-list-page': (context) => const DonationDriveListPage(),
+        '/add-donation-drive': (context) => AddDonationDrive()
       },
     );
   }
