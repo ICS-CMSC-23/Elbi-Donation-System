@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elbi_donation_system/components/main_drawer.dart';
 import 'package:elbi_donation_system/models/route_model.dart';
 import 'package:elbi_donation_system/models/user_model.dart';
-import 'package:elbi_donation_system/providers/auth_provider.dart';
+// import 'package:elbi_donation_system/providers/auth_provider.dart';
 import 'package:elbi_donation_system/providers/user_provider.dart';
 import 'package:elbi_donation_system/screens/donation_list_page.dart';
 import 'package:flutter/material.dart';
@@ -21,9 +21,8 @@ class _DonorHomePageState extends State<DonorHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final currentUser = context.watch<AuthProvider>().currentUser;
+    // final currentUser = context.watch<AuthProvider>().currentUser;
 
-    // Fetching the list of organizations from Firestore
     Stream<QuerySnapshot> orgStream = FirebaseFirestore.instance
         .collection('users')
         .where('role', isEqualTo: 'organization')
@@ -41,7 +40,6 @@ class _DonorHomePageState extends State<DonorHomePage> {
           IconButton(
             icon: const Icon(Icons.person),
             onPressed: () {
-              // Navigate to Donor Profile Page
               Navigator.pushNamed(
                 context,
                 "/donor-profile",
