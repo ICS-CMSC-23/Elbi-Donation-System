@@ -1,4 +1,5 @@
 import 'package:elbi_donation_system/providers/user_list_provider.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/user_model.dart';
@@ -163,23 +164,27 @@ class _LoginPageState extends State<LoginPage> {
                         color: Theme.of(context).primaryColor, fontSize: 15),
                   ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    const Text('New User?'),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, "/signup");
-                      },
-                      child: Text(
-                        'Create Account',
-                        style: TextStyle(
-                            color: Theme.of(context).primaryColor,
-                            fontSize: 15),
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      const TextSpan(
+                        text: 'New User? ',
+                        style: TextStyle(color: Colors.black),
                       ),
-                    ),
-                  ],
-                ),
+                      TextSpan(
+                        text: 'Create Account',
+                        style: TextStyle(
+                          color: Theme.of(context).primaryColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            Navigator.pushNamed(context, "/signup");
+                          },
+                      ),
+                    ],
+                  ),
+                )
               ],
             ),
           ),
