@@ -23,7 +23,9 @@ class _DonorHomePageState extends State<DonorHomePage> {
   Widget build(BuildContext context) {
     final currentUser = context.watch<AuthProvider>().currentUser;
 
-    Stream<QuerySnapshot> orgStream = FirebaseFirestore.instance.collection('users')
+    // Fetching the list of organizations from Firestore
+    Stream<QuerySnapshot> orgStream = FirebaseFirestore.instance
+        .collection('users')
         .where('role', isEqualTo: 'organization')
         .snapshots();
 
@@ -83,7 +85,8 @@ class _DonorHomePageState extends State<DonorHomePage> {
                     return Center(
                       child: Text("Error: ${snapshot.error}"),
                     );
-                  } else if (snapshot.connectionState == ConnectionState.waiting) {
+                  } else if (snapshot.connectionState ==
+                      ConnectionState.waiting) {
                     return const Center(
                       child: CircularProgressIndicator(),
                     );
@@ -113,21 +116,45 @@ class _DonorHomePageState extends State<DonorHomePage> {
                             children: [
                               Center(
                                 child: Image.network(
-                                  organization.profilePhoto ?? 'https://via.placeholder.com/150',
+                                  organization.profilePhoto ??
+                                      'https://via.placeholder.com/150',
                                   fit: BoxFit.cover,
-                                  width: MediaQuery.of(context).size.width / 1.5,
+                                  width:
+                                      MediaQuery.of(context).size.width / 1.5,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return ClipRRect(
+                                      borderRadius: BorderRadius.circular(
+                                          (MediaQuery.of(context).size.width /
+                                                  1.5) /
+                                              2),
+                                      child: Image.asset(
+                                        'assets/images/portrait-placeholder.jpg',
+                                        fit: BoxFit.cover,
+                                        width:
+                                            MediaQuery.of(context).size.width /
+                                                1.5,
+                                        height:
+                                            MediaQuery.of(context).size.width /
+                                                1.5,
+                                      ),
+                                    );
+                                  },
                                 ),
                               ),
                               Center(child: Text(organization.name)),
                               Center(
-                                  child: Text(organization.about ?? "This organization has no tagline.")),
+                                  child: Text(organization.about ??
+                                      "This organization has no tagline.")),
                               Center(
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                                      context.read<UserProvider>().changeSelectedUser(
-                                        organization,
-                                      );
+                                    WidgetsBinding.instance
+                                        .addPostFrameCallback((_) {
+                                      context
+                                          .read<UserProvider>()
+                                          .changeSelectedUser(
+                                            organization,
+                                          );
                                       Navigator.pushNamed(
                                         context,
                                         "/org-profile",
