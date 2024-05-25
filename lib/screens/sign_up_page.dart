@@ -326,39 +326,6 @@ class _SignUpPageState extends State<SignUpPage> {
                 ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      List<String> proofsOfLegitimacy =
-                          _orgImages.map((file) => file.path).toList();
-                      user_model.User newUser = user_model.User(
-                        name: isDonor
-                            ? nameController.text
-                            : orgNameController.text,
-                        username: userNameController.text,
-                        email: emailController.text,
-                        password: passwordController.text,
-                        address: [addressController.text],
-                        contactNo: contactNumberController.text,
-                        role: isDonor ? "donor" : "organization",
-                        profilePhoto: _imagePath != null
-                            ? _imagePath!
-                            : 'assets/images/portrait-placeholder.jpg',
-                        about: "A donor na igop",
-                        proofsOfLegitimacy: proofsOfLegitimacy,
-                        // [
-                        //   "https://i.pinimg.com/originals/f5/24/e1/f524e1e728b829b039c84f5ee4f1478a.webp"
-                        // ],
-                        isApproved: false,
-                        isOpenForDonation: false,
-                      );
-                      String? error =
-                          await context.read<AuthProvider>().signUp(newUser);
-
-                      if (error == null) {
-                        Navigator.pushReplacementNamed(context, "/login");
-                      } else {
-                        setState(() {
-                          errorMessage = error;
-                        });
-                      }
                     }
                   },
                   child: const Text(

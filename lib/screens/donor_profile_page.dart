@@ -36,7 +36,9 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
   @override
   Widget build(BuildContext context) {
     User authUser = context.watch<AuthProvider>().currentUser;
-    User user = context.watch<UserProvider>().selected;
+    User user = authUser.role == User.donor
+        ? authUser
+        : context.watch<UserProvider>().selected;
     Row actionButtons;
     if (authUser.role == User.donor) {
       actionButtons = Row(
@@ -108,11 +110,25 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
                       child: Text("No Donations Found"),
                     );
                   }
+
+                  // Filter donations by donorId
+                  var filteredDonations = snapshot.data!.docs.where((doc) {
+                    var donation =
+                        Donation.fromJson(doc.data() as Map<String, dynamic>);
+                    return donation.donorId == user.id;
+                  }).toList();
+
+                  if (filteredDonations.isEmpty) {
+                    return const Center(
+                      child: Text("No Donations Found for the specified donor"),
+                    );
+                  }
+
                   return ListView.builder(
-                      itemCount: snapshot.data?.docs.length,
+                      itemCount: filteredDonations.length,
                       itemBuilder: (context, index) {
                         Donation donation = Donation.fromJson(
-                            snapshot.data!.docs[index].data()
+                            filteredDonations[index].data()
                                 as Map<String, dynamic>);
                         return ListTile(
                           leading: RoundedImage(
@@ -120,7 +136,7 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
                           title: Text(donation.category),
                           subtitle: Text(donation.description),
                           trailing: IconButton(
-                            icon: const Icon(Icons.card_giftcard_outlined),
+                            icon: const Icon(Icons.more_vert),
                             onPressed: () {
                               context
                                   .read<DonationProvider>()

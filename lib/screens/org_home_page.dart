@@ -1,6 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elbi_donation_system/components/main_drawer.dart';
+import 'package:elbi_donation_system/models/donation_drive_model.dart';
 import 'package:elbi_donation_system/models/route_model.dart';
+import 'package:elbi_donation_system/providers/auth_provider.dart';
 import 'package:elbi_donation_system/providers/donation_drive_list_provider.dart';
+import 'package:elbi_donation_system/providers/donation_drive_provider.dart';
+import 'package:elbi_donation_system/providers/user_provider.dart';
 import 'package:elbi_donation_system/screens/donation_drive_list_page.dart';
 import '../screens/donor_profile_page.dart';
 import 'package:flutter/material.dart';
@@ -15,8 +20,11 @@ class OrgHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Accessing DonationDriveListProvider
-    final donationDriveListProvider =
-        Provider.of<DonationDriveListProvider>(context);
+    // final donationDriveListProvider =
+    //     Provider.of<DonationDriveListProvider>(context);
+
+    Stream<QuerySnapshot> donationDriveStream =
+        context.watch<DonationDriveProvider>().donationDrives;
 
     return Scaffold(
       drawer: MainDrawer(routes: [
@@ -43,42 +51,75 @@ class OrgHomePage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(
-            child: ListView.builder(
-              itemCount: donationDriveListProvider.donationDriveList.length,
-              itemBuilder: (context, index) {
-                final donationDrive =
-                    donationDriveListProvider.donationDriveList[index];
-                return Card(
-                  child: ListTile(
-                    title: Text(donationDrive.name),
-                    subtitle: Text(donationDrive.description),
-                    leading: SizedBox(
-                      width: 100,
-                      child: Image.network(
-                        donationDrive.photos![0],
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    trailing: SizedBox(
-                      width: 50,
-                      child: IconButton(
-                        icon: const Icon(Icons.more_vert),
-                        onPressed: () {
-                          context
-                              .read<DonationDriveListProvider>()
-                              .setCurrentDonationDrive(donationDriveListProvider
-                                      .donationDriveList[index].id ??
-                                  "1");
-                          Navigator.pushNamed(
-                              context, "/donation-drive-details");
-                        },
-                      ),
-                    ),
-                  ),
+              child: StreamBuilder(
+            stream: donationDriveStream,
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Center(
+                  child: Text("Error encountered! ${snapshot.error}"),
                 );
-              },
-            ),
-          ),
+              } else if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (!snapshot.hasData) {
+                return const Center(
+                  child: Text("No Donation Drives Found"),
+                );
+              }
+
+              var filteredDonationDrives = snapshot.data!.docs.where((doc) {
+                DonationDrive donationDrive =
+                    DonationDrive.fromJson(doc.data() as Map<String, dynamic>);
+                return donationDrive.organizationId ==
+                    context.read<AuthProvider>().currentUser.id;
+              }).toList();
+
+              if (filteredDonationDrives.isEmpty) {
+                return const Center(
+                  child: Text(
+                      "No Donation Drives found for the specified organization"),
+                );
+              }
+
+              return ListView.builder(
+                itemCount: filteredDonationDrives.length,
+                itemBuilder: (context, index) {
+                  DonationDrive donationDrive = DonationDrive.fromJson(
+                      filteredDonationDrives[index].data()
+                          as Map<String, dynamic>);
+                  return Card(
+                    child: ListTile(
+                      title: Text(donationDrive.name),
+                      subtitle: Text(donationDrive.description),
+                      leading: SizedBox(
+                        width: 100,
+                        child: Image.network(
+                          donationDrive.photos![0],
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      trailing: SizedBox(
+                        width: 50,
+                        child: IconButton(
+                          icon: const Icon(Icons.more_vert),
+                          onPressed: () {
+                            context
+                                .read<DonationDriveProvider>()
+                                .changeSelectedDonationDrive(donationDrive);
+                            context.read<UserProvider>().changeSelectedUser(
+                                context.read<AuthProvider>().currentUser);
+                            Navigator.pushNamed(
+                                context, "/donation-drive-details");
+                          },
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          )),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(

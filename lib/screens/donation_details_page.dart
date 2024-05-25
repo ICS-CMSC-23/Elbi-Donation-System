@@ -37,8 +37,6 @@ class _DonationDetailsState extends State<DonationDetails> {
         .watch<AuthProvider>()
         .currentUser
         .role; //donor, organization, admin
-    print(donation.photos);
-    print(userType);
     Row actionButtons;
     if (userType == User.donor) {
       actionButtons = Row(
@@ -91,7 +89,7 @@ class _DonationDetailsState extends State<DonationDetails> {
                   subtitle: donation.status,
                   description:
                       // "Donor: Try"),
-                      "Donor: ${context.read<UserProvider>().selected.name}"),
+                      "Donor: ${context.watch<UserProvider>().selected.name}"),
               TitleDetail(title: "Description", detail: donation.description),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
