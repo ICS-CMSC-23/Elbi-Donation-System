@@ -67,9 +67,8 @@ class _LoginPageState extends State<LoginPage> {
                 const Padding(
                   padding: EdgeInsets.only(top: 60.0, bottom: 20),
                   child: CircleAvatar(
-                    radius: 50,
-                    backgroundImage:
-                        AssetImage('assets/images/portrait-placeholder.jpg'),
+                    radius: 100,
+                    backgroundImage: AssetImage('assets/images/Logo.png'),
                   ),
                 ),
                 Padding(
