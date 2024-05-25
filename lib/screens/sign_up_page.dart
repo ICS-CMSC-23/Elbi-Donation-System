@@ -38,6 +38,7 @@ class _SignUpPageState extends State<SignUpPage> {
     setState(() {
       _imagePath = null;
       _orgImages.clear();
+      errorMessage = null;
     });
   }
 
@@ -316,10 +317,26 @@ class _SignUpPageState extends State<SignUpPage> {
                     },
                   ),
                 ],
+                if (errorMessage != null) ...[
+                  const SizedBox(height: 16),
+                  Center(
+                    child: Text(
+                      errorMessage!,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  )
+                ],
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
+                      if (!isDonor && _orgImages.isEmpty) {
+                        setState(() {
+                          errorMessage =
+                              'Please upload at least one proof of legitimacy';
+                        });
+                        return;
+                      }
                       List<String> proofsOfLegitimacy =
                           _orgImages.map((file) => file.path).toList();
                       user_model.User newUser = user_model.User(
@@ -339,9 +356,6 @@ class _SignUpPageState extends State<SignUpPage> {
                             : 'assets/images/portrait-placeholder.jpg',
                         about: "A donor na igop",
                         proofsOfLegitimacy: proofsOfLegitimacy,
-                        // [
-                        //   "https://i.pinimg.com/originals/f5/24/e1/f524e1e728b829b039c84f5ee4f1478a.webp"
-                        // ],
                         isApproved: false,
                         isOpenForDonation: false,
                       );
@@ -349,6 +363,12 @@ class _SignUpPageState extends State<SignUpPage> {
                           await context.read<AuthProvider>().signUp(newUser);
 
                       if (error == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Sign up successful!'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
                         Navigator.pushReplacementNamed(context, "/login");
                       } else {
                         setState(() {
@@ -379,15 +399,6 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                   ),
                 ),
-                if (errorMessage != null) ...[
-                  const SizedBox(height: 16),
-                  Center(
-                    child: Text(
-                      errorMessage!,
-                      style: const TextStyle(color: Colors.red),
-                    ),
-                  )
-                ],
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
