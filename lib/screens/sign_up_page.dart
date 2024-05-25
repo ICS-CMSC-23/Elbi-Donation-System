@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../components/upload_helper.dart';
 import '../models/user_model.dart' as user_model;
@@ -257,6 +256,13 @@ class _SignUpPageState extends State<SignUpPage> {
                         _orgImages.addAll(images);
                       });
                     },
+                    style: ElevatedButton.styleFrom(
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.zero,
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24.0, vertical: 12.0),
+                    ),
                     child: const Text('Upload Proof of Legitimacy'),
                   ),
                   if (_orgImages.isNotEmpty) const SizedBox(height: 16),
@@ -278,8 +284,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             child: Image.file(
                               _orgImages[index],
                               fit: BoxFit.cover,
-                              width: double
-                                  .infinity, // Ensures the image covers the entire grid cell
+                              width: double.infinity,
                               height: double.infinity,
                             ),
                           ),
@@ -314,7 +319,43 @@ class _SignUpPageState extends State<SignUpPage> {
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () async {
-                    if (_formKey.currentState!.validate()) {}
+                    if (_formKey.currentState!.validate()) {
+                      List<String> proofsOfLegitimacy =
+                          _orgImages.map((file) => file.path).toList();
+                      user_model.User newUser = user_model.User(
+                        name: isDonor
+                            ? nameController.text
+                            : orgNameController.text,
+                        username: isDonor
+                            ? userNameController.text
+                            : orgNameController.text,
+                        email: emailController.text,
+                        password: passwordController.text,
+                        address: [addressController.text],
+                        contactNo: contactNumberController.text,
+                        role: isDonor ? "donor" : "organization",
+                        profilePhoto: _imagePath != null
+                            ? _imagePath!
+                            : 'assets/images/portrait-placeholder.jpg',
+                        about: "A donor na igop",
+                        proofsOfLegitimacy: proofsOfLegitimacy,
+                        // [
+                        //   "https://i.pinimg.com/originals/f5/24/e1/f524e1e728b829b039c84f5ee4f1478a.webp"
+                        // ],
+                        isApproved: false,
+                        isOpenForDonation: false,
+                      );
+                      String? error =
+                          await context.read<AuthProvider>().signUp(newUser);
+
+                      if (error == null) {
+                        Navigator.pushReplacementNamed(context, "/login");
+                      } else {
+                        setState(() {
+                          errorMessage = error;
+                        });
+                      }
+                    }
                   },
                   child: const Text(
                     'Sign Up',

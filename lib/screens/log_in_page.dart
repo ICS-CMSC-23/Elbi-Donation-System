@@ -66,28 +66,6 @@ class _LoginPageState extends State<LoginPage> {
           errorMessage = "Incorrect email/password";
         });
       }
-
-      // if (_formKey.currentState!.validate()) {
-
-      //   final userListProvider =
-      //       Provider.of<UserListProvider>(context, listen: false);
-      //   final User user =
-      //       userListProvider.changeCurrentUser(_emailController.text);
-      //   if (user.email != _emailController.text) {
-      //     setState(() {
-      //       errorMessage = 'Account does not exist';
-      //     });
-      //   } else if (user.password != _passwordController.text) {
-      //     setState(() {
-      //       errorMessage = 'Incorrect password';
-      //     });
-      //   } else if (user.role == 'org') {
-      //     Navigator.pushReplacementNamed(context, '/org_homepage');
-      //   } else if (user.role == 'admin') {
-      //     Navigator.pushReplacementNamed(context, '/admin_homepage');
-      //   } else {
-      //     Navigator.pushReplacementNamed(context, '/donor_homepage');
-      //   }
     }
   }
 
