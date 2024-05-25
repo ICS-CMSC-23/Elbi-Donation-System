@@ -1,14 +1,9 @@
 import 'dart:io';
-import 'package:elbi_donation_system/models/user_model.dart';
-import 'package:elbi_donation_system/providers/auth_provider.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:provider/provider.dart';
-import '../components/main_drawer.dart';
-import '../models/route_model.dart';
-import 'donor_home_page.dart';
-import 'log_in_page.dart';
-import 'org_home_page.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../components/upload_helper.dart';
+import '../models/user_model.dart' as user_model;
+import '../providers/auth_provider.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -26,31 +21,24 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController addressController = TextEditingController();
   final TextEditingController contactNumberController = TextEditingController();
   final TextEditingController orgNameController = TextEditingController();
-  // final TextEditingController proofController = TextEditingController();
   bool isDonor = true;
-  File? _image;
-
-  Future<void> _pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      setState(() {
-        _image = File(image.path);
-      });
-    }
-  }
+  String? _imagePath;
+  List<File> _orgImages = [];
+  String? errorMessage;
 
   void _resetForm() {
     _formKey.currentState?.reset();
     nameController.clear();
     userNameController.clear();
+    emailController.clear();
     passwordController.clear();
     addressController.clear();
     contactNumberController.clear();
     orgNameController.clear();
-    // proofController.clear();
     setState(() {
-      _image = null;
+      _imagePath = null;
+      _orgImages.clear();
+      errorMessage = null;
     });
   }
 
@@ -94,6 +82,72 @@ class _SignUpPageState extends State<SignUpPage> {
                   ],
                 ),
                 const SizedBox(height: 16),
+                GestureDetector(
+                  onTap: () async {
+                    String? imagePath = await pickImage();
+                    setState(() {
+                      _imagePath = imagePath;
+                    });
+                  },
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      CircleAvatar(
+                        radius: 50,
+                        backgroundImage: _imagePath != null
+                            ? FileImage(File(_imagePath!))
+                            : const AssetImage(
+                                'assets/images/portrait-placeholder.jpg',
+                              ) as ImageProvider,
+                      ),
+                      if (_imagePath == null)
+                        Container(
+                          width: 100,
+                          height: 100,
+                          decoration: const BoxDecoration(
+                            color: Colors.black45,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Center(
+                            child: Text(
+                              'Click to Upload',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ),
+                      if (_imagePath != null)
+                        Positioned(
+                          top: 10,
+                          right: 130,
+                          child: GestureDetector(
+                            onTap: () async {
+                              String? imagePath = await pickImage();
+                              setState(() {
+                                _imagePath = imagePath;
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(2.0),
+                              decoration: const BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.close,
+                                size: 20,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
                 if (isDonor) ...[
                   TextFormField(
                     controller: nameController,
@@ -135,18 +189,6 @@ class _SignUpPageState extends State<SignUpPage> {
                       }
                       return null;
                     },
-                  ),
-                  const SizedBox(height: 16),
-                  GestureDetector(
-                    onTap: _pickImage,
-                    child: Container(
-                      height: 150,
-                      width: 150,
-                      color: Colors.grey[300],
-                      child: _image != null
-                          ? Image.file(_image!, fit: BoxFit.cover)
-                          : const Icon(Icons.camera_alt, color: Colors.grey),
-                    ),
                   ),
                 ],
                 const SizedBox(height: 16),
@@ -206,32 +248,133 @@ class _SignUpPageState extends State<SignUpPage> {
                     return null;
                   },
                 ),
+                if (!isDonor) ...[
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () async {
+                      List<File> images = await pickMultipleImages();
+                      setState(() {
+                        _orgImages.addAll(images);
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.zero,
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24.0, vertical: 12.0),
+                    ),
+                    child: const Text('Upload Proof of Legitimacy'),
+                  ),
+                  if (_orgImages.isNotEmpty) const SizedBox(height: 16),
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      crossAxisSpacing: 8,
+                      mainAxisSpacing: 8,
+                    ),
+                    itemCount: _orgImages.length,
+                    itemBuilder: (context, index) {
+                      return Stack(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8.0),
+                            child: Image.file(
+                              _orgImages[index],
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
+                            ),
+                          ),
+                          Positioned(
+                            top: 0,
+                            right: 0,
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  removeImage(_orgImages, index);
+                                });
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(2.0),
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.close,
+                                  size: 16,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ],
+                if (errorMessage != null) ...[
+                  const SizedBox(height: 16),
+                  Center(
+                    child: Text(
+                      errorMessage!,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  )
+                ],
                 const SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      context.read<AuthProvider>().signUp(User(
-                            name: isDonor
-                                ? nameController.text
-                                : orgNameController.text,
-                            username: isDonor
-                                ? userNameController.text
-                                : orgNameController.text,
-                            email: emailController.text,
-                            password: passwordController
-                                .text, // Don't store password locally
-                            address: [addressController.text],
-                            contactNo: contactNumberController.text,
-                            role: isDonor ? "donor" : "organization",
-                            profilePhoto:
-                                "https://i.pinimg.com/originals/f5/24/e1/f524e1e728b829b039c84f5ee4f1478a.webp",
-                            about: "A donor na igop",
-                            proofsOfLegitimacy: [
-                              "https://i.pinimg.com/originals/f5/24/e1/f524e1e728b829b039c84f5ee4f1478a.webp"
-                            ],
-                            isApproved: false,
-                            isOpenForDonation: false,
-                          ));
+                      if (!isDonor && _orgImages.isEmpty) {
+                        setState(() {
+                          errorMessage =
+                              'Please upload at least one proof of legitimacy';
+                        });
+                        return;
+                      }
+                      List<String> proofsOfLegitimacy =
+                          _orgImages.map((file) => file.path).toList();
+                      user_model.User newUser = user_model.User(
+                        name: isDonor
+                            ? nameController.text
+                            : orgNameController.text,
+                        username: isDonor
+                            ? userNameController.text
+                            : orgNameController.text,
+                        email: emailController.text,
+                        password: passwordController.text,
+                        address: [addressController.text],
+                        contactNo: contactNumberController.text,
+                        role: isDonor ? "donor" : "organization",
+                        profilePhoto: _imagePath != null
+                            ? _imagePath!
+                            : 'assets/images/portrait-placeholder.jpg',
+                        about: "A donor na igop",
+                        proofsOfLegitimacy: proofsOfLegitimacy,
+                        isApproved: false,
+                        isOpenForDonation: false,
+                      );
+                      String? error =
+                          await context.read<AuthProvider>().signUp(newUser);
+
+                      if (error == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Sign up successful!'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                        Navigator.pushReplacementNamed(context, "/login");
+                      } else {
+                        setState(() {
+                          errorMessage = error;
+                        });
+                      }
                     }
                   },
                   child: const Text(

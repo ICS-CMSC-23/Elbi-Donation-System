@@ -7,6 +7,7 @@ import 'package:elbi_donation_system/providers/donation_provider.dart';
 import 'package:elbi_donation_system/providers/theme_provider.dart';
 import 'package:elbi_donation_system/providers/user_list_provider.dart';
 import 'package:elbi_donation_system/providers/user_provider.dart';
+import 'package:elbi_donation_system/screens/add_donation.dart';
 import 'package:elbi_donation_system/screens/admin_home_page.dart';
 import 'package:elbi_donation_system/screens/donation_drive_list_page.dart';
 import 'package:elbi_donation_system/screens/donor_home_page.dart';
@@ -29,6 +30,7 @@ import 'package:flutter/material.dart';
 import "package:provider/provider.dart";
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'screens/add_donation_drive.dart';
 
 // necessary packages for firebase integration
 // flutter pub add firebase_core
@@ -84,7 +86,9 @@ class MyApp extends StatelessWidget {
         '/org-account-approval': (context) => const OrgAccApprovalPage(),
         '/donor-list-page': (context) => const DonorListPage(),
         '/donation-list-page': (context) => const DonationListPage(),
-        '/donation-drive-list-page': (context) => const DonationDriveListPage()
+        '/donation-drive-list-page': (context) => const DonationDriveListPage(),
+        '/add-donation-drive': (context) => AddDonationDrive(),
+        '/add-donation': (context) => AddDonation()
       },
     );
   }
