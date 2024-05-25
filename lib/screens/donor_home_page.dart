@@ -4,7 +4,6 @@ import 'package:elbi_donation_system/models/route_model.dart';
 import 'package:elbi_donation_system/models/user_model.dart';
 import 'package:elbi_donation_system/providers/auth_provider.dart';
 import 'package:elbi_donation_system/providers/user_provider.dart';
-import 'package:elbi_donation_system/screens/donation_drive_list_page.dart';
 import 'package:elbi_donation_system/screens/donation_list_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -22,10 +21,8 @@ class _DonorHomePageState extends State<DonorHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // Accessing the current user from AuthProvider
     final currentUser = context.watch<AuthProvider>().currentUser;
 
-    // Fetching the list of organizations from Firestore
     Stream<QuerySnapshot> orgStream = FirebaseFirestore.instance.collection('users')
         .where('role', isEqualTo: 'organization')
         .snapshots();

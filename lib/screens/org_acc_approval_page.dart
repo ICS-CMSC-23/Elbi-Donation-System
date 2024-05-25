@@ -1,6 +1,6 @@
-import 'package:elbi_donation_system/dummy_data/dummy_users.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elbi_donation_system/models/user_model.dart';
-import 'package:elbi_donation_system/providers/user_list_provider.dart';
+import 'package:elbi_donation_system/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:elbi_donation_system/themes/purple_theme.dart';
@@ -15,12 +15,13 @@ class OrgAccApprovalPage extends StatefulWidget {
 class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
   final _formKey = GlobalKey<FormState>();
 
-  final List<User> organizations = dummyUsers
-      .where((user) => user.role == User.organization)
-      .toList(); // Dummy data for organizations
-
   @override
   Widget build(BuildContext context) {
+    Stream<QuerySnapshot> orgStream = FirebaseFirestore.instance.collection('users')
+        .where('role', isEqualTo: 'organization')
+        .where('isApproved', isEqualTo: false)
+        .snapshots();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Org Account Approval"),
@@ -38,99 +39,127 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                   textAlign: TextAlign.center,
                 ),
               ),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: organizations.length,
-                itemBuilder: (context, index) {
-                  return Card(
-                    margin: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 20),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        children: [
-                          Image.network(
-                            organizations[index].profilePhoto!,
-                            fit: BoxFit.cover,
-                            width: MediaQuery.of(context).size.width / 1.5,
-                          ),
-                          Text(
-                            organizations[index].name,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 18),
-                          ),
-                          Text(
-                            organizations[index].about ??
-                                "This organization has no description.",
-                            textAlign: TextAlign.center,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+              StreamBuilder<QuerySnapshot>(
+                stream: orgStream,
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Text("Error: ${snapshot.error}"),
+                    );
+                  } else if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return const Center(
+                      child: Text("No organizations found."),
+                    );
+                  }
+
+                  var organizations = snapshot.data!.docs.map((doc) {
+                    return User.fromJson(doc.data() as Map<String, dynamic>);
+                  }).toList();
+
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: organizations.length,
+                    itemBuilder: (context, index) {
+                      final organization = organizations[index];
+                      return Card(
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 20),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
                             children: [
-                              ElevatedButton.icon(
-                                onPressed: () {
-                                  context
-                                      .read<UserListProvider>()
-                                      .changeCurrentUser(
-                                        organizations[index].email,
-                                      );
-                                  Navigator.pushNamed(
-                                    context,
-                                    '/org-profile',
-                                    arguments: organizations[index],
-                                  );
-                                },
-                                icon: const Icon(Icons.info),
-                                label: const Text("View Org Details"),
+                              Image.network(
+                                organization.profilePhoto ?? 'https://via.placeholder.com/150',
+                                fit: BoxFit.cover,
+                                width: MediaQuery.of(context).size.width / 1.5,
                               ),
-                              ElevatedButton(
-                                onPressed: () {
-                                  _showConfirmationDialog(
-                                    context,
-                                    organizations[index].name,
-                                    "approve",
-                                    () {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                              "${organizations[index].name} approved"),
-                                        ),
-                                      );
-                                      Navigator.of(context).pop();
-                                    },
-                                  );
-                                },
-                                child: const Icon(Icons.check,
-                                    color: Colors.green),
+                              Text(
+                                organization.name,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 18),
                               ),
-                              ElevatedButton(
-                                onPressed: () {
-                                  _showConfirmationDialog(
-                                    context,
-                                    organizations[index].name,
-                                    "disapprove",
-                                    () {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                              "${organizations[index].name} disapproved"),
-                                        ),
+                              Text(
+                                organization.about ??
+                                    "This organization has no description.",
+                                textAlign: TextAlign.center,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                children: [
+                                  ElevatedButton.icon(
+                                    onPressed: () {
+                                      context.read<UserProvider>().changeSelectedUser(organization);
+                                      Navigator.pushNamed(
+                                        context,
+                                        '/org-profile',
+                                        arguments: organization,
                                       );
-                                      Navigator.of(context).pop();
                                     },
-                                  );
-                                },
-                                child:
-                                    const Icon(Icons.close, color: Colors.red),
+                                    icon: const Icon(Icons.info),
+                                    label: const Text("View Org Details"),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      _showConfirmationDialog(
+                                        context,
+                                        organization.name,
+                                        "approve",
+                                        () {
+                                          FirebaseFirestore.instance
+                                              .collection('users')
+                                              .doc(organization.id)
+                                              .update({'isApproved': true});
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text("${organization.name} approved"),
+                                            ),
+                                          );
+                                          Navigator.of(context).pop();
+                                        },
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.lightGreen, 
+                                    ),
+                                    child: const Icon(Icons.check_rounded, color: Colors.white),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      _showConfirmationDialog(
+                                        context,
+                                        organization.name,
+                                        "disapprove",
+                                        () {
+                                          FirebaseFirestore.instance
+                                              .collection('users')
+                                              .doc(organization.id)
+                                              .update({'isApproved': false});
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text("${organization.name} disapproved"),
+                                            ),
+                                          );
+                                          Navigator.of(context).pop();
+                                        },
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color.fromARGB(255, 240, 84, 72), 
+                                    ),
+                                    child: const Icon(Icons.close_rounded, color: Colors.white),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ],
-                      ),
-                    ),
+                        ),
+                      );
+                    },
                   );
                 },
               ),
@@ -141,8 +170,7 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
     );
   }
 
-  void _showConfirmationDialog(BuildContext context, String orgName,
-      String action, VoidCallback onConfirm) {
+  void _showConfirmationDialog(BuildContext context, String orgName, String action, VoidCallback onConfirm) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -151,8 +179,7 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
           child: AlertDialog(
             title: Text(
               "Confirm $action",
-              style: const TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.bold),
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             ),
             content: Text(
               "Are you sure you want to $action $orgName?",
@@ -172,8 +199,7 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                 onPressed: onConfirm,
                 child: const Text(
                   "Confirm",
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ),
             ],
