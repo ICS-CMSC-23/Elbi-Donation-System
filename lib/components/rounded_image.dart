@@ -13,8 +13,11 @@ class RoundedImage extends StatelessWidget {
       width: size,
       height: size,
       errorBuilder: (context, error, stackTrace) {
-        return Image.asset('assets/images/portrait-placeholder.jpg',
-            fit: BoxFit.fitWidth);
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(size / 2),
+          child: Image.asset('assets/images/portrait-placeholder.jpg',
+              width: size, height: size, fit: BoxFit.cover),
+        );
       },
       fit: BoxFit.cover,
     );
