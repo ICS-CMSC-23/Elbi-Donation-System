@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import '../components/upload_helper.dart';
 import '../models/user_model.dart' as user_model;
 import '../providers/auth_provider.dart';
 
@@ -25,37 +26,6 @@ class _SignUpPageState extends State<SignUpPage> {
   String? _imagePath;
   List<File> _orgImages = [];
   String? errorMessage;
-
-  Future<void> _pickImage() async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _imagePath = pickedFile.path;
-      });
-    }
-  }
-
-  Future<void> _pickMultipleImages() async {
-    final List<XFile>? pickedFiles = await ImagePicker().pickMultiImage();
-    if (pickedFiles != null && pickedFiles.isNotEmpty) {
-      setState(() {
-        _orgImages.addAll(pickedFiles.map((file) => File(file.path)));
-      });
-    }
-  }
-
-  void _remove() {
-    setState(() {
-      _imagePath = null;
-    });
-  }
-
-  void _removeImage(int index) {
-    setState(() {
-      _orgImages.removeAt(index);
-    });
-  }
 
   void _resetForm() {
     _formKey.currentState?.reset();
@@ -113,7 +83,12 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
                 const SizedBox(height: 16),
                 GestureDetector(
-                  onTap: _pickImage,
+                  onTap: () async {
+                    String? imagePath = await pickImage();
+                    setState(() {
+                      _imagePath = imagePath;
+                    });
+                  },
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
@@ -149,7 +124,12 @@ class _SignUpPageState extends State<SignUpPage> {
                           top: 10,
                           right: 130,
                           child: GestureDetector(
-                            onTap: () => _remove(),
+                            onTap: () async {
+                              String? imagePath = await pickImage();
+                              setState(() {
+                                _imagePath = imagePath;
+                              });
+                            },
                             child: Container(
                               padding: const EdgeInsets.all(2.0),
                               decoration: const BoxDecoration(
@@ -271,7 +251,12 @@ class _SignUpPageState extends State<SignUpPage> {
                 if (!isDonor) ...[
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: _pickMultipleImages,
+                    onPressed: () async {
+                      List<File> images = await pickMultipleImages();
+                      setState(() {
+                        _orgImages.addAll(images);
+                      });
+                    },
                     child: const Text('Upload Proof of Legitimacy'),
                   ),
                   if (_orgImages.isNotEmpty) const SizedBox(height: 16),
@@ -302,7 +287,11 @@ class _SignUpPageState extends State<SignUpPage> {
                             top: 0,
                             right: 0,
                             child: GestureDetector(
-                              onTap: () => _removeImage(index),
+                              onTap: () {
+                                setState(() {
+                                  removeImage(_orgImages, index);
+                                });
+                              },
                               child: Container(
                                 padding: const EdgeInsets.all(2.0),
                                 decoration: const BoxDecoration(
@@ -325,8 +314,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                    }
+                    if (_formKey.currentState!.validate()) {}
                   },
                   child: const Text(
                     'Sign Up',
