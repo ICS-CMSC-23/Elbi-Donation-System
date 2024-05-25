@@ -113,7 +113,7 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
 
                   // Filter donations by donorId
                   var filteredDonations = snapshot.data!.docs.where((doc) {
-                    var donation =
+                    Donation donation =
                         Donation.fromJson(doc.data() as Map<String, dynamic>);
                     return donation.donorId == user.id;
                   }).toList();
