@@ -1,9 +1,8 @@
-import 'package:elbi_donation_system/providers/auth_provider.dart';
 import 'package:elbi_donation_system/providers/user_list_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../models/user_model.dart';
+import '../providers/auth_provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -13,10 +12,10 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  // ignore: unused_field
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  String? errorMessage;
 
   @override
   void initState() {
@@ -50,11 +49,53 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  Future<void> _login() async {
+    if (_formKey.currentState!.validate()) {
+      String? error = await context
+          .read<AuthProvider>()
+          .signIn(_emailController.text, _passwordController.text);
+
+      if (error == null) {
+        if (context.read<AuthProvider>().currentUser.role != "guest") {
+          User currentUser = context.read<AuthProvider>().currentUser;
+          context.read<UserListProvider>().changeCurrentUser(currentUser.email);
+          Navigator.pushNamed(context, "/");
+        }
+      } else {
+        setState(() {
+          errorMessage = "Incorrect email/password";
+        });
+      }
+
+      // if (_formKey.currentState!.validate()) {
+
+      //   final userListProvider =
+      //       Provider.of<UserListProvider>(context, listen: false);
+      //   final User user =
+      //       userListProvider.changeCurrentUser(_emailController.text);
+      //   if (user.email != _emailController.text) {
+      //     setState(() {
+      //       errorMessage = 'Account does not exist';
+      //     });
+      //   } else if (user.password != _passwordController.text) {
+      //     setState(() {
+      //       errorMessage = 'Incorrect password';
+      //     });
+      //   } else if (user.role == 'org') {
+      //     Navigator.pushReplacementNamed(context, '/org_homepage');
+      //   } else if (user.role == 'admin') {
+      //     Navigator.pushReplacementNamed(context, '/admin_homepage');
+      //   } else {
+      //     Navigator.pushReplacementNamed(context, '/donor_homepage');
+      //   }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false, // to remove back button
+        automaticallyImplyLeading: false,
         title: const Text("Log In"),
       ),
       body: SingleChildScrollView(
@@ -72,7 +113,6 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 Padding(
-                  //padding: const EdgeInsets.only(left:15.0,right: 15.0,top:0,bottom: 0),
                   padding: const EdgeInsets.symmetric(horizontal: 15),
                   child: TextFormField(
                     controller: _emailController,
@@ -95,7 +135,6 @@ class _LoginPageState extends State<LoginPage> {
                 Padding(
                   padding: const EdgeInsets.only(
                       left: 15.0, right: 15.0, top: 15, bottom: 0),
-                  //padding: EdgeInsets.symmetric(horizontal: 15),
                   child: TextFormField(
                     controller: _passwordController,
                     obscureText: true,
@@ -112,30 +151,21 @@ class _LoginPageState extends State<LoginPage> {
                     },
                   ),
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
+                const SizedBox(height: 20),
+                if (errorMessage != null) ...[
+                  Text(
+                    errorMessage!,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                  const SizedBox(height: 10),
+                ],
                 Container(
                   height: 50,
                   width: 250,
                   decoration:
                       BoxDecoration(borderRadius: BorderRadius.circular(20)),
                   child: ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        context.read<AuthProvider>().signIn(
-                            _emailController.text, _passwordController.text);
-                        if (context.read<AuthProvider>().currentUser.role !=
-                            "guest") {
-                          User currentUser =
-                              context.read<AuthProvider>().currentUser;
-                          context
-                              .read<UserListProvider>()
-                              .changeCurrentUser(currentUser.email);
-                          Navigator.pushNamed(context, "/");
-                        }
-                      }
-                    },
+                    onPressed: _login,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).primaryColor,
                       elevation: 0,
@@ -146,9 +176,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-                const SizedBox(
-                  height: 5,
-                ),
+                const SizedBox(height: 5),
                 TextButton(
                   onPressed: _forgotPassword,
                   child: Text(
