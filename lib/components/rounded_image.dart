@@ -9,13 +9,14 @@ class RoundedImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Image imageType = Image.memory(
-      decodeBase64Image(source),
+    Image imageType = Image.network(
+      source,
       width: size,
       height: size,
+      fit: BoxFit.cover,
       errorBuilder: (context, error, stackTrace) {
-        return Image.network(
-          source,
+        return Image.memory(
+          decodeBase64Image(source),
           width: size,
           height: size,
           errorBuilder: (context, error, stackTrace) {
@@ -28,7 +29,6 @@ class RoundedImage extends StatelessWidget {
           fit: BoxFit.cover,
         );
       },
-      fit: BoxFit.cover,
     );
 
     return ClipRRect(

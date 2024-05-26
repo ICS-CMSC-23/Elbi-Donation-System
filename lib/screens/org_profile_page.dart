@@ -88,12 +88,25 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
                 return Padding(
                     padding: const EdgeInsets.all(5.00),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10.0),
-                      child: Image.memory(
-                          decodeBase64ImageUncompressed(
-                              user.proofsOfLegitimacy![index]),
-                          fit: BoxFit.cover),
-                    ));
+                        borderRadius: BorderRadius.circular(10.0),
+                        child: Image.network(
+                          user.proofsOfLegitimacy![index],
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Image.memory(
+                              decodeBase64ImageUncompressed(
+                                user.proofsOfLegitimacy![index],
+                              ),
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Image.asset(
+                                  "/assets/images/portrait-placeholder.jpg",
+                                  fit: BoxFit.cover,
+                                );
+                              },
+                            );
+                          },
+                        )));
               }),
         ],
       );
