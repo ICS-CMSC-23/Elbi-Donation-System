@@ -135,7 +135,13 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
                 detail: user.contactNo,
               ),
               proofList,
-              actionButtons,
+              const Padding(
+                padding: EdgeInsets.only(top: 20),
+                child: Text(
+                  "Donation Drives",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
               Expanded(
                   child: StreamBuilder(
                 stream: donationDrivesStream,
@@ -193,7 +199,8 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
                         );
                       });
                 },
-              ))
+              )),
+              actionButtons,
             ],
           ),
         ));

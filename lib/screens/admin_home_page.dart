@@ -53,7 +53,9 @@ class _AdminHomePageState extends State<AdminHomePage> {
           }
 
           var organizations = snapshot.data!.docs.map((doc) {
-            return User.fromJson(doc.data() as Map<String, dynamic>);
+            Map<String, dynamic> docMap = doc.data() as Map<String, dynamic>;
+            docMap["id"] = doc.id;
+            return User.fromJson(docMap);
           }).toList();
 
           return ListView.builder(
