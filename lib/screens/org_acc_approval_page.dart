@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:elbi_donation_system/components/square_image.dart';
 import 'package:elbi_donation_system/models/user_model.dart';
 import 'package:elbi_donation_system/providers/user_provider.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,8 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
 
   @override
   Widget build(BuildContext context) {
-    Stream<QuerySnapshot> orgStream = FirebaseFirestore.instance.collection('users')
+    Stream<QuerySnapshot> orgStream = FirebaseFirestore.instance
+        .collection('users')
         .where('role', isEqualTo: 'organization')
         .where('isApproved', isEqualTo: false)
         .snapshots();
@@ -46,7 +48,8 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                     return Center(
                       child: Text("Error: ${snapshot.error}"),
                     );
-                  } else if (snapshot.connectionState == ConnectionState.waiting) {
+                  } else if (snapshot.connectionState ==
+                      ConnectionState.waiting) {
                     return const Center(
                       child: CircularProgressIndicator(),
                     );
@@ -73,11 +76,10 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                           padding: const EdgeInsets.all(8.0),
                           child: Column(
                             children: [
-                              Image.network(
-                                organization.profilePhoto ?? 'https://via.placeholder.com/150',
-                                fit: BoxFit.cover,
-                                width: MediaQuery.of(context).size.width / 1.5,
-                              ),
+                              SquareImage(
+                                  source: organization.profilePhoto,
+                                  size:
+                                      MediaQuery.of(context).size.width / 1.5),
                               Text(
                                 organization.name,
                                 style: const TextStyle(
@@ -88,72 +90,85 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                                     "This organization has no description.",
                                 textAlign: TextAlign.center,
                               ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                children: [
-                                  ElevatedButton.icon(
-                                    onPressed: () {
-                                      context.read<UserProvider>().changeSelectedUser(organization);
-                                      Navigator.pushNamed(
-                                        context,
-                                        '/org-profile',
-                                        arguments: organization,
-                                      );
-                                    },
-                                    icon: const Icon(Icons.info),
-                                    label: const Text("View Org Details"),
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      _showConfirmationDialog(
-                                        context,
-                                        organization.name,
-                                        "approve",
-                                        () {
-                                          FirebaseFirestore.instance
-                                              .collection('users')
-                                              .doc(organization.id)
-                                              .update({'isApproved': true});
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(
-                                              content: Text("${organization.name} approved"),
-                                            ),
-                                          );
-                                          Navigator.of(context).pop();
-                                        },
-                                      );
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.lightGreen, 
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    ElevatedButton.icon(
+                                      onPressed: () {
+                                        context
+                                            .read<UserProvider>()
+                                            .changeSelectedUser(organization);
+                                        Navigator.pushNamed(
+                                          context,
+                                          '/org-profile',
+                                          arguments: organization,
+                                        );
+                                      },
+                                      icon: const Icon(Icons.info),
+                                      label: const Text("View Org Details"),
                                     ),
-                                    child: const Icon(Icons.check_rounded, color: Colors.white),
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      _showConfirmationDialog(
-                                        context,
-                                        organization.name,
-                                        "disapprove",
-                                        () {
-                                          FirebaseFirestore.instance
-                                              .collection('users')
-                                              .doc(organization.id)
-                                              .update({'isApproved': false});
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(
-                                              content: Text("${organization.name} disapproved"),
-                                            ),
-                                          );
-                                          Navigator.of(context).pop();
-                                        },
-                                      );
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color.fromARGB(255, 240, 84, 72), 
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        _showConfirmationDialog(
+                                          context,
+                                          organization.name,
+                                          "approve",
+                                          () {
+                                            FirebaseFirestore.instance
+                                                .collection('users')
+                                                .doc(organization.id)
+                                                .update({'isApproved': true});
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                    "${organization.name} approved"),
+                                              ),
+                                            );
+                                            Navigator.of(context).pop();
+                                          },
+                                        );
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.lightGreen,
+                                      ),
+                                      child: const Icon(Icons.check_rounded,
+                                          color: Colors.white),
                                     ),
-                                    child: const Icon(Icons.close_rounded, color: Colors.white),
-                                  ),
-                                ],
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        _showConfirmationDialog(
+                                          context,
+                                          organization.name,
+                                          "disapprove",
+                                          () {
+                                            FirebaseFirestore.instance
+                                                .collection('users')
+                                                .doc(organization.id)
+                                                .update({'isApproved': false});
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                    "${organization.name} disapproved"),
+                                              ),
+                                            );
+                                            Navigator.of(context).pop();
+                                          },
+                                        );
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color.fromARGB(
+                                            255, 240, 84, 72),
+                                      ),
+                                      child: const Icon(Icons.close_rounded,
+                                          color: Colors.white),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
@@ -170,7 +185,8 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
     );
   }
 
-  void _showConfirmationDialog(BuildContext context, String orgName, String action, VoidCallback onConfirm) {
+  void _showConfirmationDialog(BuildContext context, String orgName,
+      String action, VoidCallback onConfirm) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -179,7 +195,8 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
           child: AlertDialog(
             title: Text(
               "Confirm $action",
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  color: Colors.white, fontWeight: FontWeight.bold),
             ),
             content: Text(
               "Are you sure you want to $action $orgName?",
@@ -199,7 +216,8 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                 onPressed: onConfirm,
                 child: const Text(
                   "Confirm",
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ),
             ],

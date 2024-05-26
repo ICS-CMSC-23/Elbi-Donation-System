@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elbi_donation_system/components/main_drawer.dart';
+import 'package:elbi_donation_system/components/rounded_image.dart';
 import 'package:elbi_donation_system/models/route_model.dart';
 import 'package:elbi_donation_system/models/user_model.dart';
 import 'package:elbi_donation_system/providers/user_provider.dart';
@@ -18,7 +19,8 @@ class _AdminHomePageState extends State<AdminHomePage> {
   @override
   Widget build(BuildContext context) {
     // Fetching the list of organizations from Firestore
-    Stream<QuerySnapshot> orgStream = FirebaseFirestore.instance.collection('users')
+    Stream<QuerySnapshot> orgStream = FirebaseFirestore.instance
+        .collection('users')
         .where('role', isEqualTo: 'organization')
         .snapshots();
 
@@ -59,19 +61,21 @@ class _AdminHomePageState extends State<AdminHomePage> {
             itemBuilder: (context, index) {
               final organization = organizations[index];
               return Card(
-                margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                margin:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                 child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: NetworkImage(organization.profilePhoto ?? 'https://via.placeholder.com/150'),
-                  ),
+                  leading: RoundedImage(
+                      source: organization.profilePhoto!, size: 50),
                   title: Text(organization.name),
-                  subtitle: Text(
-                      organization.about ?? "This organization has no description"),
+                  subtitle: Text(organization.about ??
+                      "This organization has no description"),
                   trailing: ElevatedButton(
                     onPressed: () {
                       // Link Org Profile page
                       WidgetsBinding.instance.addPostFrameCallback((_) {
-                        context.read<UserProvider>().changeSelectedUser(organization);
+                        context
+                            .read<UserProvider>()
+                            .changeSelectedUser(organization);
                         Navigator.pushNamed(context, "/org-profile");
                       });
                     },

@@ -70,7 +70,7 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
     }
 
     Widget proofList;
-    if (authUser.role == User.admin) {
+    if (authUser.role == User.admin || authUser.role == User.organization) {
       proofList = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -93,18 +93,19 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
                           user.proofsOfLegitimacy![index],
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
-                            return Image.memory(
-                              decodeBase64ImageUncompressed(
-                                user.proofsOfLegitimacy![index],
-                              ),
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Image.asset(
-                                  "/assets/images/portrait-placeholder.jpg",
-                                  fit: BoxFit.cover,
-                                );
-                              },
-                            );
+                            try {
+                              return Image.memory(
+                                decodeBase64ImageUncompressed(
+                                  user.proofsOfLegitimacy![index],
+                                ),
+                                fit: BoxFit.cover,
+                              );
+                            } catch (e) {
+                              return Image.asset(
+                                "assets/images/portrait-placeholder.jpg",
+                                fit: BoxFit.cover,
+                              );
+                            }
                           },
                         )));
               }),
