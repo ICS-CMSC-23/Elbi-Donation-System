@@ -2,26 +2,44 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 
 import '../api/firebase_auth_api.dart';
 import '../api/firebase_donation_drive_api.dart';
+import '../components/square_image.dart';
 import '../components/upload_helper.dart';
 import '../models/donation_drive_model.dart';
+import '../providers/donation_drive_provider.dart';
 
-class AddDonationDrive extends StatefulWidget {
+class EditDonationDrive extends StatefulWidget {
+  final DonationDrive donationDrive;
+
+  EditDonationDrive({required this.donationDrive});
+
   @override
-  _AddDonationDriveState createState() => _AddDonationDriveState();
+  _EditDonationDriveState createState() => _EditDonationDriveState();
 }
 
-class _AddDonationDriveState extends State<AddDonationDrive> {
+class _EditDonationDriveState extends State<EditDonationDrive> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   DateTime _startDate = DateTime.now();
-  DateTime _endDate = DateTime.now().add(Duration(days: 1));
+  DateTime _endDate = DateTime.now();
   List<File> _ddriveImages = [];
   List<String> _ddriveImages64 = [];
   String? errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _titleController.text = widget.donationDrive.name;
+    _descriptionController.text = widget.donationDrive.description;
+    _startDate = widget.donationDrive.startDate;
+    _endDate = widget.donationDrive.endDate;
+    _ddriveImages64 = widget.donationDrive.photos!;
+  }
 
   @override
   void dispose() {
@@ -32,14 +50,14 @@ class _AddDonationDriveState extends State<AddDonationDrive> {
 
   void _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      if (_ddriveImages.isEmpty) {
+      if (_ddriveImages64.isEmpty) {
         setState(() {
           errorMessage = 'Please upload at least one image';
         });
         return;
       }
       final currentUser = FirebaseAuthAPI.auth.currentUser;
-      DonationDrive newDrive = DonationDrive(
+      DonationDrive updatedDrive = DonationDrive(
         organizationId: currentUser!.uid,
         startDate: _startDate,
         endDate: _endDate,
@@ -48,10 +66,9 @@ class _AddDonationDriveState extends State<AddDonationDrive> {
         photos: _ddriveImages64,
       );
 
-      String result =
-          await FirebaseDonationDriveAPI().addDonationDrive(newDrive);
-
-      if (result == "Successfully added donation drive!") {
+      String result = await FirebaseDonationDriveAPI()
+          .updateDonationDrive(updatedDrive.id!, updatedDrive.toJson());
+      if (result == "Successfully updated donation drive!") {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(result)),
         );
@@ -64,41 +81,49 @@ class _AddDonationDriveState extends State<AddDonationDrive> {
     }
   }
 
-  void _clearForm() {
-    _formKey.currentState!.reset();
-    _titleController.clear();
-    _descriptionController.clear();
-    setState(() {
-      _startDate = DateTime.now();
-      _endDate = DateTime.now().add(Duration(days: 1));
-      _ddriveImages.clear();
-      _ddriveImages64.clear();
-    });
-  }
-
   Future<void> _selectDate(BuildContext context, bool isStartDate) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: _endDate,
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
-    if (picked != null && picked != (isStartDate ? _startDate : _endDate)) {
+    if (picked != null) {
       setState(() {
-        if (isStartDate) {
-          _startDate = picked;
-        } else {
-          _endDate = picked;
-        }
+        _endDate = picked;
       });
+    }
+  }
+
+  void _sDate() async {
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Start date cannot be modified.")));
+  }
+
+  void _removeImage(int index) {
+    if (_ddriveImages64.length > 1) {
+      setState(() {
+        _ddriveImages.removeAt(index);
+        _ddriveImages64.removeAt(index);
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('At least one image is required.'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    DonationDrive donationDrive =
+        context.watch<DonationDriveProvider>().selected;
+    // String userType = context.watch<AuthProvider>().currentUser.role;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Donation Drive'),
+        title: const Text('Edit Donation Drive'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -113,7 +138,7 @@ class _AddDonationDriveState extends State<AddDonationDrive> {
                       title: Text(
                           'Start Date: ${DateFormat('yyyy-MM-dd').format(_startDate)}'),
                       trailing: const Icon(Icons.calendar_today),
-                      onTap: () => _selectDate(context, true),
+                      onTap: () => _sDate(),
                     ),
                   ),
                   Expanded(
@@ -184,6 +209,7 @@ class _AddDonationDriveState extends State<AddDonationDrive> {
                 ),
                 child: const Text('Upload Images'),
               ),
+              const SizedBox(height: 16),
               if (_ddriveImages.isNotEmpty) const SizedBox(height: 16),
               GridView.builder(
                 shrinkWrap: true,
@@ -193,27 +219,22 @@ class _AddDonationDriveState extends State<AddDonationDrive> {
                   crossAxisSpacing: 8,
                   mainAxisSpacing: 8,
                 ),
-                itemCount: _ddriveImages.length,
+                itemCount: donationDrive.photos?.length,
                 itemBuilder: (context, index) {
                   return Stack(
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(8.0),
-                        child: Image.file(
-                          _ddriveImages[index],
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: double.infinity,
-                        ),
+                        child: SquareImage(
+                            source: donationDrive.photos![index],
+                            size: double.infinity),
                       ),
                       Positioned(
                         top: 0,
                         right: 0,
                         child: GestureDetector(
                           onTap: () {
-                            setState(() {
-                              removeImage(_ddriveImages, index);
-                            });
+                            _removeImage(index);
                           },
                           child: Container(
                             padding: const EdgeInsets.all(2.0),
@@ -239,16 +260,7 @@ class _AddDonationDriveState extends State<AddDonationDrive> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: _submitForm,
-                      child: const Text('Add'),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: _clearForm,
-                      style:
-                          ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                      child: const Text('Reset'),
+                      child: const Text('Update'),
                     ),
                   ),
                 ],

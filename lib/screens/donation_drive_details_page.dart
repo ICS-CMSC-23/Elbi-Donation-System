@@ -18,6 +18,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../models/donation_model.dart';
 import '../models/route_model.dart';
+import 'edit_donation_drive.dart';
 
 class DonationDriveDetails extends StatefulWidget {
   const DonationDriveDetails({super.key});
@@ -56,7 +57,15 @@ class _DonationDriveDetailsState extends State<DonationDriveDetails> {
         children: [
           Flexible(
             child: TextButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          EditDonationDrive(donationDrive: donationDrive),
+                    ),
+                  );
+                },
                 icon: const Icon(Icons.edit),
                 label: const Text("Edit Donation Drive")),
           ),
