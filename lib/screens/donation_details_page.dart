@@ -89,7 +89,7 @@ class _DonationDetailsState extends State<DonationDetails> {
                   subtitle: donation.status,
                   description:
                       // "Donor: Try"),
-                      "Donor: ${context.watch<UserProvider>().selected.name}"),
+                      "Donor: ${context.watch<DonationProvider>().selectedDonor.name}"),
               TitleDetail(title: "Description", detail: donation.description),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
