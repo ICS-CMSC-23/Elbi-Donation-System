@@ -1,3 +1,4 @@
+import 'package:elbi_donation_system/components/upload_helper.dart';
 import 'package:flutter/material.dart';
 
 //widget for rounded images
@@ -8,15 +9,23 @@ class RoundedImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Image imageType = Image.network(
-      source,
+    Image imageType = Image.memory(
+      decodeBase64Image(source),
       width: size,
       height: size,
       errorBuilder: (context, error, stackTrace) {
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(size / 2),
-          child: Image.asset('assets/images/portrait-placeholder.jpg',
-              width: size, height: size, fit: BoxFit.cover),
+        return Image.network(
+          source,
+          width: size,
+          height: size,
+          errorBuilder: (context, error, stackTrace) {
+            return ClipRRect(
+              borderRadius: BorderRadius.circular(size / 2),
+              child: Image.asset('assets/images/portrait-placeholder.jpg',
+                  width: size, height: size, fit: BoxFit.cover),
+            );
+          },
+          fit: BoxFit.cover,
         );
       },
       fit: BoxFit.cover,

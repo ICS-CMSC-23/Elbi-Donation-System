@@ -2,6 +2,7 @@ import 'package:elbi_donation_system/components/header_with_pic.dart';
 import 'package:elbi_donation_system/components/main_drawer.dart';
 import 'package:elbi_donation_system/components/title_detail.dart';
 import 'package:elbi_donation_system/components/title_detail_list.dart';
+import 'package:elbi_donation_system/components/upload_helper.dart';
 import 'package:elbi_donation_system/models/donation_model.dart';
 import 'package:elbi_donation_system/models/route_model.dart';
 import 'package:elbi_donation_system/models/user_model.dart';
@@ -68,6 +69,38 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
       );
     }
 
+    Widget proofList;
+    if (authUser.role == User.admin) {
+      proofList = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Proofs of Legitimacy",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3),
+              itemCount: user.proofsOfLegitimacy?.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Padding(
+                    padding: const EdgeInsets.all(5.00),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10.0),
+                      child: Image.memory(
+                          decodeBase64ImageUncompressed(
+                              user.proofsOfLegitimacy![index]),
+                          fit: BoxFit.cover),
+                    ));
+              }),
+        ],
+      );
+    } else {
+      proofList = const SizedBox.shrink();
+    }
+
     return Scaffold(
         appBar: AppBar(
           title: Text(user.name),
@@ -89,6 +122,7 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
                 title: "Contact Number",
                 detail: "09762946252",
               ),
+              proofList,
               actionButtons
             ],
           ),
