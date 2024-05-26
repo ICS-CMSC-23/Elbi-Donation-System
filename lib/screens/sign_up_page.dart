@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -25,6 +26,7 @@ class _SignUpPageState extends State<SignUpPage> {
   bool isDonor = true;
   String? _imagePath;
   List<File> _orgImages = [];
+  List<String> _orgImages64 = [];
   String? errorMessage;
 
   void _resetForm() {
@@ -87,9 +89,23 @@ class _SignUpPageState extends State<SignUpPage> {
                 GestureDetector(
                   onTap: () async {
                     String? imagePath = await pickImage();
-                    setState(() {
-                      _imagePath = imagePath;
-                    });
+                    List<int> bytes = utf8.encode(imagePath!);
+                    int sizeInBytes = bytes.length;
+                    print('Size of base64 string in bytes: $sizeInBytes');
+
+                    if (sizeInBytes < 1000000) {
+                      setState(() {
+                        _imagePath = imagePath;
+                      });
+                    } else {
+                      print("Please upload image less than 1MB.");
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Please upload image less than 1MB.'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
                   },
                   child: Stack(
                     alignment: Alignment.center,
@@ -97,7 +113,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       CircleAvatar(
                         radius: 50,
                         backgroundImage: _imagePath != null
-                            ? FileImage(File(_imagePath!))
+                            ? MemoryImage(decodeBase64Image(_imagePath!))
                             : const AssetImage(
                                 'assets/images/portrait-placeholder.jpg',
                               ) as ImageProvider,
@@ -271,9 +287,29 @@ class _SignUpPageState extends State<SignUpPage> {
                   ElevatedButton(
                     onPressed: () async {
                       List<File> images = await pickMultipleImages();
-                      setState(() {
-                        _orgImages.addAll(images);
-                      });
+                      List<String> base64Images =
+                          await convertImagesToBase64(images);
+
+                      for (var i = 0; i < images.length; i++) {
+                        List<int> bytes = utf8.encode(base64Images[i]!);
+                        int sizeInBytes = bytes.length;
+                        print('Size of base64 string in bytes: $sizeInBytes');
+                        if (sizeInBytes < 1000000) {
+                          setState(() {
+                            _orgImages.add(images[i]);
+                            _orgImages64.add(base64Images[i]);
+                          });
+                        } else {
+                          print("Please upload image less than 1MB.");
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content:
+                                  Text('Please upload image less than 1MB.'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       shape: const RoundedRectangleBorder(
@@ -355,8 +391,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         });
                         return;
                       }
-                      List<String> proofsOfLegitimacy =
-                          _orgImages.map((file) => file.path).toList();
+                      List<String> proofsOfLegitimacy = _orgImages64;
                       user_model.User newUser = user_model.User(
                         name: isDonor
                             ? nameController.text
