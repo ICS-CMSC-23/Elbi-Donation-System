@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elbi_donation_system/components/main_drawer.dart';
+import 'package:elbi_donation_system/components/square_image.dart';
 import 'package:elbi_donation_system/models/route_model.dart';
 import 'package:elbi_donation_system/models/user_model.dart';
 // import 'package:elbi_donation_system/providers/auth_provider.dart';
@@ -113,31 +114,10 @@ class _DonorHomePageState extends State<DonorHomePage> {
                           child: Column(
                             children: [
                               Center(
-                                child: Image.network(
-                                  organization.profilePhoto ??
-                                      'https://via.placeholder.com/150',
-                                  fit: BoxFit.cover,
-                                  width:
-                                      MediaQuery.of(context).size.width / 1.5,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return ClipRRect(
-                                      borderRadius: BorderRadius.circular(
-                                          (MediaQuery.of(context).size.width /
-                                                  1.5) /
-                                              2),
-                                      child: Image.asset(
-                                        'assets/images/portrait-placeholder.jpg',
-                                        fit: BoxFit.cover,
-                                        width:
-                                            MediaQuery.of(context).size.width /
-                                                1.5,
-                                        height:
-                                            MediaQuery.of(context).size.width /
-                                                1.5,
-                                      ),
-                                    );
-                                  },
-                                ),
+                                child: SquareImage(
+                                    source: organization.profilePhoto,
+                                    size: MediaQuery.of(context).size.width /
+                                        1.5),
                               ),
                               Center(child: Text(organization.name)),
                               Center(
