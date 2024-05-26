@@ -16,6 +16,7 @@ class _SignUpPageState extends State<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController userNameController = TextEditingController();
+  final TextEditingController aboutController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
@@ -30,6 +31,7 @@ class _SignUpPageState extends State<SignUpPage> {
     _formKey.currentState?.reset();
     nameController.clear();
     userNameController.clear();
+    aboutController.clear();
     emailController.clear();
     passwordController.clear();
     addressController.clear();
@@ -176,6 +178,14 @@ class _SignUpPageState extends State<SignUpPage> {
                       return null;
                     },
                   ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: aboutController,
+                    decoration: const InputDecoration(
+                      labelText: 'Biography',
+                      prefixIcon: Icon(Icons.info),
+                    ),
+                  ),
                 ] else ...[
                   TextFormField(
                     controller: orgNameController,
@@ -189,6 +199,14 @@ class _SignUpPageState extends State<SignUpPage> {
                       }
                       return null;
                     },
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: aboutController,
+                    decoration: const InputDecoration(
+                      labelText: 'Tagline',
+                      prefixIcon: Icon(Icons.info),
+                    ),
                   ),
                 ],
                 const SizedBox(height: 16),
@@ -354,7 +372,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         profilePhoto: _imagePath != null
                             ? _imagePath!
                             : 'assets/images/portrait-placeholder.jpg',
-                        about: "A donor na igop",
+                        about: aboutController.text,
                         proofsOfLegitimacy: proofsOfLegitimacy,
                         isApproved: false,
                         isOpenForDonation: false,
