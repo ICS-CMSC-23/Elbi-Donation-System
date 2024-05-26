@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elbi_donation_system/components/header_with_pic.dart';
 import 'package:elbi_donation_system/components/main_drawer.dart';
 import 'package:elbi_donation_system/components/rounded_image.dart';
+import 'package:elbi_donation_system/components/square_image.dart';
 import 'package:elbi_donation_system/components/title_detail.dart';
 import 'package:elbi_donation_system/models/donation_drive_model.dart';
 import 'package:elbi_donation_system/models/user_model.dart';
@@ -113,7 +114,7 @@ class _DonationDriveDetailsState extends State<DonationDriveDetails> {
                     ? "Event Finished"
                     : "Event Ongoing",
                 description:
-                    "Organization: ${context.watch<UserProvider>().selected.name}"),
+                    "Organization: ${context.watch<DonationDriveProvider>().selectedDonationDriveUser.name}"),
             TitleDetail(
               title: "Description",
               detail: donationDrive.description,
@@ -155,8 +156,8 @@ class _DonationDriveDetailsState extends State<DonationDriveDetails> {
                       padding: const EdgeInsets.all(5.00),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(10.0),
-                        child: Image.network(donationDrive.photos![index],
-                            fit: BoxFit.cover),
+                        child: SquareImage(
+                            source: donationDrive.photos![index], size: 80),
                       ));
                 }),
             const Padding(
@@ -184,11 +185,28 @@ class _DonationDriveDetailsState extends State<DonationDriveDetails> {
                     child: Text("No Donations Found"),
                   );
                 }
+
+                // Filter donations  by donorId
+                var filteredDonations = snapshot.data!.docs.where((doc) {
+                  Map<String, dynamic> docMap =
+                      doc.data() as Map<String, dynamic>;
+                  docMap["id"] = doc.id;
+                  Donation donation = Donation.fromJson(docMap);
+                  return donation.donationDriveId == donationDrive.id;
+                }).toList();
+
+                if (filteredDonations.isEmpty) {
+                  return const Center(
+                    child:
+                        Text("This donation drive doesn't have a donation yet"),
+                  );
+                }
+
                 return ListView.builder(
-                    itemCount: snapshot.data!.docs.length,
+                    itemCount: filteredDonations.length,
                     itemBuilder: (context, index) {
                       Donation donation = Donation.fromJson(
-                          snapshot.data!.docs[index].data()
+                          filteredDonations[index].data()
                               as Map<String, dynamic>);
                       return ListTile(
                         leading:
@@ -197,10 +215,15 @@ class _DonationDriveDetailsState extends State<DonationDriveDetails> {
                         subtitle: Text(donation.description),
                         trailing: IconButton(
                           icon: const Icon(Icons.more_vert),
-                          onPressed: () {
+                          onPressed: () async {
                             context
                                 .read<DonationProvider>()
                                 .changeSelectedDonation(donation);
+                            context
+                                .read<DonationProvider>()
+                                .changeSelectedDonor(await context
+                                    .read<UserProvider>()
+                                    .fetchUserById(donation.donorId));
                             Navigator.pushNamed(context, "/donation-details");
                           },
                         ),

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elbi_donation_system/components/main_drawer.dart';
+import 'package:elbi_donation_system/components/square_image.dart';
 import 'package:elbi_donation_system/models/donation_drive_model.dart';
 import 'package:elbi_donation_system/models/route_model.dart';
 import 'package:elbi_donation_system/providers/auth_provider.dart';
@@ -97,9 +98,11 @@ class OrgHomePage extends StatelessWidget {
                 return ListView.builder(
                   itemCount: filteredDonationDrives.length,
                   itemBuilder: (context, index) {
-                    DonationDrive donationDrive = DonationDrive.fromJson(
-                        filteredDonationDrives[index].data()
-                            as Map<String, dynamic>);
+                    Map<String, dynamic> docMap = filteredDonationDrives[index]
+                        .data() as Map<String, dynamic>;
+                    docMap["id"] = filteredDonationDrives[index].id;
+                    DonationDrive donationDrive =
+                        DonationDrive.fromJson(docMap);
                     return Card(
                       margin: const EdgeInsets.symmetric(
                           vertical: 10, horizontal: 20),
@@ -127,21 +130,21 @@ class OrgHomePage extends StatelessWidget {
                         ),
                         leading: ClipRRect(
                           borderRadius: BorderRadius.circular(10),
-                          child: Image.network(
-                            donationDrive.photos![0],
-                            width: 100,
-                            height: 100,
-                            fit: BoxFit.cover,
-                          ),
+                          child: SquareImage(
+                              source: donationDrive.photos![index], size: 80),
                         ),
                         trailing: IconButton(
                           icon: const Icon(Icons.more_vert),
-                          onPressed: () {
+                          onPressed: () async {
                             context
                                 .read<DonationDriveProvider>()
                                 .changeSelectedDonationDrive(donationDrive);
-                            context.read<UserProvider>().changeSelectedUser(
-                                context.read<AuthProvider>().currentUser);
+                            context
+                                .read<DonationDriveProvider>()
+                                .changeSelectedDonationDriveUser(await context
+                                    .read<UserProvider>()
+                                    .fetchUserById(
+                                        donationDrive.organizationId));
                             Navigator.pushNamed(
                                 context, "/donation-drive-details");
                           },

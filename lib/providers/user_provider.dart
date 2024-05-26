@@ -29,12 +29,12 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchUserById(String id) async {
+  Future<User> fetchUserById(String id) async {
     try {
       DocumentSnapshot doc = await firebaseService.getUserById(id);
       if (doc.exists) {
         Map<String, dynamic> userData = doc.data() as Map<String, dynamic>;
-        _selectedUser = User(
+        return User(
           id: id,
           name: userData['name'],
           username: userData['username'],
@@ -49,13 +49,41 @@ class UserProvider with ChangeNotifier {
           isApproved: userData['isApproved'],
           isOpenForDonation: userData['isOpenForDonation'],
         );
-        print(_selectedUser?.name);
-        notifyListeners();
       } else {
         print("No user found with the given ID");
+        return User(
+          id: '-1',
+          name: 'Guest',
+          username: 'guest',
+          password: 'none',
+          address: [],
+          contactNo: 'none',
+          role: 'guest',
+          email: 'guest@example.com',
+          profilePhoto: 'none',
+          about: 'guest data',
+          proofsOfLegitimacy: [],
+          isApproved: false,
+          isOpenForDonation: false,
+        );
       }
     } catch (e) {
       print("Failed to fetch user by ID: $e");
+      return User(
+        id: '-1',
+        name: 'Guest',
+        username: 'guest',
+        password: 'none',
+        address: [],
+        contactNo: 'none',
+        role: 'guest',
+        email: 'guest@example.com',
+        profilePhoto: 'none',
+        about: 'guest data',
+        proofsOfLegitimacy: [],
+        isApproved: false,
+        isOpenForDonation: false,
+      );
     }
   }
 

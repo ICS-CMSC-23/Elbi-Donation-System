@@ -1,3 +1,4 @@
+import 'package:elbi_donation_system/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../api/firebase_donation_drive_api.dart';
@@ -7,6 +8,7 @@ class DonationDriveProvider with ChangeNotifier {
   late FirebaseDonationDriveAPI firebaseService;
   late Stream<QuerySnapshot> _donationDrivesStream;
   DonationDrive? _selectedDonationDrive;
+  User? _selectedDonationDriveUser;
 
   DonationDriveProvider() {
     firebaseService = FirebaseDonationDriveAPI();
@@ -16,9 +18,15 @@ class DonationDriveProvider with ChangeNotifier {
   // getters
   Stream<QuerySnapshot> get donationDrives => _donationDrivesStream;
   DonationDrive get selected => _selectedDonationDrive!;
+  User get selectedDonationDriveUser => _selectedDonationDriveUser!;
 
   changeSelectedDonationDrive(DonationDrive donationDrive) {
     _selectedDonationDrive = donationDrive;
+    notifyListeners();
+  }
+
+  changeSelectedDonationDriveUser(User user) {
+    _selectedDonationDriveUser = user;
     notifyListeners();
   }
 

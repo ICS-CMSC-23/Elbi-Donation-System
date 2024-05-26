@@ -60,7 +60,7 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
       );
     } else {
       actionButtons = const Row(
-        children: [],
+        children: [SizedBox.shrink()],
       );
     }
 
@@ -113,6 +113,75 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
     Stream<QuerySnapshot> donationDrivesStream =
         context.watch<DonationDriveProvider>().donationDrives;
 
+    Widget donationDrives;
+    if (authUser.role == User.donor) {
+      donationDrives = Expanded(
+          child: StreamBuilder(
+        stream: donationDrivesStream,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(
+              child: Text("Error encountered! ${snapshot.error}"),
+            );
+          } else if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (!snapshot.hasData) {
+            return const Center(
+              child: Text("No Donations Drives Found"),
+            );
+          }
+
+          // Filter donations Drives by donorId
+          var filteredDonationDrives = snapshot.data!.docs.where((doc) {
+            Map<String, dynamic> docMap = doc.data() as Map<String, dynamic>;
+            docMap["id"] = doc.id;
+            DonationDrive donationDrive = DonationDrive.fromJson(docMap);
+            return donationDrive.organizationId == user.id;
+          }).toList();
+
+          if (filteredDonationDrives.isEmpty) {
+            return const Center(
+              child:
+                  Text("This organization doesn't have a donation drive yet"),
+            );
+          }
+
+          return ListView.builder(
+              itemCount: filteredDonationDrives.length,
+              itemBuilder: (context, index) {
+                Map<String, dynamic> mapData = filteredDonationDrives[index]
+                    .data() as Map<String, dynamic>;
+                mapData["id"] = filteredDonationDrives[index].id;
+                DonationDrive donationDrive = DonationDrive.fromJson(mapData);
+                return ListTile(
+                  leading:
+                      RoundedImage(source: donationDrive.photos![0], size: 50),
+                  title: Text(donationDrive.name),
+                  subtitle: Text(donationDrive.description),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.more_vert),
+                    onPressed: () async {
+                      context
+                          .read<DonationDriveProvider>()
+                          .changeSelectedDonationDrive(donationDrive);
+                      context
+                          .read<DonationDriveProvider>()
+                          .changeSelectedDonationDriveUser(await context
+                              .read<UserProvider>()
+                              .fetchUserById(donationDrive.organizationId!));
+                      Navigator.pushNamed(context, "/donation-drive-details");
+                    },
+                  ),
+                );
+              });
+        },
+      ));
+    } else {
+      donationDrives = const SizedBox.shrink();
+    }
+
     return Scaffold(
         appBar: AppBar(
           title: Text(user.name),
@@ -135,71 +204,16 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
                 detail: user.contactNo,
               ),
               proofList,
-              const Padding(
-                padding: EdgeInsets.only(top: 20),
-                child: Text(
-                  "Donation Drives",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              Expanded(
-                  child: StreamBuilder(
-                stream: donationDrivesStream,
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) {
-                    return Center(
-                      child: Text("Error encountered! ${snapshot.error}"),
-                    );
-                  } else if (snapshot.connectionState ==
-                      ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  } else if (!snapshot.hasData) {
-                    return const Center(
-                      child: Text("No Donations Drives Found"),
-                    );
-                  }
-
-                  // Filter donations Drives by donorId
-                  var filteredDonationDrives = snapshot.data!.docs.where((doc) {
-                    DonationDrive donationDrive = DonationDrive.fromJson(
-                        doc.data() as Map<String, dynamic>);
-                    return donationDrive.organizationId == user.id;
-                  }).toList();
-
-                  if (filteredDonationDrives.isEmpty) {
-                    return const Center(
+              authUser.role == User.donor
+                  ? const Padding(
+                      padding: EdgeInsets.only(top: 20),
                       child: Text(
-                          "This organization doesn't have a donation drive yet"),
-                    );
-                  }
-
-                  return ListView.builder(
-                      itemCount: filteredDonationDrives.length,
-                      itemBuilder: (context, index) {
-                        DonationDrive donationDrive = DonationDrive.fromJson(
-                            filteredDonationDrives[index].data()
-                                as Map<String, dynamic>);
-                        return ListTile(
-                          leading: RoundedImage(
-                              source: donationDrive.photos![0], size: 50),
-                          title: Text(donationDrive.name),
-                          subtitle: Text(donationDrive.description),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.more_vert),
-                            onPressed: () {
-                              context
-                                  .read<DonationDriveProvider>()
-                                  .changeSelectedDonationDrive(donationDrive);
-                              Navigator.pushNamed(
-                                  context, "/donation-drive-details");
-                            },
-                          ),
-                        );
-                      });
-                },
-              )),
+                        "Donation Drives",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+              donationDrives,
               actionButtons,
             ],
           ),
