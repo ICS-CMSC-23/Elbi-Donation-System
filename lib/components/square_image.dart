@@ -2,10 +2,10 @@ import 'package:elbi_donation_system/components/upload_helper.dart';
 import 'package:flutter/material.dart';
 
 //widget for rounded images
-class RoundedImage extends StatelessWidget {
+class SquareImage extends StatelessWidget {
   final String source;
   final double size;
-  const RoundedImage({super.key, required this.source, required this.size});
+  const SquareImage({super.key, required this.source, required this.size});
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +37,6 @@ class RoundedImage extends StatelessWidget {
     );
 
     return ClipRRect(
-      borderRadius: BorderRadius.circular(size / 2),
       child: imageType,
     );
   }
