@@ -7,7 +7,7 @@ class DonationDriveListProvider with ChangeNotifier {
   List<DonationDrive> get donationDriveList => _donationDriveList;
   DonationDrive _currentDonationDrive = DonationDrive(
       id: "1",
-      description: 'Donation Drive Description undefined',
+      description: 'DonationDrive Drive Description undefined',
       organizationId: '2',
       name: 'Undefined',
       startDate: DateTime.now(),

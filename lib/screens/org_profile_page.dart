@@ -1,12 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elbi_donation_system/components/header_with_pic.dart';
 import 'package:elbi_donation_system/components/main_drawer.dart';
+import 'package:elbi_donation_system/components/rounded_image.dart';
 import 'package:elbi_donation_system/components/title_detail.dart';
 import 'package:elbi_donation_system/components/title_detail_list.dart';
 import 'package:elbi_donation_system/components/upload_helper.dart';
-import 'package:elbi_donation_system/models/donation_model.dart';
+import 'package:elbi_donation_system/models/donation_drive_model.dart';
 import 'package:elbi_donation_system/models/route_model.dart';
 import 'package:elbi_donation_system/models/user_model.dart';
 import 'package:elbi_donation_system/providers/auth_provider.dart';
+import 'package:elbi_donation_system/providers/donation_drive_provider.dart';
 import 'package:elbi_donation_system/providers/user_list_provider.dart';
 import 'package:elbi_donation_system/providers/user_provider.dart';
 import 'package:elbi_donation_system/screens/donation_drive_list_page.dart';
@@ -45,19 +48,7 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
           )
         ],
       );
-    } else if (authUser.role == User.donor) {
-      actionButtons = Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          TextButton.icon(
-              onPressed: () {
-                Navigator.pushNamed(context, DonationDriveListPage.route.path);
-              },
-              icon: const Icon(Icons.real_estate_agent_rounded),
-              label: const Text("View Donation Drives")),
-        ],
-      );
-    } else {
+    } else if (authUser.role == User.organization) {
       actionButtons = Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -66,6 +57,10 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
               icon: const Icon(Icons.edit),
               label: const Text("Edit Profile")),
         ],
+      );
+    } else {
+      actionButtons = const Row(
+        children: [],
       );
     }
 
@@ -115,6 +110,9 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
       proofList = const SizedBox.shrink();
     }
 
+    Stream<QuerySnapshot> donationDrivesStream =
+        context.watch<DonationDriveProvider>().donationDrives;
+
     return Scaffold(
         appBar: AppBar(
           title: Text(user.name),
@@ -132,12 +130,70 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
                 description: user.about ?? "No tagline to display...",
               ),
               TitleDetailList(title: "Address", detailList: user.address),
-              const TitleDetail(
+              TitleDetail(
                 title: "Contact Number",
-                detail: "09762946252",
+                detail: user.contactNo,
               ),
               proofList,
-              actionButtons
+              actionButtons,
+              Expanded(
+                  child: StreamBuilder(
+                stream: donationDrivesStream,
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Text("Error encountered! ${snapshot.error}"),
+                    );
+                  } else if (snapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else if (!snapshot.hasData) {
+                    return const Center(
+                      child: Text("No Donations Drives Found"),
+                    );
+                  }
+
+                  // Filter donations Drives by donorId
+                  var filteredDonationDrives = snapshot.data!.docs.where((doc) {
+                    DonationDrive donationDrive = DonationDrive.fromJson(
+                        doc.data() as Map<String, dynamic>);
+                    return donationDrive.organizationId == user.id;
+                  }).toList();
+
+                  if (filteredDonationDrives.isEmpty) {
+                    return const Center(
+                      child: Text(
+                          "This organization doesn't have a donation drive yet"),
+                    );
+                  }
+
+                  return ListView.builder(
+                      itemCount: filteredDonationDrives.length,
+                      itemBuilder: (context, index) {
+                        DonationDrive donationDrive = DonationDrive.fromJson(
+                            filteredDonationDrives[index].data()
+                                as Map<String, dynamic>);
+                        return ListTile(
+                          leading: RoundedImage(
+                              source: donationDrive.photos![0], size: 50),
+                          title: Text(donationDrive.name),
+                          subtitle: Text(donationDrive.description),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.more_vert),
+                            onPressed: () {
+                              context
+                                  .read<DonationDriveProvider>()
+                                  .changeSelectedDonationDrive(donationDrive);
+                              Navigator.pushNamed(
+                                  context, "/donation-drive-details");
+                            },
+                          ),
+                        );
+                      });
+                },
+              ))
             ],
           ),
         ));
