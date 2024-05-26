@@ -69,7 +69,8 @@ class OrgHomePage extends StatelessWidget {
                   return Center(
                     child: Text("Error encountered! ${snapshot.error}"),
                   );
-                } else if (snapshot.connectionState == ConnectionState.waiting) {
+                } else if (snapshot.connectionState ==
+                    ConnectionState.waiting) {
                   return const Center(
                     child: CircularProgressIndicator(),
                   );
@@ -80,8 +81,8 @@ class OrgHomePage extends StatelessWidget {
                 }
 
                 var filteredDonationDrives = snapshot.data!.docs.where((doc) {
-                  DonationDrive donationDrive =
-                      DonationDrive.fromJson(doc.data() as Map<String, dynamic>);
+                  DonationDrive donationDrive = DonationDrive.fromJson(
+                      doc.data() as Map<String, dynamic>);
                   return donationDrive.organizationId ==
                       context.read<AuthProvider>().currentUser.id;
                 }).toList();
@@ -136,7 +137,8 @@ class OrgHomePage extends StatelessWidget {
                         trailing: IconButton(
                           icon: const Icon(Icons.more_vert),
                           onPressed: () {
-                            context.read<DonationDriveProvider>()
+                            context
+                                .read<DonationDriveProvider>()
                                 .changeSelectedDonationDrive(donationDrive);
                             context.read<UserProvider>().changeSelectedUser(
                                 context.read<AuthProvider>().currentUser);
