@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elbi_donation_system/components/header_with_pic.dart';
 import 'package:elbi_donation_system/components/main_drawer.dart';
 import 'package:elbi_donation_system/components/rounded_image.dart';
+import 'package:elbi_donation_system/components/square_image.dart';
 import 'package:elbi_donation_system/components/title_detail.dart';
 import 'package:elbi_donation_system/components/title_detail_list.dart';
 import 'package:elbi_donation_system/components/upload_helper.dart';
@@ -84,25 +85,9 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
                     padding: const EdgeInsets.all(5.00),
                     child: ClipRRect(
                         borderRadius: BorderRadius.circular(10.0),
-                        child: Image.network(
-                          user.proofsOfLegitimacy![index],
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            try {
-                              return Image.memory(
-                                decodeBase64ImageUncompressed(
-                                  user.proofsOfLegitimacy![index],
-                                ),
-                                fit: BoxFit.cover,
-                              );
-                            } catch (e) {
-                              return Image.asset(
-                                "assets/images/portrait-placeholder.jpg",
-                                fit: BoxFit.cover,
-                              );
-                            }
-                          },
-                        )));
+                        child: SquareImage(
+                            source: user.proofsOfLegitimacy![index],
+                            size: 80)));
               }),
         ],
       );

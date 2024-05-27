@@ -63,7 +63,14 @@ class _DonationDetailsState extends State<DonationDetails> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           TextButton.icon(
-            onPressed: () {},
+            onPressed: () {
+              print("Deleting");
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text("Successfully cancelled donation!")),
+              );
+              Navigator.pop(context);
+            },
             icon: const Icon(Icons.delete_rounded),
             label: const Text("Cancel Donation"),
             style: ButtonStyle(
