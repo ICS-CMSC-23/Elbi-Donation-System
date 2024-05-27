@@ -37,7 +37,9 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
-          // bool hasPhotos = donations[index].photos != null && donations[index].photos!.isNotEmpty;
+          bool hasPhotos = donationDrives[index]['photos'] != null &&
+              donationDrives[index]['photos'] is List &&
+              donationDrives[index]['photos'].isNotEmpty;
           return CustomTileContainer(
             key: ObjectKey(index),
             customBorder: CustomTileContainer.customBorderOne,
@@ -71,33 +73,81 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
-                            children: [
-                              for (int i = 0;
-                                  i < donationDrives[index]['photos'].length;
-                                  i++)
-                                Padding(
-                                  padding: i <
-                                          donationDrives[index]['photos']
-                                                  .length -
-                                              1
-                                      ? const EdgeInsets.only(right: 8.0)
-                                      : EdgeInsets.zero,
-                                  child: Container(
-                                    height: 100,
-                                    width: 200,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      image: DecorationImage(
-                                        image: Image.network(
+                            children: hasPhotos
+                                ? [
+                                    for (int i = 0;
+                                        i <
+                                            donationDrives[index]['photos']
+                                                .length;
+                                        i++)
+                                      Padding(
+                                        padding: i <
                                                 donationDrives[index]['photos']
-                                                    [i])
-                                            .image,
-                                        fit: BoxFit.cover,
+                                                        .length -
+                                                    1
+                                            ? const EdgeInsets.only(right: 8.0)
+                                            : EdgeInsets.zero,
+                                        child: Container(
+                                          height: 100,
+                                          width: 200,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            image: DecorationImage(
+                                              image: NetworkImage(
+                                                  donationDrives[index]
+                                                      ['photos'][i]),
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                          child: Image.network(
+                                            donationDrives[index]['photos'][i],
+                                            fit: BoxFit.cover,
+                                            loadingBuilder: (context, child,
+                                                loadingProgress) {
+                                              if (loadingProgress == null) {
+                                                return child;
+                                              }
+                                              return Center(
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  value: loadingProgress
+                                                              .expectedTotalBytes !=
+                                                          null
+                                                      ? loadingProgress
+                                                              .cumulativeBytesLoaded /
+                                                          (loadingProgress
+                                                                  .expectedTotalBytes ??
+                                                              1)
+                                                      : null,
+                                                ),
+                                              );
+                                            },
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                              return Image.asset(
+                                                'assets/images/banner_biggertext_1.png',
+                                                fit: BoxFit.cover,
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                  ]
+                                : [
+                                    Container(
+                                      height: 100,
+                                      width: 200,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        image: const DecorationImage(
+                                          image: AssetImage(
+                                              'assets/images/banner_biggertext_1.png'),
+                                          fit: BoxFit.cover,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ),
-                            ],
+                                  ],
                           ),
                         ),
                       ),
@@ -149,10 +199,18 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
                       elevation: WidgetStateProperty.all(0),
                     ),
                     onPressed: () {
+                      // convert donation drive map to donation drive object
+                      DonationDrive donationDrive =
+                          DonationDrive.fromJson(donationDrives[index].data());
+
                       // Implement view full details functionality
                       context
-                          .read<DonationDriveListProvider>()
-                          .setCurrentDonationDrive(donationDrives[index].id!);
+                          .read<DonationDriveProvider>()
+                          .changeSelectedDonationDrive(donationDrive);
+                      context
+                          .read<DonationDriveProvider>()
+                          .changeSelectedDonationDriveUser(
+                              context.read<AuthProvider>().currentUser);
                       Navigator.pushNamed(
                         context,
                         DonationDriveDetails.route.path,
@@ -188,6 +246,7 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
     context
         .read<DonationDriveProvider>()
         .fetchDonationDrivesByOrganizationId(currentUser.id!);
+    context.read<DonationDriveProvider>().fetchDonationDrives();
     Stream<QuerySnapshot> donationDrives =
         context.watch<DonationDriveProvider>().donationDrives;
 
