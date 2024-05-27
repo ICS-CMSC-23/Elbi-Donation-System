@@ -71,7 +71,20 @@ class _DonationDriveDetailsState extends State<DonationDriveDetails> {
           ),
           Flexible(
             child: TextButton.icon(
-              onPressed: () {},
+              onPressed: () async {
+                print("Deleting");
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Deleting donation drive...")),
+                );
+                await context
+                    .read<DonationDriveProvider>()
+                    .deleteDonationDrive();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                      content: Text("Successfully deleted donation drive!")),
+                );
+                Navigator.pop(context);
+              },
               icon: const Icon(Icons.delete_rounded),
               label: const Text("Delete Donation Drive"),
               style: ButtonStyle(
@@ -159,7 +172,7 @@ class _DonationDriveDetailsState extends State<DonationDriveDetails> {
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3),
-                itemCount: donationDrive.photos?.length,
+                itemCount: donationDrive.photos!.length,
                 itemBuilder: (BuildContext context, int index) {
                   return Padding(
                       padding: const EdgeInsets.all(5.00),

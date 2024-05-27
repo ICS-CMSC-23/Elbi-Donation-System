@@ -68,18 +68,21 @@ class DonationDriveProvider with ChangeNotifier {
     }
   }
 
-  void deleteDonationDrive() async {
+  Future<String> deleteDonationDrive() async {
     if (_selectedDonationDrive != null && _selectedDonationDrive!.id != null) {
       try {
         String message = await firebaseService
             .deleteDonationDrive(_selectedDonationDrive!.id!);
         print(message);
         notifyListeners();
+        return message;
       } on FirebaseException catch (e) {
         print("Failed to delete donation drive: ${e.message}");
+        return "Failed to delete donation drive: ${e.message}";
       }
     } else {
       print("No donation drive selected for deletion");
+      return "No donation drive selected for deletion";
     }
   }
 }
