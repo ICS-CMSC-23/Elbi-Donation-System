@@ -49,7 +49,15 @@ class _DonationDetailsState extends State<DonationDetails> {
               icon: const Icon(Icons.edit),
               label: const Text("Edit Donation")),
           TextButton.icon(
-            onPressed: () {},
+            onPressed: () async {
+              print("Deleting");
+              await context.read<DonationProvider>().deleteDonation();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text("Successfully cancelled donation!")),
+              );
+              Navigator.pop(context);
+            },
             icon: const Icon(Icons.delete_rounded),
             label: const Text("Cancel Donation"),
             style: ButtonStyle(
@@ -63,8 +71,9 @@ class _DonationDetailsState extends State<DonationDetails> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           TextButton.icon(
-            onPressed: () {
+            onPressed: () async {
               print("Deleting");
+              await context.read<DonationProvider>().deleteDonation();
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                     content: Text("Successfully cancelled donation!")),
