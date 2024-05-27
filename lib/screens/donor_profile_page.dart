@@ -80,9 +80,9 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
                 description: user.about ?? "No biography to display...",
               ),
               TitleDetailList(title: "Address", detailList: user.address),
-              const TitleDetail(
+              TitleDetail(
                 title: "Contact Number",
-                detail: "09762946252",
+                detail: user.contactNo,
               ),
               actionButtons,
               const Padding(
@@ -141,6 +141,9 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
                               context
                                   .read<DonationProvider>()
                                   .changeSelectedDonation(donation);
+                              context
+                                  .read<DonationProvider>()
+                                  .changeSelectedDonor(user);
                               Navigator.pushNamed(context, "/donation-details");
                             },
                           ),

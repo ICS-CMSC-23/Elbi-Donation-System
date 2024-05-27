@@ -17,7 +17,9 @@ class DonationDriveProvider with ChangeNotifier {
 
   // getters
   Stream<QuerySnapshot> get donationDrives => _donationDrivesStream;
+
   DonationDrive get selected => _selectedDonationDrive!;
+
   User get selectedDonationDriveUser => _selectedDonationDriveUser!;
 
   changeSelectedDonationDrive(DonationDrive donationDrive) {

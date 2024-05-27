@@ -49,7 +49,15 @@ class _DonationDetailsState extends State<DonationDetails> {
               icon: const Icon(Icons.edit),
               label: const Text("Edit Donation")),
           TextButton.icon(
-            onPressed: () {},
+            onPressed: () async {
+              print("Deleting");
+              await context.read<DonationProvider>().deleteDonation();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text("Successfully cancelled donation!")),
+              );
+              Navigator.pop(context);
+            },
             icon: const Icon(Icons.delete_rounded),
             label: const Text("Cancel Donation"),
             style: ButtonStyle(
@@ -63,7 +71,15 @@ class _DonationDetailsState extends State<DonationDetails> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           TextButton.icon(
-            onPressed: () {},
+            onPressed: () async {
+              print("Deleting");
+              await context.read<DonationProvider>().deleteDonation();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text("Successfully cancelled donation!")),
+              );
+              Navigator.pop(context);
+            },
             icon: const Icon(Icons.delete_rounded),
             label: const Text("Cancel Donation"),
             style: ButtonStyle(
@@ -112,16 +128,22 @@ class _DonationDetailsState extends State<DonationDetails> {
                       ],
                     ),
                   ),
-                  const Expanded(
+                  Expanded(
                     flex: 1,
                     child: TitleDetail(
                       title: "Contact Number",
-                      detail: "09762946252",
+                      detail: context
+                          .watch<DonationProvider>()
+                          .selectedDonor
+                          .contactNo,
                     ),
                   ),
                 ],
               ),
-              TitleDetailList(title: "Address", detailList: donation.addresses),
+              TitleDetailList(
+                  title: "Address",
+                  detailList:
+                      context.watch<DonationProvider>().selectedDonor.address),
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 8.0),
                 child: Text(

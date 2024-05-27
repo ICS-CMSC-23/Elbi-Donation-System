@@ -71,18 +71,21 @@ class DonationProvider with ChangeNotifier {
     }
   }
 
-  void deleteDonation() async {
+  Future<String> deleteDonation() async {
     if (_selectedDonation != null && _selectedDonation!.id != null) {
       try {
         String message =
             await firebaseService.deleteDonation(_selectedDonation!.id!);
         print(message);
         notifyListeners();
+        return message;
       } on FirebaseException catch (e) {
         print("Failed to delete donation: ${e.message}");
+        return "Failed to delete donation: ${e.message}";
       }
     } else {
       print("No donation selected for deletion");
+      return "No donation selected for deletion";
     }
   }
 }

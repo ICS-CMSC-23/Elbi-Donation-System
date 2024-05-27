@@ -30,8 +30,24 @@ class SquareImage extends StatelessWidget {
             fit: BoxFit.cover,
           );
         } catch (e) {
-          return Image.asset('assets/images/portrait-placeholder.jpg',
-              width: size, height: size, fit: BoxFit.cover);
+          try {
+            return Image.memory(
+              decodeBase64ImageUncompressed(source),
+              width: size,
+              height: size,
+              errorBuilder: (context, error, stackTrace) {
+                return ClipRRect(
+                  borderRadius: BorderRadius.circular(size / 2),
+                  child: Image.asset('assets/images/portrait-placeholder.jpg',
+                      width: size, height: size, fit: BoxFit.cover),
+                );
+              },
+              fit: BoxFit.cover,
+            );
+          } catch (e) {
+            return Image.asset('assets/images/portrait-placeholder.jpg',
+                width: size, height: size, fit: BoxFit.cover);
+          }
         }
       },
     );
