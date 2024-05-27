@@ -6,6 +6,7 @@ import 'package:elbi_donation_system/models/user_model.dart';
 import 'package:elbi_donation_system/providers/user_provider.dart';
 import 'package:elbi_donation_system/screens/donor_list_page.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class AdminHomePage extends StatefulWidget {
@@ -35,59 +36,93 @@ class _AdminHomePageState extends State<AdminHomePage> {
       appBar: AppBar(
         title: const Text("Admin Home Page"),
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: orgStream,
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(
-              child: Text("Error: ${snapshot.error}"),
-            );
-          } else if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(
-              child: Text("No organizations found."),
-            );
-          }
-
-          var organizations = snapshot.data!.docs.map((doc) {
-            Map<String, dynamic> docMap = doc.data() as Map<String, dynamic>;
-            docMap["id"] = doc.id;
-            return User.fromJson(docMap);
-          }).toList();
-
-          return ListView.builder(
-            itemCount: organizations.length,
-            itemBuilder: (context, index) {
-              final organization = organizations[index];
-              return Card(
-                margin:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                child: ListTile(
-                  leading: RoundedImage(
-                      source: organization.profilePhoto!, size: 50),
-                  title: Text(organization.name),
-                  subtitle: Text(organization.about ??
-                      "This organization has no description"),
-                  trailing: ElevatedButton(
-                    onPressed: () {
-                      // Link Org Profile page
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        context
-                            .read<UserProvider>()
-                            .changeSelectedUser(organization);
-                        Navigator.pushNamed(context, "/org-profile");
-                      });
-                    },
-                    child: const Text("View Org"),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Image.asset('assets/images/banner_biggertext_1.png'),
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.handshake,
+                    size: 100,
                   ),
-                ),
-              );
-            },
-          );
-        },
+                  Center(
+                    child: Text(
+                      "View All Donors",
+                      style: GoogleFonts.poppins(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF9C27B0),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  Center(
+                    child: SizedBox(
+                      width: 200,
+                      child: Text(
+                        "Show the list of all donor accounts in the system.",
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: const Color.fromARGB(255, 83, 21, 94),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                  Center(
+                    child: ElevatedButton(
+                        onPressed: () {}, child: const Text("View All Donors")),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.business,
+                    size: 100,
+                  ),
+                  Center(
+                    child: Text(
+                      "Organization Account Approval",
+                      style: GoogleFonts.poppins(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF9C27B0),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  Center(
+                    child: SizedBox(
+                      width: 200,
+                      child: Text(
+                        "Shows all pending organization account on approval.",
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: const Color.fromARGB(255, 83, 21, 94),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                  Center(
+                    child: ElevatedButton(
+                        onPressed: () {},
+                        child: const Text("Check Organizations")),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
