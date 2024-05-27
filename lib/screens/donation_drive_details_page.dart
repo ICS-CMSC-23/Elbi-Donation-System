@@ -227,9 +227,10 @@ class _DonationDriveDetailsState extends State<DonationDriveDetails> {
                 return ListView.builder(
                     itemCount: filteredDonations.length,
                     itemBuilder: (context, index) {
-                      Donation donation = Donation.fromJson(
-                          filteredDonations[index].data()
-                              as Map<String, dynamic>);
+                      Map<String, dynamic> docMap = filteredDonations[index]
+                          .data() as Map<String, dynamic>;
+                      docMap["id"] = filteredDonations[index].id;
+                      Donation donation = Donation.fromJson(docMap);
                       return ListTile(
                         leading:
                             RoundedImage(source: donation.photos![0], size: 50),

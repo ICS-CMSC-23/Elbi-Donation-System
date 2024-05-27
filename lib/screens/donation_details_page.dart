@@ -45,7 +45,16 @@ class _DonationDetailsState extends State<DonationDetails> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           TextButton.icon(
-              onPressed: () {},
+              onPressed: () async {
+                context
+                    .read<DonationProvider>()
+                    .changeSelectedDonation(donation);
+                context.read<DonationProvider>().changeSelectedDonor(
+                    await context
+                        .read<UserProvider>()
+                        .fetchUserById(donation.donorId));
+                Navigator.pushNamed(context, "/edit-donation");
+              },
               icon: const Icon(Icons.edit),
               label: const Text("Edit Donation")),
           TextButton.icon(
