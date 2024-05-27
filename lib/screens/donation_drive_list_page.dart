@@ -1,16 +1,22 @@
-import 'package:elbi_donation_system/models/user_model.dart';
-import 'package:elbi_donation_system/providers/donation_drive_list_provider.dart';
-import 'package:elbi_donation_system/providers/user_list_provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import '../models/route_model.dart';
-import '../models/donation_drive_model.dart';
-import '../dummy_data/dummy_donation_drives.dart';
+import '../api/firebase_donation_drive_api.dart';
 import '../components/bottom_scroll_view_widget.dart';
-import '../components/list_page_sliver_app_bar.dart';
-import '../components/list_page_header.dart';
 import '../components/custom_tile_container.dart';
-import 'donation_drive_details_page.dart';
+import '../components/list_page_header.dart';
+import '../components/list_page_sliver_app_bar.dart';
+import '../dummy_data/dummy_donation_drives.dart';
+import '../models/donation_drive_model.dart';
+import '../models/route_model.dart';
+import '../models/user_model.dart';
+import '../providers/donation_drive_list_provider.dart';
+import '../providers/donation_drive_provider.dart';
+import '../providers/user_list_provider.dart';
+import '../screens/donation_drive_details_page.dart';
+import '../providers/auth_provider.dart';
 
 class DonationDriveListPage extends StatefulWidget {
   const DonationDriveListPage({super.key});
@@ -53,7 +59,7 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
                         child: Padding(
                           padding: const EdgeInsets.only(bottom: 5),
                           child: Text(
-                            donationDrives[index].name,
+                            donationDrives[index]['name'],
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -69,11 +75,12 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
                           child: Row(
                             children: [
                               for (int i = 0;
-                                  i < donationDrives[index].photos!.length;
+                                  i < donationDrives[index]['photos'].length;
                                   i++)
                                 Padding(
                                   padding: i <
-                                          donationDrives[index].photos!.length -
+                                          donationDrives[index]['photos']
+                                                  .length -
                                               1
                                       ? const EdgeInsets.only(right: 8.0)
                                       : EdgeInsets.zero,
@@ -84,8 +91,8 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
                                       borderRadius: BorderRadius.circular(10),
                                       image: DecorationImage(
                                         image: Image.network(
-                                                donationDrives[index]
-                                                    .photos![i])
+                                                donationDrives[index]['photos']
+                                                    [i])
                                             .image,
                                         fit: BoxFit.cover,
                                       ),
@@ -117,7 +124,7 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
                               ),
                               TextSpan(
                                 text:
-                                    '${donationDrives[index].startDate.toString().substring(0, 10)}\n',
+                                    '${DateFormat('yyyy-MM-dd').format(donationDrives[index]['startDate'].toDate())}\n',
                               ),
                               const TextSpan(
                                 text: 'End Date:\t\t\t',
@@ -126,10 +133,8 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
                                 ),
                               ),
                               TextSpan(
-                                text: donationDrives[index]
-                                    .endDate
-                                    .toString()
-                                    .substring(0, 10),
+                                text: DateFormat('yyyy-MM-dd').format(
+                                    donationDrives[index]['endDate'].toDate()),
                               ),
                             ],
                           ),
@@ -178,39 +183,81 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
 
   @override
   Widget build(BuildContext context) {
-    User currentUser = context.watch<UserListProvider>().currentUser;
-    List<DonationDrive> donationDrives = dummyDonationDrives
-        .where((drive) => drive.organizationId == currentUser.id)
-        .toList();
+    // User currentUser = context.watch<UserListProvider>().currentUser;
+    User currentUser = context.read<AuthProvider>().currentUser;
+    // List<DonationDrive> donationDrives = dummyDonationDrives
+    //     .where((drive) => drive.organizationId == currentUser.id)
+    //     .toList();
+    context
+        .watch<DonationDriveProvider>()
+        .fetchDonationDrivesByOrganizationId(currentUser.id!);
+    Stream<QuerySnapshot> donationDrives =
+        context.watch<DonationDriveProvider>().donationDrives;
+
+    print(
+        'djfkl;asfjlk sjafl;dj safkljsafklj askljfsal;k fjsakjfsak fjskaj;fksajfksdajfk;sdjfk;a');
+    print(donationDrives.length);
+    print('OKAAAAAAAAAAAAAAAAAAAAAAAAAYYYYYYYYYYYYY');
+    print(currentUser.id!);
 
     return Scaffold(
-      body: CustomScrollView(
-        // physics: const BouncingScrollPhysics(),
-        semanticChildCount: donationDrives.length,
-        slivers: [
-          displayAppBar(),
-          const SliverToBoxAdapter(
-            child: SizedBox(height: 10),
-          ),
-          displayDonationDriveList(donationDrives),
-          SliverFillRemaining(
-            hasScrollBody: false,
-            child: Column(
-              children: [
-                const Expanded(child: SizedBox(height: 1)),
-                Container(
-                  color: Theme.of(context).cardColor,
-                  height: 20,
-                  child: Center(
-                    child: Text(
-                      'Donation Drives: ${donationDrives.length}',
-                    ),
-                  ),
+      body: StreamBuilder<QuerySnapshot>(
+        stream:
+            // FirebaseFirestore.instance.collection('donationDrives').snapshots(),
+            // FirebaseDonationDriveAPI()
+            //     .getDonationDrivesByOrganizationId(currentUser.id!),
+            donationDrives,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(
+              child: Text("Error encountered! ${snapshot.error}"),
+            );
+          } else if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (!snapshot.hasData) {
+            return Center(
+              child: Text(
+                "No Donation Drives found",
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.bold,
+                  color: const Color.fromARGB(255, 247, 129, 139),
                 ),
-              ],
-            ),
-          ),
-        ],
+                textAlign: TextAlign.center,
+              ),
+            );
+          }
+
+          return CustomScrollView(
+            // physics: const BouncingScrollPhysics(),
+            // semanticChildCount: donationDrives.length,
+            slivers: [
+              displayAppBar(),
+              const SliverToBoxAdapter(
+                child: SizedBox(height: 10),
+              ),
+              displayDonationDriveList(snapshot.data!.docs),
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Column(
+                  children: [
+                    const Expanded(child: SizedBox(height: 1)),
+                    Container(
+                      color: Theme.of(context).cardColor,
+                      height: 20,
+                      child: Center(
+                        child: Text(
+                          'Donation Drives: ${donationDrives.length}',
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
