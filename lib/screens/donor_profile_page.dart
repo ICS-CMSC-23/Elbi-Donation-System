@@ -141,6 +141,9 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
                               context
                                   .read<DonationProvider>()
                                   .changeSelectedDonation(donation);
+                              context
+                                  .read<DonationProvider>()
+                                  .changeSelectedDonor(user);
                               Navigator.pushNamed(context, "/donation-details");
                             },
                           ),
