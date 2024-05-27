@@ -1,5 +1,7 @@
-import 'package:elbi_donation_system/providers/user_list_provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../models/route_model.dart';
 import '../models/user_model.dart';
@@ -9,7 +11,10 @@ import '../components/bottom_scroll_view_widget.dart';
 import '../components/list_page_sliver_app_bar.dart';
 import '../components/list_page_header.dart';
 import '../components/custom_tile_container.dart';
-import 'donor_profile_page.dart';
+import '../screens/donor_profile_page.dart';
+import '../providers/user_list_provider.dart';
+import '../providers/auth_provider.dart';
+import '../providers/user_provider.dart';
 
 class DonorListPage extends StatefulWidget {
   const DonorListPage({super.key});
@@ -27,87 +32,145 @@ class DonorListPage extends StatefulWidget {
 
 class _DonorListPageState extends State<DonorListPage> {
   // only get the donors
-  List<User> donors = dummyUsers.where((user) => user.role == 'donor').toList();
+  // List<User> donors = dummyUsers.where((user) => user.role == 'donor').toList();
 
-  @override
-  Widget build(BuildContext context) {
-    // build a widget that returns a list of donors
-    Widget displayDonorList() {
-      return SliverList(
-        delegate: SliverChildBuilderDelegate(
-          (BuildContext context, int index) {
-            return CustomTileContainer(
-              customBorder: CustomTileContainer.customBorderOne,
-              customBorderAlt: CustomTileContainer.customBorderTwo,
-              context: context,
-              index: index,
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 20, bottom: 20),
-                  child: ListTile(
-                    leading: RoundedImage(
-                      source: donors[index].profilePhoto!,
-                      size: 50,
-                    ),
-                    title: Text(donors[index].email),
-                    subtitle: Text(
-                      donors[index].username,
-                      style: const TextStyle(fontStyle: FontStyle.italic),
-                    ),
-                    trailing: ElevatedButton(
-                      style: ButtonStyle(
-                        elevation: WidgetStateProperty.all(0),
-                        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20.0),
-                          ),
-                        ),
-                        overlayColor: WidgetStateProperty.resolveWith(
-                          (states) {
-                            return states.contains(WidgetState.pressed)
-                                ? Theme.of(context).cardColor
-                                : null;
-                          },
-                        ),
+  // build a widget that returns a list of donors
+  Widget displayDonorList(donors) {
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+        (BuildContext context, int index) {
+          return CustomTileContainer(
+            customBorder: CustomTileContainer.customBorderOne,
+            customBorderAlt: CustomTileContainer.customBorderTwo,
+            context: context,
+            index: index,
+            child: Stack(
+              children: [
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 15, bottom: 20),
+                    child: ListTile(
+                      leading: RoundedImage(
+                        source: donors[index]['profilePhoto'],
+                        size: 50,
                       ),
-                      onPressed: () {
-                        // Navigate to donor's profile page
-                        context
-                            .read<UserListProvider>()
-                            .changeCurrentUser(donors[index].email);
-                        Navigator.pushNamed(
-                            context, DonorProfilePage.route.path);
-                        // Navigator.pushNamed(context, '/donation-list-page'); // for testing
-                      },
-                      child: const Text('View Profile'),
+                      title: Text(
+                        donors[index]['email'],
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            donors[index]['contactNo'],
+                          ),
+                          Text(
+                            donors[index]['username'],
+                            style: const TextStyle(fontStyle: FontStyle.italic),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            );
-          },
-          childCount: donors.length,
-        ),
-      );
-    }
+                Positioned(
+                  right: 10,
+                  bottom: 15,
+                  child: ElevatedButton(
+                    style: ButtonStyle(
+                      elevation: WidgetStateProperty.all(0),
+                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                      ),
+                      overlayColor: WidgetStateProperty.resolveWith(
+                        (states) {
+                          return states.contains(WidgetState.pressed)
+                              ? Theme.of(context).cardColor
+                              : null;
+                        },
+                      ),
+                    ),
+                    onPressed: () {
+                      // convert the map to a User object
+                      User user = User.fromJson(donors[index].data());
 
-    displayAppBar() {
-      return const ListPageSliverAppBar(
-          title: "Donors",
-          backgroundWidget:
-              ListPageHeader(title: "Manage Donors", titleIcon: Icons.people));
-    }
+                      // Navigate to donor's profile page
+                      context.read<UserProvider>().changeSelectedUser(user);
+                      Navigator.pushNamed(context, DonorProfilePage.route.path);
+                      // Navigator.pushNamed(context, '/donation-list-page'); // for testing
+                    },
+                    child: const Text('View Profile'),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+        childCount: donors.length,
+      ),
+    );
+  }
+
+  displayAppBar() {
+    return const ListPageSliverAppBar(
+        title: "Donors",
+        backgroundWidget:
+            ListPageHeader(title: "Manage Donors", titleIcon: Icons.people));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // get current user
+    User currentUser = context.watch<AuthProvider>().currentUser;
+
+    // get users that are donors
+    Stream<QuerySnapshot> donors = FirebaseFirestore.instance
+        .collection('users')
+        .where('role', isEqualTo: 'donor')
+        .snapshots();
 
     return Scaffold(
       body: CustomScrollView(
-        semanticChildCount: 10,
+        // semanticChildCount: 10,
         // physics: const BouncingScrollPhysics(),
         slivers: [
           displayAppBar(),
           const SliverToBoxAdapter(
             child: SizedBox(height: 10),
           ),
-          displayDonorList(),
+          StreamBuilder<QuerySnapshot>(
+            stream: donors,
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Center(
+                  child: Text("Error encountered! ${snapshot.error}"),
+                );
+              } else if (snapshot.connectionState == ConnectionState.waiting) {
+                return const SliverFillRemaining(
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                return SliverFillRemaining(
+                  child: Center(
+                    child: Text(
+                      "No Donation Drives found",
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.bold,
+                        color: const Color.fromARGB(255, 247, 129, 139),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                );
+              }
+
+              return displayDonorList(snapshot.data!.docs);
+            },
+          ),
         ],
       ),
     );
