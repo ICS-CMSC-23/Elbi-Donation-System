@@ -239,14 +239,19 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
 
   @override
   Widget build(BuildContext context) {
-    // get current user (organization)
+    // get current user
     User currentUser = context.watch<AuthProvider>().currentUser;
 
     // get donation drives by organization id
-    context
-        .read<DonationDriveProvider>()
-        .fetchDonationDrivesByOrganizationId(currentUser.id!);
-    context.read<DonationDriveProvider>().fetchDonationDrives();
+    // check if current user is an organization or an admin
+    if (currentUser.role == 'organization') {
+      context
+          .read<DonationDriveProvider>()
+          .fetchDonationDrivesByOrganizationId(currentUser.id!);
+    } else {
+      context.read<DonationDriveProvider>().fetchDonationDrives();
+    }
+
     Stream<QuerySnapshot> donationDrives =
         context.watch<DonationDriveProvider>().donationDrives;
 
@@ -299,8 +304,22 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
                   color: Theme.of(context).cardColor,
                   height: 20,
                   child: Center(
-                    child: Text(
-                      'Donation Drives: ${donationDrives.length}',
+                    child: StreamBuilder<QuerySnapshot>(
+                      stream: donationDrives,
+                      builder: (BuildContext context,
+                          AsyncSnapshot<QuerySnapshot> snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          return Text("Error: ${snapshot.error}");
+                        } else if (!snapshot.hasData) {
+                          return const Text("Donation Drives: 0");
+                        } else {
+                          int count = snapshot.data!.docs.length;
+                          return Text("Donation Drives: $count");
+                        }
+                      },
                     ),
                   ),
                 ),
