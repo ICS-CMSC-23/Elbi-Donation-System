@@ -33,8 +33,6 @@ class DonationDriveListPage extends StatefulWidget {
 }
 
 class _DonationDriveListPageState extends State<DonationDriveListPage> {
-  // get dummy data for donation drives
-
   Widget displayDonationDriveList(donationDrives) {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
@@ -183,81 +181,74 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
 
   @override
   Widget build(BuildContext context) {
-    // User currentUser = context.watch<UserListProvider>().currentUser;
-    User currentUser = context.read<AuthProvider>().currentUser;
-    // List<DonationDrive> donationDrives = dummyDonationDrives
-    //     .where((drive) => drive.organizationId == currentUser.id)
-    //     .toList();
+    // get current user (organization)
+    User currentUser = context.watch<AuthProvider>().currentUser;
+
+    // get donation drives by organization id
     context
-        .watch<DonationDriveProvider>()
+        .read<DonationDriveProvider>()
         .fetchDonationDrivesByOrganizationId(currentUser.id!);
     Stream<QuerySnapshot> donationDrives =
         context.watch<DonationDriveProvider>().donationDrives;
 
-    print(
-        'djfkl;asfjlk sjafl;dj safkljsafklj askljfsal;k fjsakjfsak fjskaj;fksajfksdajfk;sdjfk;a');
-    print(donationDrives.length);
-    print('OKAAAAAAAAAAAAAAAAAAAAAAAAAYYYYYYYYYYYYY');
-    print(currentUser.id!);
-
     return Scaffold(
-      body: StreamBuilder<QuerySnapshot>(
-        stream:
-            // FirebaseFirestore.instance.collection('donationDrives').snapshots(),
-            // FirebaseDonationDriveAPI()
-            //     .getDonationDrivesByOrganizationId(currentUser.id!),
-            donationDrives,
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(
-              child: Text("Error encountered! ${snapshot.error}"),
-            );
-          } else if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (!snapshot.hasData) {
-            return Center(
-              child: Text(
-                "No Donation Drives found",
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.bold,
-                  color: const Color.fromARGB(255, 247, 129, 139),
-                ),
-                textAlign: TextAlign.center,
-              ),
-            );
-          }
-
-          return CustomScrollView(
-            // physics: const BouncingScrollPhysics(),
-            // semanticChildCount: donationDrives.length,
-            slivers: [
-              displayAppBar(),
-              const SliverToBoxAdapter(
-                child: SizedBox(height: 10),
-              ),
-              displayDonationDriveList(snapshot.data!.docs),
-              SliverFillRemaining(
-                hasScrollBody: false,
-                child: Column(
-                  children: [
-                    const Expanded(child: SizedBox(height: 1)),
-                    Container(
-                      color: Theme.of(context).cardColor,
-                      height: 20,
-                      child: Center(
-                        child: Text(
-                          'Donation Drives: ${donationDrives.length}',
-                        ),
+      body: CustomScrollView(
+        // physics: const BouncingScrollPhysics(),
+        // semanticChildCount: donationDrives.length,
+        slivers: [
+          displayAppBar(),
+          const SliverToBoxAdapter(
+            child: SizedBox(height: 10),
+          ),
+          StreamBuilder<QuerySnapshot>(
+            stream: donationDrives,
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Center(
+                  child: Text("Error encountered! ${snapshot.error}"),
+                );
+              } else if (snapshot.connectionState == ConnectionState.waiting) {
+                return const SliverFillRemaining(
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                return SliverFillRemaining(
+                  child: Center(
+                    child: Text(
+                      "No Donation Drives found",
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.bold,
+                        color: const Color.fromARGB(255, 247, 129, 139),
                       ),
+                      textAlign: TextAlign.center,
                     ),
-                  ],
+                  ),
+                );
+              }
+
+              return displayDonationDriveList(snapshot.data!.docs);
+            },
+          ),
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Column(
+              children: [
+                const Expanded(child: SizedBox(height: 1)),
+                Container(
+                  color: Theme.of(context).cardColor,
+                  height: 20,
+                  child: Center(
+                    child: Text(
+                      'Donation Drives: ${donationDrives.length}',
+                    ),
+                  ),
                 ),
-              ),
-            ],
-          );
-        },
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
