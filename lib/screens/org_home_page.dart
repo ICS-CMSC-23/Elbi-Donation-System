@@ -91,6 +91,7 @@ class OrgHomePage extends StatelessWidget {
                 var filteredDonationDrives = snapshot.data!.docs.where((doc) {
                   DonationDrive donationDrive = DonationDrive.fromJson(
                       doc.data() as Map<String, dynamic>);
+                  print(donationDrive.organizationId);
                   return donationDrive.organizationId ==
                       context.read<AuthProvider>().currentUser.id;
                 }).toList();
@@ -142,8 +143,7 @@ class OrgHomePage extends StatelessWidget {
                         leading: ClipRRect(
                             borderRadius: BorderRadius.circular(10),
                             child: SquareImage(
-                                source: donationDrive.photos![index],
-                                size: 80)),
+                                source: donationDrive.photos![0], size: 80)),
                         trailing: IconButton(
                           icon: const Icon(Icons.more_vert),
                           onPressed: () {
