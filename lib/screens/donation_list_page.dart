@@ -202,8 +202,24 @@ class _DonationListPageState extends State<DonationListPage> {
             child: SizedBox(height: 10),
           ),
           displayDonationList(),
-          BottomScrollViewWidget(
-              listTitle: 'Donations', listLength: donations.length),
+          const SliverFillRemaining(hasScrollBody: false),
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Column(
+              children: [
+                const Expanded(child: SizedBox(height: 1)),
+                Container(
+                  color: Theme.of(context).cardColor,
+                  height: 20,
+                  child: Center(
+                    child: Text(
+                      'Donations: ${donations.length}',
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );

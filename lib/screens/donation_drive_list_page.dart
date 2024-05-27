@@ -193,8 +193,23 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
             child: SizedBox(height: 10),
           ),
           displayDonationDriveList(donationDrives),
-          BottomScrollViewWidget(
-              listTitle: 'Donation Drives', listLength: donationDrives.length),
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Column(
+              children: [
+                const Expanded(child: SizedBox(height: 1)),
+                Container(
+                  color: Theme.of(context).cardColor,
+                  height: 20,
+                  child: Center(
+                    child: Text(
+                      'Donation Drives: ${donationDrives.length}',
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
