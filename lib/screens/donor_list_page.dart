@@ -171,6 +171,37 @@ class _DonorListPageState extends State<DonorListPage> {
               return displayDonorList(snapshot.data!.docs);
             },
           ),
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Column(
+              children: [
+                const Expanded(child: SizedBox(height: 1)),
+                Container(
+                  color: Theme.of(context).cardColor,
+                  height: 20,
+                  child: Center(
+                    child: StreamBuilder<QuerySnapshot>(
+                      stream: donors,
+                      builder: (BuildContext context,
+                          AsyncSnapshot<QuerySnapshot> snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          return Text("Error: ${snapshot.error}");
+                        } else if (!snapshot.hasData) {
+                          return const Text("Donors: 0");
+                        } else {
+                          int count = snapshot.data!.docs.length;
+                          return Text("Donors: $count");
+                        }
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
