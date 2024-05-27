@@ -14,6 +14,7 @@ import 'package:elbi_donation_system/screens/donor_home_page.dart';
 import 'package:elbi_donation_system/screens/donor_list_page.dart';
 import 'package:elbi_donation_system/screens/donor_profile_page.dart';
 import 'package:elbi_donation_system/screens/donation_list_page.dart';
+import 'package:elbi_donation_system/screens/edit_donation.dart';
 import 'package:elbi_donation_system/screens/log_in_page.dart';
 import 'package:elbi_donation_system/screens/org_acc_approval_page.dart';
 import 'package:elbi_donation_system/screens/org_home_page.dart';
@@ -88,7 +89,8 @@ class MyApp extends StatelessWidget {
         '/donation-list-page': (context) => const DonationListPage(),
         '/donation-drive-list-page': (context) => const DonationDriveListPage(),
         '/add-donation-drive': (context) => AddDonationDrive(),
-        '/add-donation': (context) => AddDonation()
+        '/add-donation': (context) => AddDonation(),
+        '/edit-donation': (context) => EditDonation()
       },
     );
   }

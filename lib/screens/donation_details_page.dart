@@ -39,54 +39,81 @@ class _DonationDetailsState extends State<DonationDetails> {
         .currentUser
         .role; //donor, organization, admin
 
-    Row actionButtons;
+    Widget cancelButton;
+    Widget editButton;
+    if (donation.status != Donation.STATUS_CANCELED &&
+        donation.status != Donation.STATUS_COMPLETE) {
+      cancelButton = TextButton.icon(
+        onPressed: () async {
+          print("Deleting");
+          await context.read<DonationProvider>().deleteDonation();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Successfully cancelled donation!")),
+          );
+          Navigator.pop(context);
+        },
+        icon: const Icon(Icons.delete_rounded),
+        label: const Text("Cancel Donation"),
+        style: ButtonStyle(
+            foregroundColor:
+                MaterialStatePropertyAll(Theme.of(context).colorScheme.error)),
+      );
+      editButton = TextButton.icon(
+          onPressed: () async {
+            context.read<DonationProvider>().changeSelectedDonation(donation);
+            context.read<DonationProvider>().changeSelectedDonor(await context
+                .read<UserProvider>()
+                .fetchUserById(donation.donorId));
+            Navigator.pushNamed(context, "/edit-donation");
+          },
+          icon: const Icon(Icons.edit),
+          label: const Text("Edit Donation"));
+    } else {
+      cancelButton = SizedBox.shrink();
+      editButton = SizedBox.shrink();
+    }
+
+    Widget actionButtons;
     if (userType == User.donor) {
       actionButtons = Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          TextButton.icon(
-              onPressed: () {},
-              icon: const Icon(Icons.edit),
-              label: const Text("Edit Donation")),
-          TextButton.icon(
-            onPressed: () async {
-              print("Deleting");
-              await context.read<DonationProvider>().deleteDonation();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                    content: Text("Successfully cancelled donation!")),
-              );
-              Navigator.pop(context);
-            },
-            icon: const Icon(Icons.delete_rounded),
-            label: const Text("Cancel Donation"),
-            style: ButtonStyle(
-                foregroundColor: MaterialStatePropertyAll(
-                    Theme.of(context).colorScheme.error)),
-          )
-        ],
+        children: [editButton, cancelButton],
       );
+    } else if (userType == User.organization) {
+      actionButtons =
+          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 8.0),
+          child: Text(
+            "Change Donation Status",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+        Column(
+          children: Donation.statuses.map((status) {
+            return Column(
+              children: [
+                RadioListTile<String>(
+                  title: Text(status),
+                  value: status,
+                  groupValue: context.watch<DonationProvider>().selected.status,
+                  onChanged: (value) {
+                    donation.status = value!;
+                    context.read<DonationProvider>().updateDonation(donation);
+                  },
+                  controlAffinity: ListTileControlAffinity.leading,
+                  dense: true,
+                  contentPadding: EdgeInsets.all(0),
+                ),
+              ],
+            );
+          }).toList(),
+        )
+      ]);
     } else {
       actionButtons = Row(
         mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          TextButton.icon(
-            onPressed: () async {
-              print("Deleting");
-              await context.read<DonationProvider>().deleteDonation();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                    content: Text("Successfully cancelled donation!")),
-              );
-              Navigator.pop(context);
-            },
-            icon: const Icon(Icons.delete_rounded),
-            label: const Text("Cancel Donation"),
-            style: ButtonStyle(
-                foregroundColor: MaterialStatePropertyAll(
-                    Theme.of(context).colorScheme.error)),
-          ),
-        ],
+        children: [cancelButton],
       );
     }
 

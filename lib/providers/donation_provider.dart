@@ -56,18 +56,21 @@ class DonationProvider with ChangeNotifier {
     }
   }
 
-  void updateDonation(Donation donation) async {
+  Future<String> updateDonation(Donation donation) async {
     if (_selectedDonation != null) {
       try {
         String message = await firebaseService.updateDonation(
             donation.id!, donation.toJson());
         print(message);
         notifyListeners();
+        return message;
       } on FirebaseException catch (e) {
         print("Failed to update donation: ${e.message}");
+        return "Failed to update donation: ${e.message}";
       }
     } else {
       print("No donation selected for update");
+      return "No donation selected for update";
     }
   }
 

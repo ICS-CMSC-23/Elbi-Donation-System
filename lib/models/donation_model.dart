@@ -22,6 +22,14 @@ class Donation {
   static const String STATUS_COMPLETE = "Completed";
   static const String STATUS_CANCELED = "Canceled";
 
+  static const List<String> statuses = [
+    STATUS_PENDING,
+    STATUS_CONFIRMED,
+    STATUS_SCHEDULED_FOR_PICKUP,
+    STATUS_COMPLETE,
+    STATUS_CANCELED,
+  ];
+
   static const String CATEGORY_FOOD = "Food";
   static const String CATEGORY_CLOTHES = "Clothes";
   static const String CATEGORY_CASH = "Cash";
