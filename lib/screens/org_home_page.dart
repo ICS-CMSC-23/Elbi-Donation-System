@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elbi_donation_system/components/main_drawer.dart';
+import 'package:elbi_donation_system/components/square_image.dart';
 import 'package:elbi_donation_system/models/donation_drive_model.dart';
 import 'package:elbi_donation_system/models/route_model.dart';
 import 'package:elbi_donation_system/providers/auth_provider.dart';
@@ -10,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+// import 'package:cached_network_image/cached_network_image.dart';
 
 class OrgHomePage extends StatelessWidget {
   const OrgHomePage({super.key, this.detailList});
@@ -70,7 +71,8 @@ class OrgHomePage extends StatelessWidget {
                   return Center(
                     child: Text("Error encountered! ${snapshot.error}"),
                   );
-                } else if (snapshot.connectionState == ConnectionState.waiting) {
+                } else if (snapshot.connectionState ==
+                    ConnectionState.waiting) {
                   return const Center(
                     child: CircularProgressIndicator(),
                   );
@@ -88,8 +90,8 @@ class OrgHomePage extends StatelessWidget {
                 }
 
                 var filteredDonationDrives = snapshot.data!.docs.where((doc) {
-                  DonationDrive donationDrive =
-                      DonationDrive.fromJson(doc.data() as Map<String, dynamic>);
+                  DonationDrive donationDrive = DonationDrive.fromJson(
+                      doc.data() as Map<String, dynamic>);
                   return donationDrive.organizationId ==
                       context.read<AuthProvider>().currentUser.id;
                 }).toList();
@@ -139,24 +141,20 @@ class OrgHomePage extends StatelessWidget {
                           ),
                         ),
                         leading: ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: Image.network(
-                            donationDrive.photos![0],
-                            width: 100,
-                            height: 100,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return const Icon(Icons.error);
-                            },
-                          )
-                        ),
+                            borderRadius: BorderRadius.circular(10),
+                            child: SquareImage(
+                                source: donationDrive.photos![index],
+                                size: 80)),
                         trailing: IconButton(
                           icon: const Icon(Icons.more_vert),
                           onPressed: () {
-                            context.read<DonationDriveProvider>()
+                            context
+                                .read<DonationDriveProvider>()
                                 .changeSelectedDonationDrive(donationDrive);
-                            context.read<UserProvider>().changeSelectedUser(
-                                context.read<AuthProvider>().currentUser);
+                            context
+                                .read<DonationDriveProvider>()
+                                .changeSelectedDonationDriveUser(
+                                    context.read<AuthProvider>().currentUser);
                             Navigator.pushNamed(
                                 context, "/donation-drive-details");
                           },
