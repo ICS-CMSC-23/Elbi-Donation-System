@@ -1,13 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elbi_donation_system/components/main_drawer.dart';
-import 'package:elbi_donation_system/components/rounded_image.dart';
 import 'package:elbi_donation_system/models/route_model.dart';
-import 'package:elbi_donation_system/models/user_model.dart';
-import 'package:elbi_donation_system/providers/user_provider.dart';
 import 'package:elbi_donation_system/screens/donor_list_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 
 class AdminHomePage extends StatefulWidget {
   const AdminHomePage({super.key});
@@ -19,7 +15,6 @@ class AdminHomePage extends StatefulWidget {
 class _AdminHomePageState extends State<AdminHomePage> {
   @override
   Widget build(BuildContext context) {
-    // Fetching the list of organizations from Firestore
     Stream<QuerySnapshot> orgStream = FirebaseFirestore.instance
         .collection('users')
         .where('role', isEqualTo: 'organization')
@@ -34,7 +29,13 @@ class _AdminHomePageState extends State<AdminHomePage> {
         ],
       ),
       appBar: AppBar(
-        title: const Text("Admin Home Page"),
+        title: Text("Admin Home Page",
+          style: GoogleFonts.poppins(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -43,85 +44,118 @@ class _AdminHomePageState extends State<AdminHomePage> {
             Padding(
               padding: const EdgeInsets.all(20.0),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
-                    Icons.handshake,
-                    size: 100,
-                  ),
-                  Center(
-                    child: Text(
-                      "View All Donors",
-                      style: GoogleFonts.poppins(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF9C27B0),
-                      ),
-                      textAlign: TextAlign.center,
+                  Text(
+                    "Welcome, Admin",
+                    style: GoogleFonts.poppins(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF9C27B0),
                     ),
                   ),
-                  Center(
-                    child: SizedBox(
-                      width: 200,
-                      child: Text(
-                        "Show the list of all donor accounts in the system.",
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: const Color.fromARGB(255, 83, 21, 94),
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
+                  const SizedBox(height: 10),
+                  Text(
+                    "Manage and oversee all operations efficiently",
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      color: const Color(0xFF9C27B0),
                     ),
                   ),
-                  Center(
-                    child: ElevatedButton(
-                        onPressed: () {}, child: const Text("View All Donors")),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                children: [
-                  Icon(
-                    Icons.business,
-                    size: 100,
-                  ),
-                  Center(
-                    child: Text(
-                      "Organization Account Approval",
-                      style: GoogleFonts.poppins(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF9C27B0),
+                  const SizedBox(height: 20),
+                  GridView.count(
+                    crossAxisCount: 2,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisSpacing: 20,
+                    mainAxisSpacing: 20,
+                    childAspectRatio: 0.5,
+                    children: [
+                      _buildFeatureCard(
+                        icon: Icons.handshake,
+                        title: "View All Donors",
+                        description: "List of all donors",
+                        onPressed: () {
+                          Navigator.pushNamed(
+                            context,
+                            "/donor-list-page",
+                          );
+                        },
                       ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  Center(
-                    child: SizedBox(
-                      width: 200,
-                      child: Text(
-                        "Shows all pending organization account on approval.",
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: const Color.fromARGB(255, 83, 21, 94),
-                        ),
-                        textAlign: TextAlign.center,
+                      _buildFeatureCard(
+                        icon: Icons.business,
+                        title: "Organization Account Approval",
+                        description: "View all pending organization accounts",
+                        onPressed: () {
+                          Navigator.pushNamed(
+                            context,
+                            "/org-account-approval",
+                          );
+                        },
                       ),
-                    ),
-                  ),
-                  Center(
-                    child: ElevatedButton(
-                        onPressed: () {},
-                        child: const Text("Check Organizations")),
+                    ],
                   ),
                 ],
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFeatureCard({
+    required IconData icon,
+    required String title,
+    required String description,
+    required VoidCallback onPressed,
+  }) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: SizedBox(
+        width: double.infinity,
+        height: 300, 
+        child: Card(
+          elevation: 10,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          // shadowColor: Colors.grey.withOpacity(0.9),
+          child: Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  size: 100,
+                  color: const Color(0xFF9C27B0),
+                ),
+                const SizedBox(height: 15),
+                Text(
+                  title,
+                  style: GoogleFonts.poppins(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF9C27B0),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: Text(
+                    description,
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF9C27B0),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

@@ -137,6 +137,7 @@ class _DonorHomePageState extends State<DonorHomePage> {
                                   ),
                                 ),
                               ),
+                              const SizedBox(height: 10),
                               Center(
                                 child: Text(
                                   organization.name,
@@ -154,6 +155,7 @@ class _DonorHomePageState extends State<DonorHomePage> {
                                   ),
                                 ),
                               ),
+                              const SizedBox(height: 10),
                               Center(
                                 child: ElevatedButton(
                                   onPressed: () {
