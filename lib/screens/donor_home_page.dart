@@ -8,9 +8,6 @@ import 'package:elbi_donation_system/screens/donation_list_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-
-import '../components/page_cover.dart';
 
 class DonorHomePage extends StatefulWidget {
   const DonorHomePage({super.key});
@@ -134,13 +131,9 @@ class _DonorHomePageState extends State<DonorHomePage> {
                               Center(
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
-                                  child: CachedNetworkImage(
-                                    imageUrl: organization.profilePhoto,
-                                    width: MediaQuery.of(context).size.width / 1.5,
-                                    height: MediaQuery.of(context).size.width / 1.5,
-                                    fit: BoxFit.cover,
-                                    placeholder: (context, url) => const CircularProgressIndicator(),
-                                    errorWidget: (context, url, error) => const Icon(Icons.error),
+                                  child: SquareImage(
+                                    source: organization.profilePhoto,
+                                    size: MediaQuery.of(context).size.width / 1.5,
                                   ),
                                 ),
                               ),
