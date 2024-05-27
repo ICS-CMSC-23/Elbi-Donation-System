@@ -3,11 +3,13 @@ import 'package:elbi_donation_system/components/main_drawer.dart';
 import 'package:elbi_donation_system/components/square_image.dart';
 import 'package:elbi_donation_system/models/route_model.dart';
 import 'package:elbi_donation_system/models/user_model.dart';
-// import 'package:elbi_donation_system/providers/auth_provider.dart';
 import 'package:elbi_donation_system/providers/user_provider.dart';
 import 'package:elbi_donation_system/screens/donation_list_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
 import '../components/page_cover.dart';
 
 class DonorHomePage extends StatefulWidget {
@@ -22,8 +24,6 @@ class _DonorHomePageState extends State<DonorHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // final currentUser = context.watch<AuthProvider>().currentUser;
-
     Stream<QuerySnapshot> orgStream = FirebaseFirestore.instance
         .collection('users')
         .where('role', isEqualTo: 'organization')
@@ -36,7 +36,14 @@ class _DonorHomePageState extends State<DonorHomePage> {
         DonationListPage.route,
       ]),
       appBar: AppBar(
-        title: const Text("Donor Home Page"),
+        title: Text(
+          "Donor Home Page",
+          style: GoogleFonts.poppins(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.person),
@@ -54,14 +61,16 @@ class _DonorHomePageState extends State<DonorHomePage> {
           key: _formKey,
           child: Column(
             children: [
-              const PageCover(),
-              const Padding(
-                padding: EdgeInsets.all(30),
+              Image.asset('assets/images/banner_biggertext_1.png'),
+              Padding(
+                padding: const EdgeInsets.all(30),
                 child: Center(
                   child: Text(
                     "Want to Donate Something?",
-                    style: TextStyle(
+                    style: GoogleFonts.poppins(
                       fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF9C27B0),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -84,8 +93,7 @@ class _DonorHomePageState extends State<DonorHomePage> {
                     return Center(
                       child: Text("Error: ${snapshot.error}"),
                     );
-                  } else if (snapshot.connectionState ==
-                      ConnectionState.waiting) {
+                  } else if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
                       child: CircularProgressIndicator(),
                     );
@@ -96,8 +104,7 @@ class _DonorHomePageState extends State<DonorHomePage> {
                   }
 
                   var organizations = snapshot.data!.docs.map((doc) {
-                    Map<String, dynamic> docMap =
-                        doc.data() as Map<String, dynamic>;
+                    Map<String, dynamic> docMap = doc.data() as Map<String, dynamic>;
                     docMap["id"] = doc.id;
                     return User.fromJson(docMap);
                   }).toList();
@@ -110,8 +117,11 @@ class _DonorHomePageState extends State<DonorHomePage> {
                     itemBuilder: (context, index) {
                       final organization = organizations[index];
                       return Card(
-                        margin: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 20),
+                        margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                        elevation: 5,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Column(
@@ -122,18 +132,28 @@ class _DonorHomePageState extends State<DonorHomePage> {
                                     size: MediaQuery.of(context).size.width /
                                         1.5),
                               ),
-                              Center(child: Text(organization.name)),
                               Center(
-                                  child: Text(organization.about ??
-                                      "This organization has no tagline.")),
+                                child: Text(
+                                  organization.name,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              Center(
+                                child: Text(
+                                  organization.about ?? "This organization has no tagline.",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
                               Center(
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    WidgetsBinding.instance
-                                        .addPostFrameCallback((_) {
-                                      context
-                                          .read<UserProvider>()
-                                          .changeSelectedUser(
+                                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                                      context.read<UserProvider>().changeSelectedUser(
                                             organization,
                                           );
                                       Navigator.pushNamed(
@@ -142,7 +162,21 @@ class _DonorHomePageState extends State<DonorHomePage> {
                                       );
                                     });
                                   },
-                                  child: const Text("View Org"),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF9C27B0),
+                                    padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    "View Org",
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                                 ),
                               )
                             ],

@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elbi_donation_system/components/main_drawer.dart';
-import 'package:elbi_donation_system/components/square_image.dart';
 import 'package:elbi_donation_system/models/donation_drive_model.dart';
 import 'package:elbi_donation_system/models/route_model.dart';
 import 'package:elbi_donation_system/providers/auth_provider.dart';
@@ -11,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class OrgHomePage extends StatelessWidget {
   const OrgHomePage({super.key, this.detailList});
@@ -70,39 +70,49 @@ class OrgHomePage extends StatelessWidget {
                   return Center(
                     child: Text("Error encountered! ${snapshot.error}"),
                   );
-                } else if (snapshot.connectionState ==
-                    ConnectionState.waiting) {
+                } else if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
                     child: CircularProgressIndicator(),
                   );
                 } else if (!snapshot.hasData) {
-                  return const Center(
-                    child: Text("No Donation Drives Found"),
+                  return Center(
+                    child: Text(
+                      "No Donation Drives found",
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.bold,
+                        color: const Color.fromARGB(255, 247, 129, 139),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   );
                 }
 
                 var filteredDonationDrives = snapshot.data!.docs.where((doc) {
-                  DonationDrive donationDrive = DonationDrive.fromJson(
-                      doc.data() as Map<String, dynamic>);
+                  DonationDrive donationDrive =
+                      DonationDrive.fromJson(doc.data() as Map<String, dynamic>);
                   return donationDrive.organizationId ==
                       context.read<AuthProvider>().currentUser.id;
                 }).toList();
 
                 if (filteredDonationDrives.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Text(
-                        "No Donation Drives found for the specified organization"),
+                      "No Donation Drives found",
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.bold,
+                        color: const Color.fromARGB(255, 247, 129, 139),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   );
                 }
 
                 return ListView.builder(
                   itemCount: filteredDonationDrives.length,
                   itemBuilder: (context, index) {
-                    Map<String, dynamic> docMap = filteredDonationDrives[index]
-                        .data() as Map<String, dynamic>;
-                    docMap["id"] = filteredDonationDrives[index].id;
-                    DonationDrive donationDrive =
-                        DonationDrive.fromJson(docMap);
+                    DonationDrive donationDrive = DonationDrive.fromJson(
+                        filteredDonationDrives[index].data()
+                            as Map<String, dynamic>);
                     return Card(
                       margin: const EdgeInsets.symmetric(
                           vertical: 10, horizontal: 20),
@@ -130,21 +140,23 @@ class OrgHomePage extends StatelessWidget {
                         ),
                         leading: ClipRRect(
                           borderRadius: BorderRadius.circular(10),
-                          child: SquareImage(
-                              source: donationDrive.photos![index], size: 80),
+                          child: Image.network(
+                            donationDrive.photos![0],
+                            width: 100,
+                            height: 100,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Icon(Icons.error);
+                            },
+                          )
                         ),
                         trailing: IconButton(
                           icon: const Icon(Icons.more_vert),
-                          onPressed: () async {
-                            context
-                                .read<DonationDriveProvider>()
+                          onPressed: () {
+                            context.read<DonationDriveProvider>()
                                 .changeSelectedDonationDrive(donationDrive);
-                            context
-                                .read<DonationDriveProvider>()
-                                .changeSelectedDonationDriveUser(await context
-                                    .read<UserProvider>()
-                                    .fetchUserById(
-                                        donationDrive.organizationId));
+                            context.read<UserProvider>().changeSelectedUser(
+                                context.read<AuthProvider>().currentUser);
                             Navigator.pushNamed(
                                 context, "/donation-drive-details");
                           },
