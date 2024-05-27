@@ -170,7 +170,7 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
                           .read<DonationDriveProvider>()
                           .changeSelectedDonationDriveUser(await context
                               .read<UserProvider>()
-                              .fetchUserById(donationDrive.organizationId!));
+                              .fetchUserById(donationDrive.organizationId));
                       Navigator.pushNamed(context, "/donation-drive-details");
                     },
                   ),

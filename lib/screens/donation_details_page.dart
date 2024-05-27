@@ -1,5 +1,6 @@
 import 'package:elbi_donation_system/components/header_with_pic.dart';
 import 'package:elbi_donation_system/components/main_drawer.dart';
+import 'package:elbi_donation_system/components/square_image.dart';
 import 'package:elbi_donation_system/components/title_detail.dart';
 import 'package:elbi_donation_system/components/title_detail_list.dart';
 import 'package:elbi_donation_system/dummy_data/dummy_donations.dart';
@@ -37,6 +38,7 @@ class _DonationDetailsState extends State<DonationDetails> {
         .watch<AuthProvider>()
         .currentUser
         .role; //donor, organization, admin
+
     Row actionButtons;
     if (userType == User.donor) {
       actionButtons = Row(
@@ -138,8 +140,10 @@ class _DonationDetailsState extends State<DonationDetails> {
                         padding: const EdgeInsets.all(5.00),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(10.0),
-                          child: Image.network(donation.photos![index],
-                              fit: BoxFit.cover),
+                          child: SquareImage(
+                            source: donation.photos![index],
+                            size: 80,
+                          ),
                         ));
                   }),
               actionButtons
