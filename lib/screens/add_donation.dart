@@ -1,7 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
 
+import 'package:elbi_donation_system/providers/auth_provider.dart';
+import 'package:elbi_donation_system/providers/donation_drive_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'dart:io';
 
 import '../api/firebase_auth_api.dart';
@@ -20,6 +24,7 @@ class _AddDonationState extends State<AddDonation> {
   final _categoryController = TextEditingController();
   final _descriptionController = TextEditingController();
   // final _remarksController = TextEditingController();
+  bool isLoading = false;
   List<File> _donationImages = [];
   List<String> _donationImages64 = [];
   String? errorMessage;
@@ -36,6 +41,10 @@ class _AddDonationState extends State<AddDonation> {
   }
 
   void _submitForm() async {
+    if (isLoading) {
+      return;
+    }
+
     if (_formKey.currentState!.validate()) {
       if (_formKey.currentState!.validate()) {
         if (_donationImages.isEmpty) {
@@ -44,11 +53,11 @@ class _AddDonationState extends State<AddDonation> {
           });
           return;
         }
-        final currentUser = FirebaseAuthAPI.auth.currentUser;
+        final currentUser = context.read<AuthProvider>().currentUser;
         // final currentDrive = FirebaseDonationDriveAPI;
         Donation newDonation = Donation(
-          donorId: currentUser!.uid,
-          donationDriveId: currentUser.uid,
+          donorId: currentUser.id!,
+          donationDriveId: context.read<DonationDriveProvider>().selected.id,
           category: _categoryController.text,
           description: _descriptionController.text,
           photos: _donationImages64,
@@ -59,17 +68,49 @@ class _AddDonationState extends State<AddDonation> {
           contactNo: '',
         );
 
-        String result = await FirebaseDonationAPI().addDonation(newDonation);
+        setState(() {
+          isLoading = true;
+        });
 
-        if (result == "Successfully added donation drive!") {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(result)),
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Adding donation... please wait...")),
+        );
+
+        try {
+          String result =
+              await FirebaseDonationAPI().addDonation(newDonation).timeout(
+            Duration(seconds: 20), // specify the duration you want to wait
+            onTimeout: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text("Request timed out. Please try again.")),
+              );
+              return 'timeout'; // Return a default value or handle the timeout case appropriately
+            },
           );
-          Navigator.pop(context); // Close the form page
-        } else {
+
+          if (result == 'timeout') {
+            // Handle the timeout case, possibly return or break out
+            setState(() {
+              isLoading = false;
+            });
+            return;
+          }
+
+          // Handle the result as usual
+        } on TimeoutException catch (_) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(result)),
+            const SnackBar(
+                content: Text("Request timed out. Please try again.")),
           );
+        } finally {
+          setState(() {
+            isLoading = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Successfully added donation!")),
+          );
+          Navigator.pop(context);
         }
       }
       //   ScaffoldMessenger.of(context)
