@@ -76,12 +76,17 @@ class _DonorHomePageState extends State<DonorHomePage> {
                   ),
                 ),
               ),
-              const Center(
+              Center(
                 child: SizedBox(
                   width: 200,
                   height: 90,
                   child: Text(
                     "Here are the available organizations you can contact for donation:",
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: const Color.fromARGB(255, 83, 21, 94),
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -127,10 +132,17 @@ class _DonorHomePageState extends State<DonorHomePage> {
                           child: Column(
                             children: [
                               Center(
-                                child: SquareImage(
-                                    source: organization.profilePhoto,
-                                    size: MediaQuery.of(context).size.width /
-                                        1.5),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: CachedNetworkImage(
+                                    imageUrl: organization.profilePhoto,
+                                    width: MediaQuery.of(context).size.width / 1.5,
+                                    height: MediaQuery.of(context).size.width / 1.5,
+                                    fit: BoxFit.cover,
+                                    placeholder: (context, url) => const CircularProgressIndicator(),
+                                    errorWidget: (context, url, error) => const Icon(Icons.error),
+                                  ),
+                                ),
                               ),
                               Center(
                                 child: Text(
