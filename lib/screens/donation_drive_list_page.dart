@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../api/firebase_donation_drive_api.dart';
 import '../components/bottom_scroll_view_widget.dart';
 import '../components/custom_tile_container.dart';
+import '../components/upload_helper.dart';
 import '../components/list_page_header.dart';
 import '../components/list_page_sliver_app_bar.dart';
 import '../dummy_data/dummy_donation_drives.dart';
@@ -87,50 +88,40 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
                                                     1
                                             ? const EdgeInsets.only(right: 8.0)
                                             : EdgeInsets.zero,
-                                        child: Container(
+                                        child: Image.network(
+                                          donationDrives[index]['photos'][i],
                                           height: 100,
                                           width: 200,
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            image: DecorationImage(
-                                              image: NetworkImage(
-                                                  donationDrives[index]
-                                                      ['photos'][i]),
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                          child: Image.network(
-                                            donationDrives[index]['photos'][i],
-                                            fit: BoxFit.cover,
-                                            loadingBuilder: (context, child,
-                                                loadingProgress) {
-                                              if (loadingProgress == null) {
-                                                return child;
-                                              }
-                                              return Center(
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  value: loadingProgress
-                                                              .expectedTotalBytes !=
-                                                          null
-                                                      ? loadingProgress
-                                                              .cumulativeBytesLoaded /
-                                                          (loadingProgress
-                                                                  .expectedTotalBytes ??
-                                                              1)
-                                                      : null,
-                                                ),
+                                          fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                            try {
+                                              return Image.memory(
+                                                decodeBase64Image(
+                                                    donationDrives[index]
+                                                        ['photos'][i]),
+                                                height: 100,
+                                                width: 200,
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (context, error,
+                                                    stackTrace) {
+                                                  return Image.asset(
+                                                    'assets/images/banner_biggertext_1.png',
+                                                    height: 100,
+                                                    width: 200,
+                                                    fit: BoxFit.cover,
+                                                  );
+                                                },
                                               );
-                                            },
-                                            errorBuilder:
-                                                (context, error, stackTrace) {
+                                            } catch (e) {
                                               return Image.asset(
                                                 'assets/images/banner_biggertext_1.png',
+                                                height: 100,
+                                                width: 200,
                                                 fit: BoxFit.cover,
                                               );
-                                            },
-                                          ),
+                                            }
+                                          },
                                         ),
                                       ),
                                   ]
