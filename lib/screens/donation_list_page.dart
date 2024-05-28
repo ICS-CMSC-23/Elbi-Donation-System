@@ -1,21 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import '../components/bottom_scroll_view_widget.dart';
 import '../components/custom_tile_container.dart';
 import '../components/list_page_header.dart';
 import '../components/list_page_sliver_app_bar.dart';
 import '../components/upload_helper.dart';
-import '../dummy_data/dummy_donations.dart';
 import '../models/donation_model.dart';
 import '../models/route_model.dart';
 import '../models/user_model.dart';
 import '../providers/auth_provider.dart';
 import '../providers/donation_provider.dart';
-import '../providers/donation_list_provider.dart';
-import '../providers/user_list_provider.dart';
 import '../screens/donation_details_page.dart';
 
 class DonationListPage extends StatefulWidget {
