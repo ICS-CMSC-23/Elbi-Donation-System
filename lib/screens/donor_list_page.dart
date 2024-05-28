@@ -8,7 +8,6 @@ import '../components/list_page_sliver_app_bar.dart';
 import '../components/list_page_header.dart';
 import '../models/route_model.dart';
 import '../models/user_model.dart';
-import '../providers/auth_provider.dart';
 import '../providers/user_provider.dart';
 import '../screens/donor_profile_page.dart';
 
@@ -118,9 +117,6 @@ class _DonorListPageState extends State<DonorListPage> {
 
   @override
   Widget build(BuildContext context) {
-    // get current user
-    // User currentUser = context.watch<AuthProvider>().currentUser;
-
     // get users that are donors
     Stream<QuerySnapshot> donors = FirebaseFirestore.instance
         .collection('users')
