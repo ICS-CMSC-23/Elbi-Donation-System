@@ -7,6 +7,7 @@ import '../components/bottom_scroll_view_widget.dart';
 import '../components/custom_tile_container.dart';
 import '../components/list_page_header.dart';
 import '../components/list_page_sliver_app_bar.dart';
+import '../components/upload_helper.dart';
 import '../dummy_data/dummy_donations.dart';
 import '../models/donation_model.dart';
 import '../models/route_model.dart';
@@ -71,48 +72,39 @@ class _DonationListPageState extends State<DonationListPage> {
                                                   1
                                           ? const EdgeInsets.only(right: 8.0)
                                           : EdgeInsets.zero,
-                                      child: Container(
+                                      child: Image.network(
+                                        donations[index]['photos'][i],
                                         height: 100,
                                         width: 200,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          image: DecorationImage(
-                                            image: NetworkImage(
-                                                donations[index]['photos'][i]),
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                        child: Image.network(
-                                          donations[index]['photos'][i],
-                                          fit: BoxFit.cover,
-                                          loadingBuilder: (context, child,
-                                              loadingProgress) {
-                                            if (loadingProgress == null) {
-                                              return child;
-                                            }
-                                            return Center(
-                                              child: CircularProgressIndicator(
-                                                value: loadingProgress
-                                                            .expectedTotalBytes !=
-                                                        null
-                                                    ? loadingProgress
-                                                            .cumulativeBytesLoaded /
-                                                        (loadingProgress
-                                                                .expectedTotalBytes ??
-                                                            1)
-                                                    : null,
-                                              ),
+                                        fit: BoxFit.cover,
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                          try {
+                                            return Image.memory(
+                                              decodeBase64Image(donations[index]
+                                                  ['photos'][i]),
+                                              height: 100,
+                                              width: 200,
+                                              fit: BoxFit.cover,
+                                              errorBuilder:
+                                                  (context, error, stackTrace) {
+                                                return Image.asset(
+                                                  'assets/images/banner_biggertext_1.png',
+                                                  height: 100,
+                                                  width: 200,
+                                                  fit: BoxFit.cover,
+                                                );
+                                              },
                                             );
-                                          },
-                                          errorBuilder:
-                                              (context, error, stackTrace) {
+                                          } catch (e) {
                                             return Image.asset(
                                               'assets/images/banner_biggertext_1.png',
+                                              height: 100,
+                                              width: 200,
                                               fit: BoxFit.cover,
                                             );
-                                          },
-                                        ),
+                                          }
+                                        },
                                       ),
                                     ),
                                 ]
