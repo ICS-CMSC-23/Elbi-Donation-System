@@ -119,7 +119,7 @@ class _DonorListPageState extends State<DonorListPage> {
   @override
   Widget build(BuildContext context) {
     // get current user
-    User currentUser = context.watch<AuthProvider>().currentUser;
+    // User currentUser = context.watch<AuthProvider>().currentUser;
 
     // get users that are donors
     Stream<QuerySnapshot> donors = FirebaseFirestore.instance
