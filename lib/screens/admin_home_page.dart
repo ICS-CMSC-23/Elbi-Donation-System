@@ -56,7 +56,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    "Manage and oversee all operations efficiently",
+                    "Manage operations efficiently",
                     style: GoogleFonts.poppins(
                       fontSize: 14,
                       color: const Color(0xFF9C27B0),

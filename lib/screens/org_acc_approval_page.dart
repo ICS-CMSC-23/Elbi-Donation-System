@@ -5,6 +5,7 @@ import 'package:elbi_donation_system/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:elbi_donation_system/themes/purple_theme.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class OrgAccApprovalPage extends StatefulWidget {
   const OrgAccApprovalPage({super.key});
@@ -26,18 +27,30 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Org Account Approval"),
+        title: Text(
+          "Org Account Approval",
+          style: GoogleFonts.poppins(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Form(
           key: _formKey,
           child: Column(
             children: [
-              const Padding(
-                padding: EdgeInsets.all(20),
+              Image.asset('assets/images/banner_biggertext_1.png'),
+              Padding(
+                padding: const EdgeInsets.all(20),
                 child: Text(
-                  "This is where you approve or disapprove organization accounts as an admin.",
-                  style: TextStyle(fontSize: 16),
+                  "Admin panel for approving or rejecting organization accounts.",
+                  style: GoogleFonts.poppins(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF9C27B0),
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -75,45 +88,62 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                       return Card(
                         margin: const EdgeInsets.symmetric(
                             vertical: 10, horizontal: 20),
+                        elevation: 8,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
                         child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(16.0),
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              SquareImage(
+                              Center(
+                                child: SquareImage(
                                   source: organization.profilePhoto,
-                                  size:
-                                      MediaQuery.of(context).size.width / 1.5),
+                                  size: MediaQuery.of(context).size.width / 1.5,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
                               Text(
                                 organization.name,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 18),
+                                style: GoogleFonts.poppins(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
                               ),
+                              const SizedBox(height: 5),
                               Text(
                                 organization.about ??
                                     "This organization has no description.",
                                 textAlign: TextAlign.center,
+                                style: GoogleFonts.poppins(
+                                  color: const Color(0xFF9C27B0),
+                                ),
                               ),
-                              SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  children: [
-                                    ElevatedButton.icon(
-                                      onPressed: () {
-                                        context
-                                            .read<UserProvider>()
-                                            .changeSelectedUser(organization);
-                                        Navigator.pushNamed(
-                                          context,
-                                          '/org-profile',
-                                          arguments: organization,
-                                        );
-                                      },
-                                      icon: const Icon(Icons.info),
-                                      label: const Text("View Org Details"),
-                                    ),
-                                    ElevatedButton(
+                              const SizedBox(height: 10),
+                              ElevatedButton.icon(
+                                onPressed: () {
+                                  context
+                                      .read<UserProvider>()
+                                      .changeSelectedUser(organization);
+                                  Navigator.pushNamed(
+                                    context,
+                                    '/org-profile',
+                                    arguments: organization,
+                                  );
+                                },
+                                icon: const Icon(Icons.info),
+                                label: const Text("View Org Details"),
+                                style: ElevatedButton.styleFrom(
+                                  minimumSize: const Size(double.infinity, 50),
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: ElevatedButton(
                                       onPressed: () {
                                         _showConfirmationDialog(
                                           context,
@@ -137,11 +167,16 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                                       },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.lightGreen,
+                                        minimumSize:
+                                            const Size(double.infinity, 50),
                                       ),
                                       child: const Icon(Icons.check_rounded,
                                           color: Colors.white),
                                     ),
-                                    ElevatedButton(
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: ElevatedButton(
                                       onPressed: () {
                                         _showConfirmationDialog(
                                           context,
@@ -166,12 +201,14 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: const Color.fromARGB(
                                             255, 240, 84, 72),
+                                        minimumSize:
+                                            const Size(double.infinity, 50),
                                       ),
                                       child: const Icon(Icons.close_rounded,
                                           color: Colors.white),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
@@ -196,6 +233,10 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
         return Theme(
           data: purpleTheme(),
           child: AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            backgroundColor: Colors.deepPurple,
             title: Text(
               "Confirm $action",
               style: const TextStyle(
