@@ -1,16 +1,18 @@
-import 'package:elbi_donation_system/models/user_model.dart';
-import 'package:elbi_donation_system/providers/donation_drive_list_provider.dart';
-import 'package:elbi_donation_system/providers/user_list_provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import '../models/route_model.dart';
-import '../models/donation_drive_model.dart';
-import '../dummy_data/dummy_donation_drives.dart';
-import '../components/bottom_scroll_view_widget.dart';
-import '../components/list_page_sliver_app_bar.dart';
-import '../components/list_page_header.dart';
 import '../components/custom_tile_container.dart';
-import 'donation_drive_details_page.dart';
+import '../components/list_page_header.dart';
+import '../components/list_page_sliver_app_bar.dart';
+import '../components/upload_helper.dart';
+import '../models/donation_drive_model.dart';
+import '../models/route_model.dart';
+import '../models/user_model.dart';
+import '../providers/auth_provider.dart';
+import '../providers/donation_drive_provider.dart';
+import '../screens/donation_drive_details_page.dart';
 
 class DonationDriveListPage extends StatefulWidget {
   const DonationDriveListPage({super.key});
@@ -27,13 +29,13 @@ class DonationDriveListPage extends StatefulWidget {
 }
 
 class _DonationDriveListPageState extends State<DonationDriveListPage> {
-  // get dummy data for donation drives
-
   Widget displayDonationDriveList(donationDrives) {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
-          // bool hasPhotos = donations[index].photos != null && donations[index].photos!.isNotEmpty;
+          bool hasPhotos = donationDrives[index]['photos'] != null &&
+              donationDrives[index]['photos'] is List &&
+              donationDrives[index]['photos'].isNotEmpty;
           return CustomTileContainer(
             key: ObjectKey(index),
             customBorder: CustomTileContainer.customBorderOne,
@@ -53,7 +55,7 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
                         child: Padding(
                           padding: const EdgeInsets.only(bottom: 5),
                           child: Text(
-                            donationDrives[index].name,
+                            donationDrives[index]['name'],
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -67,32 +69,71 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
-                            children: [
-                              for (int i = 0;
-                                  i < donationDrives[index].photos!.length;
-                                  i++)
-                                Padding(
-                                  padding: i <
-                                          donationDrives[index].photos!.length -
-                                              1
-                                      ? const EdgeInsets.only(right: 8.0)
-                                      : EdgeInsets.zero,
-                                  child: Container(
-                                    height: 100,
-                                    width: 200,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      image: DecorationImage(
-                                        image: Image.network(
-                                                donationDrives[index]
-                                                    .photos![i])
-                                            .image,
-                                        fit: BoxFit.cover,
+                            children: hasPhotos
+                                ? [
+                                    for (int i = 0;
+                                        i <
+                                            donationDrives[index]['photos']
+                                                .length;
+                                        i++)
+                                      Padding(
+                                        padding: i <
+                                                donationDrives[index]['photos']
+                                                        .length -
+                                                    1
+                                            ? const EdgeInsets.only(right: 8.0)
+                                            : EdgeInsets.zero,
+                                        child: Image.network(
+                                          donationDrives[index]['photos'][i],
+                                          height: 100,
+                                          width: 200,
+                                          fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                            try {
+                                              return Image.memory(
+                                                decodeBase64Image(
+                                                    donationDrives[index]
+                                                        ['photos'][i]),
+                                                height: 100,
+                                                width: 200,
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (context, error,
+                                                    stackTrace) {
+                                                  return Image.asset(
+                                                    'assets/images/banner_biggertext_1.png',
+                                                    height: 100,
+                                                    width: 200,
+                                                    fit: BoxFit.cover,
+                                                  );
+                                                },
+                                              );
+                                            } catch (e) {
+                                              return Image.asset(
+                                                'assets/images/banner_biggertext_1.png',
+                                                height: 100,
+                                                width: 200,
+                                                fit: BoxFit.cover,
+                                              );
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                  ]
+                                : [
+                                    Container(
+                                      height: 100,
+                                      width: 200,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        image: const DecorationImage(
+                                          image: AssetImage(
+                                              'assets/images/banner_biggertext_1.png'),
+                                          fit: BoxFit.cover,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ),
-                            ],
+                                  ],
                           ),
                         ),
                       ),
@@ -117,7 +158,7 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
                               ),
                               TextSpan(
                                 text:
-                                    '${donationDrives[index].startDate.toString().substring(0, 10)}\n',
+                                    '${DateFormat('yyyy-MM-dd').format(donationDrives[index]['startDate'].toDate())}\n',
                               ),
                               const TextSpan(
                                 text: 'End Date:\t\t\t',
@@ -126,10 +167,8 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
                                 ),
                               ),
                               TextSpan(
-                                text: donationDrives[index]
-                                    .endDate
-                                    .toString()
-                                    .substring(0, 10),
+                                text: DateFormat('yyyy-MM-dd').format(
+                                    donationDrives[index]['endDate'].toDate()),
                               ),
                             ],
                           ),
@@ -146,10 +185,18 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
                       elevation: WidgetStateProperty.all(0),
                     ),
                     onPressed: () {
+                      // convert donation drive map to donation drive object
+                      DonationDrive donationDrive =
+                          DonationDrive.fromJson(donationDrives[index].data());
+
                       // Implement view full details functionality
                       context
-                          .read<DonationDriveListProvider>()
-                          .setCurrentDonationDrive(donationDrives[index].id!);
+                          .read<DonationDriveProvider>()
+                          .changeSelectedDonationDrive(donationDrive);
+                      context
+                          .read<DonationDriveProvider>()
+                          .changeSelectedDonationDriveUser(
+                              context.read<AuthProvider>().currentUser);
                       Navigator.pushNamed(
                         context,
                         DonationDriveDetails.route.path,
@@ -178,23 +225,93 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
 
   @override
   Widget build(BuildContext context) {
-    User currentUser = context.watch<UserListProvider>().currentUser;
-    List<DonationDrive> donationDrives = dummyDonationDrives
-        .where((drive) => drive.organizationId == currentUser.id)
-        .toList();
+    // get current user
+    User currentUser = context.watch<AuthProvider>().currentUser;
+
+    // get donation drives by organization id
+    // check if current user is an organization or an admin
+    if (currentUser.role == 'organization') {
+      context
+          .read<DonationDriveProvider>()
+          .fetchDonationDrivesByOrganizationId(currentUser.id!);
+    } else {
+      context.read<DonationDriveProvider>().fetchDonationDrives();
+    }
+
+    Stream<QuerySnapshot> donationDrives =
+        context.watch<DonationDriveProvider>().donationDrives;
 
     return Scaffold(
       body: CustomScrollView(
         // physics: const BouncingScrollPhysics(),
-        semanticChildCount: donationDrives.length,
+        // semanticChildCount: donationDrives.length,
         slivers: [
           displayAppBar(),
           const SliverToBoxAdapter(
             child: SizedBox(height: 10),
           ),
-          displayDonationDriveList(donationDrives),
-          BottomScrollViewWidget(
-              listTitle: 'Donation Drives', listLength: donationDrives.length),
+          StreamBuilder<QuerySnapshot>(
+            stream: donationDrives,
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Center(
+                  child: Text("Error encountered! ${snapshot.error}"),
+                );
+              } else if (snapshot.connectionState == ConnectionState.waiting) {
+                return const SliverFillRemaining(
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                return SliverFillRemaining(
+                  child: Center(
+                    child: Text(
+                      "No Donation Drives found",
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.bold,
+                        color: const Color.fromARGB(255, 247, 129, 139),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                );
+              }
+
+              return displayDonationDriveList(snapshot.data!.docs);
+            },
+          ),
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Column(
+              children: [
+                const Expanded(child: SizedBox(height: 1)),
+                Container(
+                  color: Theme.of(context).cardColor,
+                  height: 20,
+                  child: Center(
+                    child: StreamBuilder<QuerySnapshot>(
+                      stream: donationDrives,
+                      builder: (BuildContext context,
+                          AsyncSnapshot<QuerySnapshot> snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          return Text("Error: ${snapshot.error}");
+                        } else if (!snapshot.hasData) {
+                          return const Text("Donation Drives: 0");
+                        } else {
+                          int count = snapshot.data!.docs.length;
+                          return Text("Donation Drives: $count");
+                        }
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
