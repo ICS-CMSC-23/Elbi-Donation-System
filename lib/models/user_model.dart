@@ -62,7 +62,7 @@ class User {
     };
   }
 
-  static fromJson(Map<String, dynamic> json) {
+  static User fromJson(Map<String, dynamic> json) {
     return User(
       id: json['id'],
       name: json['name'] ?? 'Unknown',
