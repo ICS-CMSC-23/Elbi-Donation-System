@@ -30,7 +30,7 @@ class _DonorListPageState extends State<DonorListPage> {
   // List<User> donors = dummyUsers.where((user) => user.role == 'donor').toList();
 
   // build a widget that returns a list of donors
-  Widget displayDonorList(donors) {
+  Widget displayDonorList(List<QueryDocumentSnapshot> donors) {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
@@ -89,7 +89,10 @@ class _DonorListPageState extends State<DonorListPage> {
                     ),
                     onPressed: () {
                       // convert the map to a User object
-                      User user = User.fromJson(donors[index].data());
+                      Map<String, dynamic> docMap =
+                          donors[index].data() as Map<String, dynamic>;
+                      docMap["id"] = donors[index].id;
+                      User user = User.fromJson(docMap);
 
                       // Navigate to donor's profile page
                       context.read<UserProvider>().changeSelectedUser(user);
