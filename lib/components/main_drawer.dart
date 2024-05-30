@@ -22,7 +22,7 @@ class _MainDrawerState extends State<MainDrawer> {
           DrawerHeader(
             decoration: BoxDecoration(color: Theme.of(context).primaryColor),
             child: const Text(
-              "Elbi Donation System",
+              "Elbi GenerosiTree",
               style: TextStyle(fontSize: 40, color: Colors.white),
             ),
           ),
