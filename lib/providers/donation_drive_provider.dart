@@ -49,7 +49,7 @@ class DonationDriveProvider with ChangeNotifier {
       print(message);
       notifyListeners();
     } on FirebaseException catch (e) {
-      print("Failed to add donation drive: ${e.message}");
+      print("Failed to add donation drive");
     }
   }
 
@@ -61,7 +61,7 @@ class DonationDriveProvider with ChangeNotifier {
         print(message);
         notifyListeners();
       } on FirebaseException catch (e) {
-        print("Failed to update donation drive: ${e.message}");
+        print("Failed to update donation drive");
       }
     } else {
       print("No donation drive selected for update");
@@ -77,8 +77,8 @@ class DonationDriveProvider with ChangeNotifier {
         notifyListeners();
         return message;
       } on FirebaseException catch (e) {
-        print("Failed to delete donation drive: ${e.message}");
-        return "Failed to delete donation drive: ${e.message}";
+        print("Failed to delete donation drive");
+        return "Failed to delete donation drive";
       }
     } else {
       print("No donation drive selected for deletion");

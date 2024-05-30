@@ -52,7 +52,7 @@ class DonationProvider with ChangeNotifier {
       print(message);
       notifyListeners();
     } on FirebaseException catch (e) {
-      print("Failed to add donation: ${e.message}");
+      print("Failed to add donation");
     }
   }
 
@@ -65,8 +65,8 @@ class DonationProvider with ChangeNotifier {
         notifyListeners();
         return message;
       } on FirebaseException catch (e) {
-        print("Failed to update donation: ${e.message}");
-        return "Failed to update donation: ${e.message}";
+        print("Failed to update donation");
+        return "Failed to update donation";
       }
     } else {
       print("No donation selected for update");
@@ -83,8 +83,8 @@ class DonationProvider with ChangeNotifier {
         notifyListeners();
         return message;
       } on FirebaseException catch (e) {
-        print("Failed to delete donation: ${e.message}");
-        return "Failed to delete donation: ${e.message}";
+        print("Failed to delete donation");
+        return "Failed to delete donation";
       }
     } else {
       print("No donation selected for deletion");

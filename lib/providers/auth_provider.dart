@@ -86,7 +86,7 @@ class AuthProvider with ChangeNotifier {
         _setGuestUser();
       }
     } catch (e) {
-      print("Error loading user data: $e");
+      print("Error loading user data");
       _setGuestUser();
     }
     notifyListeners();

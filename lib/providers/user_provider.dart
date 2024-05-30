@@ -100,7 +100,7 @@ class UserProvider with ChangeNotifier {
         print(message);
         notifyListeners();
       } on FirebaseException catch (e) {
-        print("Failed to update user: ${e.message}");
+        print("Failed to update user");
       }
     } else {
       print("No user selected for update");
@@ -114,7 +114,7 @@ class UserProvider with ChangeNotifier {
         print(message);
         notifyListeners();
       } on FirebaseException catch (e) {
-        print("Failed to delete user: ${e.message}");
+        print("Failed to delete user");
       }
     } else {
       print("No user selected for deletion");
