@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:elbi_donation_system/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -202,7 +203,19 @@ class _DonationListPageState extends State<DonationListPage> {
                               IconButton(
                                 icon: const Icon(Icons.edit),
                                 onPressed: () {
+                                  Donation donation = Donation.fromJson(
+                                      donations[index].data());
                                   // Implement edit functionality
+                                  context
+                                      .read<DonationProvider>()
+                                      .changeSelectedDonation(donation);
+                                  context
+                                      .read<DonationProvider>()
+                                      .changeSelectedDonor(context
+                                          .read<AuthProvider>()
+                                          .currentUser);
+                                  Navigator.pushNamed(
+                                      context, "/edit-donation");
                                 },
                               ),
                             IconButton(
