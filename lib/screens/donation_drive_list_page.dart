@@ -286,6 +286,22 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
             child: Column(
               children: [
                 const Expanded(child: SizedBox(height: 1)),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, "/add-donation-drive");
+                    },
+                    child: Text(
+                      'Create Donation Drive',
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
                 Container(
                   color: Theme.of(context).cardColor,
                   height: 20,
