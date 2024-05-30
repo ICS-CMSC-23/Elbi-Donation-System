@@ -95,7 +95,8 @@ class _DonorHomePageState extends State<DonorHomePage> {
                     return Center(
                       child: Text("Error: ${snapshot.error}"),
                     );
-                  } else if (snapshot.connectionState == ConnectionState.waiting) {
+                  } else if (snapshot.connectionState ==
+                      ConnectionState.waiting) {
                     return const Center(
                       child: CircularProgressIndicator(),
                     );
@@ -105,11 +106,16 @@ class _DonorHomePageState extends State<DonorHomePage> {
                     );
                   }
 
-                  var organizations = snapshot.data!.docs.map((doc) {
-                    Map<String, dynamic> docMap = doc.data() as Map<String, dynamic>;
+                  List<User> allOrganizations = snapshot.data!.docs.map((doc) {
+                    Map<String, dynamic> docMap =
+                        doc.data() as Map<String, dynamic>;
                     docMap["id"] = doc.id;
                     return User.fromJson(docMap);
                   }).toList();
+
+                  List<User> organizations = allOrganizations
+                      .where((organization) => organization.isApproved!)
+                      .toList();
 
                   return ListView.builder(
                     reverse: true,
@@ -119,7 +125,8 @@ class _DonorHomePageState extends State<DonorHomePage> {
                     itemBuilder: (context, index) {
                       final organization = organizations[index];
                       return Card(
-                        margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 20),
                         elevation: 5,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
@@ -132,8 +139,9 @@ class _DonorHomePageState extends State<DonorHomePage> {
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
                                   child: SquareImage(
-                                    source: organization.profilePhoto,
-                                    size: MediaQuery.of(context).size.width / 1.5,
+                                    source: organization.profilePhoto!,
+                                    size:
+                                        MediaQuery.of(context).size.width / 1.5,
                                   ),
                                 ),
                               ),
@@ -149,7 +157,8 @@ class _DonorHomePageState extends State<DonorHomePage> {
                               ),
                               Center(
                                 child: Text(
-                                  organization.about ?? "This organization has no tagline.",
+                                  organization.about ??
+                                      "This organization has no tagline.",
                                   style: GoogleFonts.poppins(
                                     fontSize: 12,
                                   ),
@@ -159,8 +168,11 @@ class _DonorHomePageState extends State<DonorHomePage> {
                               Center(
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                                      context.read<UserProvider>().changeSelectedUser(
+                                    WidgetsBinding.instance
+                                        .addPostFrameCallback((_) {
+                                      context
+                                          .read<UserProvider>()
+                                          .changeSelectedUser(
                                             organization,
                                           );
                                       Navigator.pushNamed(
@@ -171,7 +183,8 @@ class _DonorHomePageState extends State<DonorHomePage> {
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFF9C27B0),
-                                    padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 15, horizontal: 30),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(30),
                                     ),

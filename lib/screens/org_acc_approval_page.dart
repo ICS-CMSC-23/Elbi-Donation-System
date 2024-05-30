@@ -72,12 +72,16 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                     );
                   }
 
-                  var organizations = snapshot.data!.docs.map((doc) {
+                  List<User> allOrganizations = snapshot.data!.docs.map((doc) {
                     Map<String, dynamic> docMap =
                         doc.data() as Map<String, dynamic>;
                     docMap["id"] = doc.id;
                     return User.fromJson(docMap);
                   }).toList();
+
+                  List<User> organizations = allOrganizations
+                      .where((organization) => !organization.isApproved!)
+                      .toList();
 
                   return ListView.builder(
                     shrinkWrap: true,
@@ -99,7 +103,7 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                             children: [
                               Center(
                                 child: SquareImage(
-                                  source: organization.profilePhoto,
+                                  source: organization.profilePhoto!,
                                   size: MediaQuery.of(context).size.width / 1.5,
                                 ),
                               ),
