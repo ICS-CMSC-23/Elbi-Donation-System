@@ -43,12 +43,7 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
     if (authUser.role == User.donor) {
       actionButtons = Row(
         mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          TextButton.icon(
-              onPressed: () {},
-              icon: const Icon(Icons.edit),
-              label: const Text("Edit Profile")),
-        ],
+        children: [SizedBox.shrink()],
       );
     } else {
       actionButtons = const Row(

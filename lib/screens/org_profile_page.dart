@@ -52,12 +52,7 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
     } else if (authUser.role == User.organization) {
       actionButtons = Row(
         mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          TextButton.icon(
-              onPressed: () {},
-              icon: const Icon(Icons.edit),
-              label: const Text("Edit Profile")),
-        ],
+        children: [SizedBox.shrink()],
       );
     } else {
       actionButtons = const Row(
