@@ -23,7 +23,6 @@ import 'edit_donation_drive.dart';
 class DonationDriveDetails extends StatefulWidget {
   const DonationDriveDetails({super.key});
 
-  // class route model
   static final RouteModel _donationDriveDetails = RouteModel(
     "Donation Drive Details",
     "/donation-drive-details",
@@ -123,108 +122,113 @@ class _DonationDriveDetailsState extends State<DonationDriveDetails> {
       appBar: AppBar(
         title: const Text("Donation Drive Details"),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            HeaderWithPic(
-                imageUrl: donationDrive.photos![0],
-                title: donationDrive.name,
-                subtitle: donationDrive.isCompleted
-                    ? "Event Finished"
-                    : "Event Ongoing",
-                description:
-                    "Organization: ${context.watch<DonationDriveProvider>().selectedDonationDriveUser.name}"),
-            TitleDetail(
-              title: "Description",
-              detail: donationDrive.description,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: TitleDetail(
-                      title: "Start Date",
-                      detail: DateFormat("yy-MM-dd")
-                          .format(donationDrive.startDate)),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: TitleDetail(
-                      title: "End Date",
-                      detail:
-                          DateFormat("yy-MM-dd").format(donationDrive.endDate)),
-                ),
-              ],
-            ),
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 8.0),
-              child: Text(
-                "Photo Details",
-                style: TextStyle(fontWeight: FontWeight.bold),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              HeaderWithPic(
+                  imageUrl: donationDrive.photos![0],
+                  title: donationDrive.name,
+                  subtitle: donationDrive.isCompleted
+                      ? "Event Finished"
+                      : "Event Ongoing",
+                  description:
+                      "Organization: ${context.watch<DonationDriveProvider>().selectedDonationDriveUser.name}"),
+              TitleDetail(
+                title: "Description",
+                detail: donationDrive.description,
               ),
-            ),
-            GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3),
-                itemCount: donationDrive.photos!.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return Padding(
-                      padding: const EdgeInsets.all(5.00),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(10.0),
-                        child: SquareImage(
-                            source: donationDrive.photos![index], size: 80),
-                      ));
-                }),
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 8.0),
-              child: Text(
-                "Donations",
-                style: TextStyle(fontWeight: FontWeight.bold),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: TitleDetail(
+                        title: "Start Date",
+                        detail: DateFormat("yy-MM-dd")
+                            .format(donationDrive.startDate)),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: TitleDetail(
+                        title: "End Date",
+                        detail: DateFormat("yy-MM-dd")
+                            .format(donationDrive.endDate)),
+                  ),
+                ],
               ),
-            ),
-            Expanded(
-                child: StreamBuilder(
-              stream: donationsStream,
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Text("Error encountered! ${snapshot.error}"),
-                  );
-                } else if (snapshot.connectionState ==
-                    ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                } else if (!snapshot.hasData) {
-                  return const Center(
-                    child: Text("No Donations Found"),
-                  );
-                }
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8.0),
+                child: Text(
+                  "Photo Details",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3),
+                  itemCount: donationDrive.photos!.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Padding(
+                        padding: const EdgeInsets.all(5.00),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10.0),
+                          child: SquareImage(
+                              source: donationDrive.photos![index], size: 80),
+                        ));
+                  }),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8.0),
+                child: Text(
+                  "Donations",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              StreamBuilder(
+                stream: donationsStream,
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    print("Error encountered: ${snapshot.error}");
+                    return Center(
+                      child: Text("Error encountered! ${snapshot.error}"),
+                    );
+                  } else if (snapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    print("Loading donations...");
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    print("No donations found.");
+                    return const Center(
+                      child: Text("No Donations Found"),
+                    );
+                  }
 
-                // Filter donations  by donorId
-                var filteredDonations = snapshot.data!.docs.where((doc) {
-                  Map<String, dynamic> docMap =
-                      doc.data() as Map<String, dynamic>;
-                  docMap["id"] = doc.id;
-                  Donation donation = Donation.fromJson(docMap);
-                  return donation.donationDriveId == donationDrive.id;
-                }).toList();
+                  var filteredDonations = snapshot.data!.docs.where((doc) {
+                    Map<String, dynamic> docMap =
+                        doc.data() as Map<String, dynamic>;
+                    docMap["id"] = doc.id;
+                    Donation donation = Donation.fromJson(docMap);
+                    return donation.donationDriveId == donationDrive.id;
+                  }).toList();
 
-                if (filteredDonations.isEmpty) {
-                  return const Center(
-                    child:
-                        Text("This donation drive doesn't have a donation yet"),
-                  );
-                }
+                  if (filteredDonations.isEmpty) {
+                    print("No donations for this drive.");
+                    return const Center(
+                      child: Text(
+                          "This donation drive doesn't have a donation yet"),
+                    );
+                  }
 
-                return ListView.builder(
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
                     itemCount: filteredDonations.length,
                     itemBuilder: (context, index) {
                       Map<String, dynamic> docMap = filteredDonations[index]
@@ -251,11 +255,13 @@ class _DonationDriveDetailsState extends State<DonationDriveDetails> {
                           },
                         ),
                       );
-                    });
-              },
-            )),
-            actionButtons,
-          ],
+                    },
+                  );
+                },
+              ),
+              actionButtons,
+            ],
+          ),
         ),
       ),
     );

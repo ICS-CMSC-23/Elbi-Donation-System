@@ -17,18 +17,21 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 
-class OrgHomePage extends StatelessWidget {
+class OrgHomePage extends StatefulWidget {
   const OrgHomePage({super.key, this.detailList});
 
   final List<String>? detailList;
 
   @override
-  Widget build(BuildContext context) {
-    Stream<QuerySnapshot> donationDriveStream =
-        context.watch<DonationDriveProvider>().donationDrives;
+  State<OrgHomePage> createState() => _OrgHomePageState();
+}
 
-    Stream<QuerySnapshot> donationsStream =
-        context.watch<DonationProvider>().donations;
+class _OrgHomePageState extends State<OrgHomePage> {
+  @override
+  Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+    final donationDriveProvider = context.watch<DonationDriveProvider>();
+    final donationProvider = context.watch<DonationProvider>();
 
     return Scaffold(
       drawer: MainDrawer(routes: [
@@ -72,7 +75,7 @@ class OrgHomePage extends StatelessWidget {
           ),
           Expanded(
             child: StreamBuilder(
-              stream: donationDriveStream,
+              stream: donationDriveProvider.donationDrives,
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
                   return Center(
@@ -83,10 +86,10 @@ class OrgHomePage extends StatelessWidget {
                   return const Center(
                     child: CircularProgressIndicator(),
                   );
-                } else if (!snapshot.hasData) {
+                } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                   return Center(
                     child: Text(
-                      "No DonationDrives found",
+                      "No Donation found",
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.bold,
                         color: const Color.fromARGB(255, 247, 129, 139),
@@ -99,9 +102,8 @@ class OrgHomePage extends StatelessWidget {
                 var filteredDonationDrives = snapshot.data!.docs.where((doc) {
                   DonationDrive donationDrive = DonationDrive.fromJson(
                       doc.data() as Map<String, dynamic>);
-                  print(donationDrive.organizationId);
                   return donationDrive.organizationId ==
-                      context.read<AuthProvider>().currentUser.id;
+                      authProvider.currentUser.id;
                 }).toList();
 
                 if (filteredDonationDrives.isEmpty) {
@@ -118,7 +120,7 @@ class OrgHomePage extends StatelessWidget {
                 }
 
                 return StreamBuilder(
-                  stream: donationsStream,
+                  stream: donationProvider.donations,
                   builder: (context, snapshot) {
                     if (snapshot.hasError) {
                       return Center(
@@ -129,7 +131,8 @@ class OrgHomePage extends StatelessWidget {
                       return const Center(
                         child: CircularProgressIndicator(),
                       );
-                    } else if (!snapshot.hasData) {
+                    } else if (!snapshot.hasData ||
+                        snapshot.data!.docs.isEmpty) {
                       return Center(
                         child: Text(
                           "No Donations found",
@@ -147,13 +150,9 @@ class OrgHomePage extends StatelessWidget {
                           doc.data() as Map<String, dynamic>;
                       docMap["id"] = doc.id;
                       Donation donation = Donation.fromJson(docMap);
-                      if (filteredDonationDrives
+                      return filteredDonationDrives
                           .map((drive) => drive.id)
-                          .contains(donation.donationDriveId)) {
-                        return true;
-                      } else {
-                        return false;
-                      }
+                          .contains(donation.donationDriveId);
                     }).toList();
 
                     if (filteredDonations.isEmpty) {
@@ -196,7 +195,7 @@ class OrgHomePage extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                             ),
                             subtitle: Text(
-                              donation.description!,
+                              donation.status!,
                               style: GoogleFonts.poppins(
                                 fontSize: 12,
                               ),
@@ -249,24 +248,16 @@ class OrgHomePage extends StatelessWidget {
   }
 
   void _handleDonationDetails(BuildContext context, Donation donation) async {
-    // Capture the current BuildContext
-    final currentContext = context;
+    final donationProvider = context.read<DonationProvider>();
+    final userProvider = context.read<UserProvider>();
 
-    // Perform synchronous operations
-    currentContext.read<DonationProvider>().changeSelectedDonation(donation);
+    donationProvider.changeSelectedDonation(donation);
 
-    // Perform asynchronous operations
-    final selectedDonor = await currentContext
-        .read<UserProvider>()
-        .fetchUserById(donation.donorId);
+    final selectedDonor = await userProvider.fetchUserById(donation.donorId);
 
-    // Ensure the context is still valid
-    if (currentContext.mounted) {
-      // Update the state and navigate
-      currentContext
-          .read<DonationProvider>()
-          .changeSelectedDonor(selectedDonor);
-      Navigator.pushNamed(currentContext, "/donation-details");
+    if (context.mounted) {
+      donationProvider.changeSelectedDonor(selectedDonor);
+      Navigator.pushNamed(context, "/donation-details");
     }
   }
 }
