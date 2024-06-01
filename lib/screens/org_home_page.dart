@@ -28,10 +28,18 @@ class OrgHomePage extends StatefulWidget {
 
 class _OrgHomePageState extends State<OrgHomePage> {
   @override
+  void initState() {
+    super.initState();
+    print(context.read<AuthProvider>().currentUser.id!);
+    context
+        .read<DonationProvider>()
+        .fetchDonationsByOrgId(context.read<AuthProvider>().currentUser.id!);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final authProvider = context.watch<AuthProvider>();
-    final donationDriveProvider = context.watch<DonationDriveProvider>();
-    final donationProvider = context.watch<DonationProvider>();
+    Stream<QuerySnapshot> donations =
+        context.watch<DonationProvider>().donations;
 
     return Scaffold(
       drawer: MainDrawer(routes: [
@@ -75,7 +83,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
           ),
           Expanded(
             child: StreamBuilder(
-              stream: donationDriveProvider.donationDrives,
+              stream: donations,
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
                   return Center(
@@ -89,7 +97,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
                 } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                   return Center(
                     child: Text(
-                      "No Donation found",
+                      "No Donations found",
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.bold,
                         color: const Color.fromARGB(255, 247, 129, 139),
@@ -99,120 +107,49 @@ class _OrgHomePageState extends State<OrgHomePage> {
                   );
                 }
 
-                var filteredDonationDrives = snapshot.data!.docs.where((doc) {
-                  DonationDrive donationDrive = DonationDrive.fromJson(
-                      doc.data() as Map<String, dynamic>);
-                  return donationDrive.organizationId ==
-                      authProvider.currentUser.id;
-                }).toList();
-
-                if (filteredDonationDrives.isEmpty) {
-                  return Center(
-                    child: Text(
-                      "No Donation Drives found",
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.bold,
-                        color: const Color.fromARGB(255, 247, 129, 139),
+                return ListView.builder(
+                  itemCount: snapshot.data!.docs.length,
+                  itemBuilder: (context, index) {
+                    Map<String, dynamic> docMap = snapshot.data!.docs[index]
+                        .data() as Map<String, dynamic>;
+                    docMap["id"] = snapshot.data!.docs[index].id;
+                    Donation donation = Donation.fromJson(docMap);
+                    return Card(
+                      margin: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20),
+                      elevation: 5,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
                       ),
-                      textAlign: TextAlign.center,
-                    ),
-                  );
-                }
-
-                return StreamBuilder(
-                  stream: donationProvider.donations,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Center(
-                        child: Text("Error encountered! ${snapshot.error}"),
-                      );
-                    } else if (snapshot.connectionState ==
-                        ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    } else if (!snapshot.hasData ||
-                        snapshot.data!.docs.isEmpty) {
-                      return Center(
-                        child: Text(
-                          "No Donations found",
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.all(10),
+                        title: AutoSizeText(
+                          donation.category,
                           style: GoogleFonts.poppins(
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: const Color.fromARGB(255, 247, 129, 139),
                           ),
-                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          minFontSize: 10,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      );
-                    }
-
-                    var filteredDonations = snapshot.data!.docs.where((doc) {
-                      Map<String, dynamic> docMap =
-                          doc.data() as Map<String, dynamic>;
-                      docMap["id"] = doc.id;
-                      Donation donation = Donation.fromJson(docMap);
-                      return filteredDonationDrives
-                          .map((drive) => drive.id)
-                          .contains(donation.donationDriveId);
-                    }).toList();
-
-                    if (filteredDonations.isEmpty) {
-                      return Center(
-                        child: Text(
-                          "No Donations found",
+                        subtitle: Text(
+                          donation.status!,
                           style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.bold,
-                            color: const Color.fromARGB(255, 247, 129, 139),
+                            fontSize: 12,
                           ),
-                          textAlign: TextAlign.center,
                         ),
-                      );
-                    }
-
-                    return ListView.builder(
-                      itemCount: filteredDonations.length,
-                      itemBuilder: (context, index) {
-                        Map<String, dynamic> docMap = filteredDonations[index]
-                            .data() as Map<String, dynamic>;
-                        docMap["id"] = filteredDonations[index].id;
-                        Donation donation = Donation.fromJson(docMap);
-                        return Card(
-                          margin: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 20),
-                          elevation: 5,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.all(10),
-                            title: AutoSizeText(
-                              donation.category,
-                              style: GoogleFonts.poppins(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              maxLines: 1,
-                              minFontSize: 10,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            subtitle: Text(
-                              donation.status!,
-                              style: GoogleFonts.poppins(
-                                fontSize: 12,
-                              ),
-                            ),
-                            leading: ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: SquareImage(
-                                    source: donation.photos![0], size: 80)),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.more_vert),
-                              onPressed: () {
-                                _handleDonationDetails(context, donation);
-                              },
-                            ),
-                          ),
-                        );
-                      },
+                        leading: ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: SquareImage(
+                                source: donation.photos![0], size: 80)),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.more_vert),
+                          onPressed: () {
+                            _handleDonationDetails(context, donation);
+                          },
+                        ),
+                      ),
                     );
                   },
                 );
