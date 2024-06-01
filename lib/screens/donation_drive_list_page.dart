@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:elbi_donation_system/providers/donation_provider.dart';
+import 'package:elbi_donation_system/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -29,10 +31,12 @@ class DonationDriveListPage extends StatefulWidget {
 }
 
 class _DonationDriveListPageState extends State<DonationDriveListPage> {
-  Widget displayDonationDriveList(donationDrives) {
+  Widget displayDonationDriveList(List<QueryDocumentSnapshot> donationDrives) {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
+          DonationDrive donationDrive = DonationDrive.fromJson(
+              donationDrives[index].data() as Map<String, dynamic>);
           bool hasPhotos = donationDrives[index]['photos'] != null &&
               donationDrives[index]['photos'] is List &&
               donationDrives[index]['photos'].isNotEmpty;
@@ -184,12 +188,7 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
                     style: ButtonStyle(
                       elevation: WidgetStateProperty.all(0),
                     ),
-                    onPressed: () {
-                      // convert donation drive map to donation drive object
-                      DonationDrive donationDrive =
-                          DonationDrive.fromJson(donationDrives[index].data());
-
-                      // Implement view full details functionality
+                    onPressed: () async {
                       context
                           .read<DonationDriveProvider>()
                           .changeSelectedDonationDrive(donationDrive);
@@ -197,10 +196,8 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
                           .read<DonationDriveProvider>()
                           .changeSelectedDonationDriveUser(
                               context.read<AuthProvider>().currentUser);
-                      Navigator.pushNamed(
-                        context,
-                        DonationDriveDetails.route.path,
-                      );
+                      context.read<DonationProvider>().fetchDonations();
+                      Navigator.pushNamed(context, "/donation-drive-details");
                     },
                     child: const Text('View Full Details'),
                   ),
@@ -212,6 +209,23 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
         childCount: donationDrives.length,
       ),
     );
+  }
+
+  void handleOnViewed(
+      List<QueryDocumentSnapshot> donationDrives, int index) async {
+    // convert donation drive map to donation drive object
+    Map<String, dynamic> docMap =
+        donationDrives[index].data() as Map<String, dynamic>;
+    docMap["id"] = donationDrives[index].id;
+    DonationDrive donationDrive = DonationDrive.fromJson(docMap);
+
+    // Implement view full details functionality
+    context
+        .read<DonationDriveProvider>()
+        .changeSelectedDonationDrive(donationDrive);
+    context.read<DonationDriveProvider>().changeSelectedDonationDriveUser(
+        context.read<AuthProvider>().currentUser);
+    Navigator.pushNamed(context, "/donation-drive-details");
   }
 
   Widget displayAppBar() {
@@ -308,8 +322,7 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
                   child: Center(
                     child: StreamBuilder<QuerySnapshot>(
                       stream: donationDrives,
-                      builder: (BuildContext context,
-                          AsyncSnapshot<QuerySnapshot> snapshot) {
+                      builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
                           return const CircularProgressIndicator();
