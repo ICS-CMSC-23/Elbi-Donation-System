@@ -1,3 +1,4 @@
+import 'package:elbi_donation_system/api/firebase_users_api.dart';
 import 'package:elbi_donation_system/dummy_data/dummy_users.dart';
 import 'package:elbi_donation_system/models/user_model.dart' as user_model;
 import 'package:flutter/material.dart';
@@ -37,11 +38,13 @@ class AuthProvider with ChangeNotifier {
   user_model.User get currentUser => _currentUser;
 
   late FirebaseAuthAPI authService;
+  late FirebaseUsersAPI firebaseService;
   late Stream<firebase_auth.User?> uStream;
   firebase_auth.User? firebaseUser;
 
   AuthProvider() {
     authService = FirebaseAuthAPI();
+    firebaseService = FirebaseUsersAPI();
     fetchAuthentication();
   }
 
@@ -163,5 +166,21 @@ class AuthProvider with ChangeNotifier {
     _setHomeElementBasedOnRole();
     notifyListeners();
     return _currentUser;
+  }
+
+  void updateUser(user_model.User user) async {
+    if (currentUser != null) {
+      try {
+        String message =
+            await firebaseService.updateUser(user.id!, user.toJson());
+        _loadUserData(user.id!);
+        print(message);
+        notifyListeners();
+      } on FirebaseException catch (e) {
+        print("Failed to update user");
+      }
+    } else {
+      print("No user selected for update");
+    }
   }
 }

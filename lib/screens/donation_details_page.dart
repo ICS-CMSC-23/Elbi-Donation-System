@@ -7,6 +7,7 @@ import 'package:elbi_donation_system/dummy_data/dummy_donations.dart';
 import 'package:elbi_donation_system/models/donation_model.dart';
 import 'package:elbi_donation_system/models/user_model.dart';
 import 'package:elbi_donation_system/providers/auth_provider.dart';
+import 'package:elbi_donation_system/providers/donation_drive_provider.dart';
 import 'package:elbi_donation_system/providers/donation_list_provider.dart';
 import 'package:elbi_donation_system/providers/donation_provider.dart';
 import 'package:elbi_donation_system/providers/user_list_provider.dart';
@@ -157,12 +158,19 @@ class _DonationDetailsState extends State<DonationDetails> {
                   ),
                   Expanded(
                     flex: 1,
-                    child: TitleDetail(
-                      title: "Contact Number",
-                      detail: context
-                          .watch<DonationProvider>()
-                          .selectedDonor
-                          .contactNo,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TitleDetail(
+                          title: "Contact Number",
+                          detail: context
+                              .watch<DonationProvider>()
+                              .selectedDonor
+                              .contactNo,
+                        ),
+                        TitleDetail(
+                            title: "Donation Drive", detail: "Sample drive"),
+                      ],
                     ),
                   ),
                 ],

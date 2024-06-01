@@ -17,17 +17,28 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 
-class OrgHomePage extends StatelessWidget {
+class OrgHomePage extends StatefulWidget {
   const OrgHomePage({super.key, this.detailList});
 
   final List<String>? detailList;
 
   @override
-  Widget build(BuildContext context) {
-    Stream<QuerySnapshot> donationDriveStream =
-        context.watch<DonationDriveProvider>().donationDrives;
+  State<OrgHomePage> createState() => _OrgHomePageState();
+}
 
-    Stream<QuerySnapshot> donationsStream =
+class _OrgHomePageState extends State<OrgHomePage> {
+  @override
+  void initState() {
+    super.initState();
+    print(context.read<AuthProvider>().currentUser.id!);
+    context
+        .read<DonationProvider>()
+        .fetchDonationsByOrgId(context.read<AuthProvider>().currentUser.id!);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Stream<QuerySnapshot> donations =
         context.watch<DonationProvider>().donations;
 
     return Scaffold(
@@ -72,7 +83,7 @@ class OrgHomePage extends StatelessWidget {
           ),
           Expanded(
             child: StreamBuilder(
-              stream: donationDriveStream,
+              stream: donations,
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
                   return Center(
@@ -83,10 +94,10 @@ class OrgHomePage extends StatelessWidget {
                   return const Center(
                     child: CircularProgressIndicator(),
                   );
-                } else if (!snapshot.hasData) {
+                } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                   return Center(
                     child: Text(
-                      "No DonationDrives found",
+                      "No Donations found",
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.bold,
                         color: const Color.fromARGB(255, 247, 129, 139),
@@ -96,124 +107,49 @@ class OrgHomePage extends StatelessWidget {
                   );
                 }
 
-                var filteredDonationDrives = snapshot.data!.docs.where((doc) {
-                  DonationDrive donationDrive = DonationDrive.fromJson(
-                      doc.data() as Map<String, dynamic>);
-                  print(donationDrive.organizationId);
-                  return donationDrive.organizationId ==
-                      context.read<AuthProvider>().currentUser.id;
-                }).toList();
-
-                if (filteredDonationDrives.isEmpty) {
-                  return Center(
-                    child: Text(
-                      "No Donation Drives found",
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.bold,
-                        color: const Color.fromARGB(255, 247, 129, 139),
+                return ListView.builder(
+                  itemCount: snapshot.data!.docs.length,
+                  itemBuilder: (context, index) {
+                    Map<String, dynamic> docMap = snapshot.data!.docs[index]
+                        .data() as Map<String, dynamic>;
+                    docMap["id"] = snapshot.data!.docs[index].id;
+                    Donation donation = Donation.fromJson(docMap);
+                    return Card(
+                      margin: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20),
+                      elevation: 5,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
                       ),
-                      textAlign: TextAlign.center,
-                    ),
-                  );
-                }
-
-                return StreamBuilder(
-                  stream: donationsStream,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Center(
-                        child: Text("Error encountered! ${snapshot.error}"),
-                      );
-                    } else if (snapshot.connectionState ==
-                        ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    } else if (!snapshot.hasData) {
-                      return Center(
-                        child: Text(
-                          "No Donations found",
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.all(10),
+                        title: AutoSizeText(
+                          donation.category,
                           style: GoogleFonts.poppins(
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: const Color.fromARGB(255, 247, 129, 139),
                           ),
-                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          minFontSize: 10,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      );
-                    }
-
-                    var filteredDonations = snapshot.data!.docs.where((doc) {
-                      Map<String, dynamic> docMap =
-                          doc.data() as Map<String, dynamic>;
-                      docMap["id"] = doc.id;
-                      Donation donation = Donation.fromJson(docMap);
-                      if (filteredDonationDrives
-                          .map((drive) => drive.id)
-                          .contains(donation.donationDriveId)) {
-                        return true;
-                      } else {
-                        return false;
-                      }
-                    }).toList();
-
-                    if (filteredDonations.isEmpty) {
-                      return Center(
-                        child: Text(
-                          "No Donations found",
+                        subtitle: Text(
+                          donation.status!,
                           style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.bold,
-                            color: const Color.fromARGB(255, 247, 129, 139),
+                            fontSize: 12,
                           ),
-                          textAlign: TextAlign.center,
                         ),
-                      );
-                    }
-
-                    return ListView.builder(
-                      itemCount: filteredDonations.length,
-                      itemBuilder: (context, index) {
-                        Map<String, dynamic> docMap = filteredDonations[index]
-                            .data() as Map<String, dynamic>;
-                        docMap["id"] = filteredDonations[index].id;
-                        Donation donation = Donation.fromJson(docMap);
-                        return Card(
-                          margin: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 20),
-                          elevation: 5,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.all(10),
-                            title: AutoSizeText(
-                              donation.category,
-                              style: GoogleFonts.poppins(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              maxLines: 1,
-                              minFontSize: 10,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            subtitle: Text(
-                              donation.description!,
-                              style: GoogleFonts.poppins(
-                                fontSize: 12,
-                              ),
-                            ),
-                            leading: ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: SquareImage(
-                                    source: donation.photos![0], size: 80)),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.more_vert),
-                              onPressed: () {
-                                _handleDonationDetails(context, donation);
-                              },
-                            ),
-                          ),
-                        );
-                      },
+                        leading: ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: SquareImage(
+                                source: donation.photos![0], size: 80)),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.more_vert),
+                          onPressed: () {
+                            _handleDonationDetails(context, donation);
+                          },
+                        ),
+                      ),
                     );
                   },
                 );
@@ -249,24 +185,16 @@ class OrgHomePage extends StatelessWidget {
   }
 
   void _handleDonationDetails(BuildContext context, Donation donation) async {
-    // Capture the current BuildContext
-    final currentContext = context;
+    final donationProvider = context.read<DonationProvider>();
+    final userProvider = context.read<UserProvider>();
 
-    // Perform synchronous operations
-    currentContext.read<DonationProvider>().changeSelectedDonation(donation);
+    donationProvider.changeSelectedDonation(donation);
 
-    // Perform asynchronous operations
-    final selectedDonor = await currentContext
-        .read<UserProvider>()
-        .fetchUserById(donation.donorId);
+    final selectedDonor = await userProvider.fetchUserById(donation.donorId);
 
-    // Ensure the context is still valid
-    if (currentContext.mounted) {
-      // Update the state and navigate
-      currentContext
-          .read<DonationProvider>()
-          .changeSelectedDonor(selectedDonor);
-      Navigator.pushNamed(currentContext, "/donation-details");
+    if (context.mounted) {
+      donationProvider.changeSelectedDonor(selectedDonor);
+      Navigator.pushNamed(context, "/donation-details");
     }
   }
 }
