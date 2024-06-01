@@ -242,16 +242,8 @@ class _DonationDriveDetailsState extends State<DonationDriveDetails> {
                         subtitle: Text(donation.description),
                         trailing: IconButton(
                           icon: const Icon(Icons.more_vert),
-                          onPressed: () async {
-                            context
-                                .read<DonationProvider>()
-                                .changeSelectedDonation(donation);
-                            context
-                                .read<DonationProvider>()
-                                .changeSelectedDonor(await context
-                                    .read<UserProvider>()
-                                    .fetchUserById(donation.donorId));
-                            Navigator.pushNamed(context, "/donation-details");
+                          onPressed: () {
+                            handleViewDonation(context, donation);
                           },
                         ),
                       );
@@ -265,5 +257,13 @@ class _DonationDriveDetailsState extends State<DonationDriveDetails> {
         ),
       ),
     );
+  }
+
+  Future<void> handleViewDonation(
+      BuildContext context, Donation donation) async {
+    context.read<DonationProvider>().changeSelectedDonation(donation);
+    context.read<DonationProvider>().changeSelectedDonor(
+        await context.read<UserProvider>().fetchUserById(donation.donorId));
+    Navigator.pushNamed(context, "/donation-details");
   }
 }
