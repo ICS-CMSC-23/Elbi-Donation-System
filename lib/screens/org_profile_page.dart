@@ -52,7 +52,21 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
     } else if (authUser.role == User.organization) {
       actionButtons = Row(
         mainAxisAlignment: MainAxisAlignment.end,
-        children: [SizedBox.shrink()],
+        children: [
+          Text("Open for Donation"),
+          Switch(
+              inactiveTrackColor: Theme.of(context).disabledColor,
+              activeColor: Theme.of(context).primaryColor,
+              value: authUser.isOpenForDonation!,
+              onChanged: (e) {
+                Map<String, dynamic> userMap = authUser.toJson();
+                setState(() {
+                  userMap["isOpenForDonation"] =
+                      authUser.isOpenForDonation! ? false : true;
+                });
+                context.read<AuthProvider>().updateUser(User.fromJson(userMap));
+              })
+        ],
       );
     } else {
       actionButtons = const Row(
