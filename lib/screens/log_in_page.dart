@@ -1,4 +1,5 @@
-import 'package:elbi_donation_system/providers/user_list_provider.dart';
+import 'package:elbi_donation_system/providers/donation_provider.dart';
+import 'package:elbi_donation_system/providers/dummy_providers/user_list_provider.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -61,6 +62,10 @@ class _LoginPageState extends State<LoginPage> {
           User currentUser = context.read<AuthProvider>().currentUser;
           context.read<UserListProvider>().changeCurrentUser(currentUser.email);
           Navigator.pushNamed(context, "/");
+        }
+        if (context.read<AuthProvider>().currentUser.role == "donor") {
+          context.read<DonationProvider>().fetchDonationsByDonorId(
+              context.read<AuthProvider>().currentUser.id!);
         }
       } else {
         setState(() {

@@ -7,11 +7,11 @@ import 'package:elbi_donation_system/components/title_detail.dart';
 import 'package:elbi_donation_system/models/donation_drive_model.dart';
 import 'package:elbi_donation_system/models/user_model.dart';
 import 'package:elbi_donation_system/providers/auth_provider.dart';
-import 'package:elbi_donation_system/providers/donation_drive_list_provider.dart';
+import 'package:elbi_donation_system/providers/dummy_providers/donation_drive_list_provider.dart';
 import 'package:elbi_donation_system/providers/donation_drive_provider.dart';
-import 'package:elbi_donation_system/providers/donation_list_provider.dart';
+import 'package:elbi_donation_system/providers/dummy_providers/donation_list_provider.dart';
 import 'package:elbi_donation_system/providers/donation_provider.dart';
-import 'package:elbi_donation_system/providers/user_list_provider.dart';
+import 'package:elbi_donation_system/providers/dummy_providers/user_list_provider.dart';
 import 'package:elbi_donation_system/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -49,7 +49,10 @@ class _DonationDriveDetailsState extends State<DonationDriveDetails> {
     Stream<QuerySnapshot> donationsStream =
         context.watch<DonationProvider>().donations;
 
-    Row actionButtons;
+    Stream<QuerySnapshot> openOrgsStream =
+        context.watch<UserProvider>().openOrgs;
+
+    Widget actionButtons;
     if (userType == User.organization) {
       actionButtons = Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -94,23 +97,63 @@ class _DonationDriveDetailsState extends State<DonationDriveDetails> {
         ],
       );
     } else if (userType == "donor") {
-      actionButtons = Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          TextButton.icon(
-            onPressed: () {
-              Navigator.pushNamed(
-                context,
-                "/add-donation",
-              );
-            },
-            icon: const Icon(Icons.add),
-            label: const Text("Add Donation"),
-            style: ButtonStyle(
-                foregroundColor: MaterialStatePropertyAll(
-                    Theme.of(context).colorScheme.error)),
-          ),
-        ],
+      actionButtons = StreamBuilder(
+        stream: openOrgsStream,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            print("Error encountered: ${snapshot.error}");
+            return Center(
+              child: Text("Error encountered! ${snapshot.error}"),
+            );
+          } else if (snapshot.connectionState == ConnectionState.waiting) {
+            print("Loading open orgs...");
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            print("No donations found.");
+            return const Center(
+              child: Text("No Donations Found"),
+            );
+          }
+
+          List<String> openOrgIds =
+              snapshot.data!.docs.map((doc) => doc.id).toList();
+
+          if (openOrgIds.contains(donationDrive.organizationId)) {
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton.icon(
+                  onPressed: () {
+                    Navigator.pushNamed(
+                      context,
+                      "/add-donation",
+                    );
+                  },
+                  icon: const Icon(Icons.add),
+                  label: const Text("Add Donation"),
+                  style: ButtonStyle(
+                      foregroundColor: MaterialStatePropertyAll(
+                          Theme.of(context).colorScheme.error)),
+                ),
+              ],
+            );
+          } else {
+            return const Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    "Closed for Donation",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            );
+          }
+        },
       );
     } else {
       actionButtons = const Row(
@@ -239,7 +282,7 @@ class _DonationDriveDetailsState extends State<DonationDriveDetails> {
                         leading:
                             RoundedImage(source: donation.photos![0], size: 50),
                         title: Text(donation.category),
-                        subtitle: Text(donation.description),
+                        subtitle: Text(donation.status),
                         trailing: IconButton(
                           icon: const Icon(Icons.more_vert),
                           onPressed: () {

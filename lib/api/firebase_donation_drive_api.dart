@@ -23,6 +23,11 @@ class FirebaseDonationDriveAPI {
     return db.collection("donationDrives").snapshots();
   }
 
+  Future<DocumentSnapshot<Map<String, dynamic>>> getDonationDriveById(
+      String id) {
+    return db.collection("donationDrives").doc(id).get();
+  }
+
   Stream<QuerySnapshot> getDonationDrivesByOrganizationId(
       String organizationId) {
     return db
