@@ -4,6 +4,7 @@ import 'package:elbi_donation_system/components/square_image.dart';
 import 'package:elbi_donation_system/components/title_detail.dart';
 import 'package:elbi_donation_system/components/title_detail_list.dart';
 import 'package:elbi_donation_system/dummy_data/dummy_donations.dart';
+import 'package:elbi_donation_system/models/donation_drive_model.dart';
 import 'package:elbi_donation_system/models/donation_model.dart';
 import 'package:elbi_donation_system/models/user_model.dart';
 import 'package:elbi_donation_system/providers/auth_provider.dart';
@@ -168,8 +169,34 @@ class _DonationDetailsState extends State<DonationDetails> {
                               .selectedDonor
                               .contactNo,
                         ),
-                        TitleDetail(
-                            title: "Donation Drive", detail: "Sample drive"),
+                        FutureBuilder(
+                            future: context
+                                .read<DonationDriveProvider>()
+                                .getDonationDriveById(
+                                    donation.donationDriveId!),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasError) {
+                                print("Error encountered: ${snapshot.error}");
+                                return Center(
+                                  child: Text(
+                                      "Error encountered! ${snapshot.error}"),
+                                );
+                              } else if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                print("Loading donations...");
+                                return const Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              } else if (!snapshot.hasData) {
+                                print("No drive found.");
+                                return const Center(
+                                  child: Text("No Donations Found"),
+                                );
+                              }
+                              return TitleDetail(
+                                  title: "Donation Drive",
+                                  detail: snapshot.data!.name);
+                            }),
                       ],
                     ),
                   ),

@@ -239,7 +239,7 @@ class _DonationDriveDetailsState extends State<DonationDriveDetails> {
                         leading:
                             RoundedImage(source: donation.photos![0], size: 50),
                         title: Text(donation.category),
-                        subtitle: Text(donation.description),
+                        subtitle: Text(donation.status),
                         trailing: IconButton(
                           icon: const Icon(Icons.more_vert),
                           onPressed: () {
