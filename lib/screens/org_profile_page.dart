@@ -11,7 +11,7 @@ import 'package:elbi_donation_system/models/route_model.dart';
 import 'package:elbi_donation_system/models/user_model.dart';
 import 'package:elbi_donation_system/providers/auth_provider.dart';
 import 'package:elbi_donation_system/providers/donation_drive_provider.dart';
-import 'package:elbi_donation_system/providers/user_list_provider.dart';
+import 'package:elbi_donation_system/providers/dummy_providers/user_list_provider.dart';
 import 'package:elbi_donation_system/providers/user_provider.dart';
 import 'package:elbi_donation_system/screens/donation_drive_list_page.dart';
 import 'package:flutter/material.dart';
@@ -69,9 +69,33 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
         ],
       );
     } else {
-      actionButtons = const Row(
-        children: [SizedBox.shrink()],
-      );
+      if (user.isOpenForDonation!) {
+        actionButtons = const Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: const Text(
+                "Open for Donation",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        );
+      } else {
+        actionButtons = const Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: const Text(
+                "Closed for Donation",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        );
+      }
     }
 
     Widget proofList;
