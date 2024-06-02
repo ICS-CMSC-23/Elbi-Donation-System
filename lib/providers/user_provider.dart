@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:elbi_donation_system/api/firebase_users_api.dart';
 import 'package:elbi_donation_system/models/user_model.dart';
 import 'package:flutter/material.dart';
@@ -8,15 +10,18 @@ import '../models/donation_model.dart';
 class UserProvider with ChangeNotifier {
   late FirebaseUsersAPI firebaseService;
   late Stream<QuerySnapshot> _userStream;
+  late Stream<QuerySnapshot> _openOrgStream;
   User? _selectedUser;
 
   UserProvider() {
     firebaseService = FirebaseUsersAPI();
     fetchUsers();
+    fetchOpenOrgs();
   }
 
   // getters
   Stream<QuerySnapshot> get users => _userStream;
+  Stream<QuerySnapshot> get openOrgs => _openOrgStream;
   User get selected => _selectedUser!;
 
   changeSelectedUser(User user) {
@@ -89,6 +94,11 @@ class UserProvider with ChangeNotifier {
 
   void fetchUserByEmail(String email) {
     _userStream = firebaseService.getUserByEmail(email);
+    notifyListeners();
+  }
+
+  void fetchOpenOrgs() {
+    _openOrgStream = firebaseService.getUsersByOpenStatus(true);
     notifyListeners();
   }
 

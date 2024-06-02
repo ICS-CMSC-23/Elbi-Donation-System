@@ -1,11 +1,11 @@
 import 'package:elbi_donation_system/models/user_model.dart';
 import 'package:elbi_donation_system/providers/auth_provider.dart';
-import 'package:elbi_donation_system/providers/donation_drive_list_provider.dart';
+import 'package:elbi_donation_system/providers/dummy_providers/donation_drive_list_provider.dart';
 import 'package:elbi_donation_system/providers/donation_drive_provider.dart';
-import 'package:elbi_donation_system/providers/donation_list_provider.dart';
+import 'package:elbi_donation_system/providers/dummy_providers/donation_list_provider.dart';
 import 'package:elbi_donation_system/providers/donation_provider.dart';
 import 'package:elbi_donation_system/providers/theme_provider.dart';
-import 'package:elbi_donation_system/providers/user_list_provider.dart';
+import 'package:elbi_donation_system/providers/dummy_providers/user_list_provider.dart';
 import 'package:elbi_donation_system/providers/user_provider.dart';
 import 'package:elbi_donation_system/screens/add_donation.dart';
 import 'package:elbi_donation_system/screens/admin_home_page.dart';

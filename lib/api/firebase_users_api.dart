@@ -12,6 +12,13 @@ class FirebaseUsersAPI {
     return db.collection("users").where("email", isEqualTo: email).snapshots();
   }
 
+  Stream<QuerySnapshot> getUsersByOpenStatus(bool isOpenForDonation) {
+    return db
+        .collection("users")
+        .where("isOpenForDonation", isEqualTo: isOpenForDonation)
+        .snapshots();
+  }
+
   Future<DocumentSnapshot> getUserById(String id) {
     return db.collection('users').doc(id).get();
   }
