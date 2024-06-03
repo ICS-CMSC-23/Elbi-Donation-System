@@ -17,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../models/route_model.dart';
+import "package:flutter_sms/flutter_sms.dart";
 
 class DonationDetails extends StatefulWidget {
   const DonationDetails({super.key});
@@ -102,6 +103,15 @@ class _DonationDetailsState extends State<DonationDetails> {
                   onChanged: (value) {
                     donation.status = value!;
                     context.read<DonationProvider>().updateDonation(donation);
+
+                    _sendSMS(
+                        "The status of your donation, ${donation.category} which was donated at ${donation.dateTime.toString()} has been updated to $value.",
+                        [
+                          context
+                              .watch<DonationProvider>()
+                              .selectedDonor
+                              .contactNo
+                        ]);
                   },
                   controlAffinity: ListTileControlAffinity.leading,
                   dense: true,
@@ -237,4 +247,12 @@ class _DonationDetailsState extends State<DonationDetails> {
       ),
     );
   }
+}
+
+void _sendSMS(String message, List<String> recipents) async {
+  String _result = await sendSMS(message: message, recipients: recipents)
+      .catchError((onError) {
+    print(onError);
+  });
+  print(_result);
 }
