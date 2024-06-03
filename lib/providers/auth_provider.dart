@@ -174,18 +174,25 @@ class AuthProvider with ChangeNotifier {
   }
 
   void updateUser(user_model.User user) async {
-    if (currentUser != null) {
-      try {
-        String message =
-            await firebaseService.updateUser(user.id!, user.toJson());
-        _loadUserData(user.id!);
-        print(message);
-        notifyListeners();
-      } on FirebaseException catch (e) {
-        print("Failed to update user");
-      }
-    } else {
-      print("No user selected for update");
+    try {
+      String message =
+          await firebaseService.updateUser(user.id!, user.toJson());
+      _loadUserData(user.id!);
+      print(message);
+      notifyListeners();
+    } on FirebaseException catch (e) {
+      print("Failed to update user");
+    }
+  }
+
+  Future<void> deleteUser(String userId) async {
+    try {
+      await FirebaseFirestore.instance.collection('users').doc(userId).delete();
+
+      await FirebaseAuthAPI.auth.currentUser?.delete();
+    } catch (e) {
+      print("Error deleting user: $e");
+      throw e;
     }
   }
 }

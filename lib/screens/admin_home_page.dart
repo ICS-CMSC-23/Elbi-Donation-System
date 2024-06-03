@@ -135,7 +135,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
                 Text(
                   title,
                   style: GoogleFonts.poppins(
-                    fontSize: 18,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: const Color(0xFF9C27B0),
                   ),
@@ -146,7 +146,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
                   child: Text(
                     description,
                     style: GoogleFonts.poppins(
-                      fontSize: 14,
+                      fontSize: 12,
                       fontWeight: FontWeight.w500,
                       color: const Color(0xFF9C27B0),
                     ),
