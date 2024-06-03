@@ -62,10 +62,9 @@ class _LoginPageState extends State<LoginPage> {
       String? error = await authProvider.signIn(_emailController.text, _passwordController.text);
 
       if (error != null) {
-        await scaffoldMessenger.showSnackBar(
-          SnackBar(content: Text(error)),
-        ).closed;
-
+      scaffoldMessenger.showSnackBar(
+        SnackBar(content: Text(error)),
+        );
         return;
       }
 
