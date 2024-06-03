@@ -53,24 +53,29 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
-      String? error = await context
-          .read<AuthProvider>()
-          .signIn(_emailController.text, _passwordController.text);
+      final authProvider = context.read<AuthProvider>();
+      final userListProvider = context.read<UserListProvider>();
+      final donationProvider = context.read<DonationProvider>();
+      final navigator = Navigator.of(context);
+      final scaffoldMessenger = ScaffoldMessenger.of(context);
 
-      if (error == null) {
-        if (context.read<AuthProvider>().currentUser.role != "guest") {
-          User currentUser = context.read<AuthProvider>().currentUser;
-          context.read<UserListProvider>().changeCurrentUser(currentUser.email);
-          Navigator.pushNamed(context, "/");
-        }
-        if (context.read<AuthProvider>().currentUser.role == "donor") {
-          context.read<DonationProvider>().fetchDonationsByDonorId(
-              context.read<AuthProvider>().currentUser.id!);
-        }
-      } else {
-        setState(() {
-          errorMessage = "Incorrect email/password";
-        });
+      String? error = await authProvider.signIn(_emailController.text, _passwordController.text);
+
+      if (error != null) {
+        await scaffoldMessenger.showSnackBar(
+          SnackBar(content: Text(error)),
+        ).closed;
+
+        return;
+      }
+
+      User currentUser = authProvider.currentUser;
+      if (currentUser.role != "guest") {
+        userListProvider.changeCurrentUser(currentUser.email);
+        navigator.pushNamed("/");
+      }
+      if (currentUser.role == "donor") {
+        donationProvider.fetchDonationsByDonorId(currentUser.id!);
       }
     }
   }
@@ -136,13 +141,6 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                if (errorMessage != null) ...[
-                  Text(
-                    errorMessage!,
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                  const SizedBox(height: 10),
-                ],
                 Container(
                   height: 50,
                   width: 250,

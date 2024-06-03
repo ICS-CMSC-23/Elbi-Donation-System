@@ -108,6 +108,11 @@ class AuthProvider with ChangeNotifier {
     String? error = await authService.signIn(email, password);
     if (error == null && firebaseUser != null) {
       await _loadUserData(firebaseUser!.uid);
+
+      if (_currentUser.role == "organization" && (_currentUser.isApproved ?? false) == false) {
+        await signOut();
+        return "Organization account hasn't been approved";
+      }
     }
     notifyListeners();
     return error;
