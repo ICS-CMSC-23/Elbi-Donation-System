@@ -175,7 +175,7 @@ class _EditDonationState extends State<EditDonation> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Donation'),
+        title: const Text('Edit Donation'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
