@@ -295,27 +295,6 @@ class _AddDonationState extends State<AddDonation> {
                 ),
                 if (isForPickup) ...[
                   const SizedBox(height: 16.0),
-                  // DropdownButtonFormField<String>(
-                  //   items: addresses.map((address) {
-                  //     return DropdownMenuItem(
-                  //       value: address,
-                  //       child: Text(address),
-                  //     );
-                  //   }).toList(),
-                  //   value: _selectedAddress,
-                  //   onChanged: (value) {
-                  //     setState(() {
-                  //       _selectedAddress = value;
-                  //     });
-                  //   },
-                  //   decoration: const InputDecoration(labelText: 'Select Address'),
-                  //   validator: (value) {
-                  //     if (value == null) {
-                  //       return 'Please select an address';
-                  //     }
-                  //     return null;
-                  //   },
-                  // ),
                   const Text(
                     'Select Address/es',
                     style: TextStyle(fontSize: 16.0),
