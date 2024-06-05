@@ -57,8 +57,9 @@ class _QrCodeScannerState extends State<QrCodeScanner> {
       // check if the scanned QR code matches the donation ID
       if (qrCodeResult == selectedDonation.id) {
         // UD Matched
-        // update the status of the donation to "Completed"
-        selectedDonation.status = "Completed";
+        // update the status of the donation to "Completed" and isForPickup to false
+        selectedDonation.status = Donation.STATUS_COMPLETE;
+        selectedDonation.isForPickup = false;
         // update the donation in Firebase
         await FirebaseDonationAPI().updateDonation(
           selectedDonation.id!,
