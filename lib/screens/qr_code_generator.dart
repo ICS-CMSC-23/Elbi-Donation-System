@@ -81,7 +81,7 @@ class _QrCodeGeneratorState extends State<QrCodeGenerator> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("QR Code Generator"),
+          title: const Text("QR Code of Donation ID"),
         ),
         body: Center(
           child: SingleChildScrollView(
