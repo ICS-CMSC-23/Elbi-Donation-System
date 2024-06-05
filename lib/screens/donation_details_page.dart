@@ -215,7 +215,7 @@ class _DonationDetailsState extends State<DonationDetails> {
               TitleDetailList(
                   title: "Address",
                   detailList:
-                      context.watch<DonationProvider>().selectedDonor.address),
+                      context.watch<DonationProvider>().selected.addresses),
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 8.0),
                 child: Text(
