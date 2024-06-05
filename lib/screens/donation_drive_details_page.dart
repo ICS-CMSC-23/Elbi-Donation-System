@@ -135,7 +135,7 @@ class _DonationDriveDetailsState extends State<DonationDriveDetails> {
                   label: const Text("Add Donation"),
                   style: ButtonStyle(
                       foregroundColor: MaterialStatePropertyAll(
-                          Theme.of(context).colorScheme.error)),
+                          Theme.of(context).colorScheme.primary)),
                 ),
               ],
             );
