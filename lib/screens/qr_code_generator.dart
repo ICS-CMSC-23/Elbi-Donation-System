@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:qr_flutter/qr_flutter.dart'; // Import the qr_flutter package
 import '../models/route_model.dart';
+import '../providers/donation_provider.dart';
 
 class QrCodeGenerator extends StatefulWidget {
   const QrCodeGenerator({super.key});
 
-  // class route model
   static final RouteModel _qrCodeGenerator = RouteModel(
     "QR Code Generator",
     "/qr-code-generator",
   );
+
   static RouteModel get route => _qrCodeGenerator;
 
   @override
@@ -18,6 +21,22 @@ class QrCodeGenerator extends StatefulWidget {
 class _QrCodeGeneratorState extends State<QrCodeGenerator> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    String selectedDonationId = context.watch<DonationProvider>().selected.id!;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("QR Code Generator"),
+      ),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("GENERATOR"),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
