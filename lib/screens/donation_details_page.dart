@@ -13,6 +13,8 @@ import 'package:elbi_donation_system/providers/dummy_providers/donation_list_pro
 import 'package:elbi_donation_system/providers/donation_provider.dart';
 import 'package:elbi_donation_system/providers/dummy_providers/user_list_provider.dart';
 import 'package:elbi_donation_system/providers/user_provider.dart';
+import 'package:elbi_donation_system/screens/qr_code_generator.dart';
+import 'package:elbi_donation_system/screens/qr_code_scanner.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -128,6 +130,22 @@ class _DonationDetailsState extends State<DonationDetails> {
         children: [cancelButton],
       );
     }
+
+    // add a button to scan the QR code
+    Widget scanButton = TextButton.icon(
+        onPressed: () {
+          Navigator.pushNamed(context, QrCodeScanner.route.path);
+        },
+        icon: const Icon(Icons.qr_code_scanner),
+        label: const Text("Scan QR Code"));
+
+    // button for generating QR code
+    Widget qrButton = TextButton.icon(
+        onPressed: () {
+          Navigator.pushNamed(context, QrCodeGenerator.route.path);
+        },
+        icon: const Icon(Icons.qr_code),
+        label: const Text("Generate QR Code"));
 
     return Scaffold(
       appBar: AppBar(
