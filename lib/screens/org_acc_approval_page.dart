@@ -204,7 +204,8 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
     );
   }
 
-  void _showConfirmationDialog(BuildContext context, String orgName, String action, User organization) {
+  void _showConfirmationDialog(
+      BuildContext context, String orgName, String action, User organization) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -244,6 +245,7 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                         .collection('users')
                         .doc(organization.id)
                         .update({'isApproved': true});
+                    Navigator.of(context).pop();
                     if (!mounted) return;
                     messenger.showSnackBar(
                       SnackBar(
@@ -251,16 +253,18 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                       ),
                     );
                   } else {
-                    await Provider.of<AuthProvider>(context, listen: false).deleteUser(organization.id!);
+                    await Provider.of<AuthProvider>(context, listen: false)
+                        .deleteUser(organization.id!);
+                    navigator.pop();
                     if (!mounted) return;
                     messenger.showSnackBar(
                       SnackBar(
-                        content: Text("${organization.name} disapproved and deleted"),
+                        content: Text(
+                            "${organization.name} disapproved and deleted"),
                       ),
                     );
                   }
                   if (!mounted) return;
-                  navigator.pop();
                 },
                 child: const Text(
                   "Confirm",

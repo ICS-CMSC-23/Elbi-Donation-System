@@ -31,16 +31,36 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
     User user = context.watch<UserProvider>().selected;
 
     Row actionButtons;
-    if (authUser.role == User.admin) {
+    if (authUser.role == User.admin && user.isApproved == false) {
       actionButtons = Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           TextButton.icon(
-              onPressed: () {},
+              onPressed: () async {
+                await FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(user.id!)
+                    .update({'isApproved': true});
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("${user.name} approved"),
+                  ),
+                );
+              },
               icon: const Icon(Icons.check),
               label: const Text("Approve")),
           TextButton.icon(
-            onPressed: () {},
+            onPressed: () async {
+              await Provider.of<AuthProvider>(context, listen: false)
+                  .deleteUser(user.id!);
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("${user.name} disapproved and deleted"),
+                ),
+              );
+            },
             icon: const Icon(Icons.delete_rounded),
             label: const Text("Disapprove"),
             style: ButtonStyle(
