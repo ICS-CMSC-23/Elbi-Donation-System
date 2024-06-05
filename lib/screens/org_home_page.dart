@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:elbi_donation_system/api/firebase_donation_api.dart';
 import 'package:elbi_donation_system/components/main_drawer.dart';
 import 'package:elbi_donation_system/components/square_image.dart';
 import 'package:elbi_donation_system/models/donation_drive_model.dart';
@@ -28,19 +29,7 @@ class OrgHomePage extends StatefulWidget {
 
 class _OrgHomePageState extends State<OrgHomePage> {
   @override
-  void initState() {
-    super.initState();
-    print(context.read<AuthProvider>().currentUser.id!);
-    context
-        .read<DonationProvider>()
-        .fetchDonationsByOrgId(context.read<AuthProvider>().currentUser.id!);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    Stream<QuerySnapshot> donations =
-        context.watch<DonationProvider>().donations;
-
     return Scaffold(
       drawer: MainDrawer(routes: [
         RouteModel("Logout", "/login"),
@@ -83,7 +72,8 @@ class _OrgHomePageState extends State<OrgHomePage> {
           ),
           Expanded(
             child: StreamBuilder(
-              stream: donations,
+              stream: FirebaseDonationAPI().getDonationsByOrgId(
+                  context.read<AuthProvider>().currentUser.id!),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
                   return Center(
