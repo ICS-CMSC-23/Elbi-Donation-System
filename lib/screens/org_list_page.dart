@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:elbi_donation_system/providers/donation_provider.dart';
+import 'package:elbi_donation_system/screens/org_profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -12,21 +12,21 @@ import '../models/user_model.dart';
 import '../providers/user_provider.dart';
 import '../screens/donor_profile_page.dart';
 
-class DonorListPage extends StatefulWidget {
-  const DonorListPage({super.key});
+class OrgListPage extends StatefulWidget {
+  const OrgListPage({super.key});
 
   // class route model
   static final RouteModel _donorListPage = RouteModel(
-    "Donor List Page",
-    "/donor-list-page",
+    "Organization List Page",
+    "/org-list-page",
   );
   static RouteModel get route => _donorListPage;
 
   @override
-  State<DonorListPage> createState() => _DonorListPageState();
+  State<OrgListPage> createState() => _DonorListPageState();
 }
 
-class _DonorListPageState extends State<DonorListPage> {
+class _DonorListPageState extends State<OrgListPage> {
   // only get the donors
   // List<User> donors = dummyUsers.where((user) => user.role == 'donor').toList();
 
@@ -96,11 +96,8 @@ class _DonorListPageState extends State<DonorListPage> {
                       User user = User.fromJson(docMap);
 
                       // Navigate to donor's profile page
-                      context
-                          .read<DonationProvider>()
-                          .fetchDonationsByDonorId(user.id!);
                       context.read<UserProvider>().changeSelectedUser(user);
-                      Navigator.pushNamed(context, DonorProfilePage.route.path);
+                      Navigator.pushNamed(context, "/org-profile");
                       // Navigator.pushNamed(context, '/donation-list-page'); // for testing
                     },
                     child: const Text('View Profile'),
@@ -117,17 +114,18 @@ class _DonorListPageState extends State<DonorListPage> {
 
   displayAppBar() {
     return const ListPageSliverAppBar(
-        title: "Donors",
-        backgroundWidget:
-            ListPageHeader(title: "Manage Donors", titleIcon: Icons.people));
+        title: "Organizations",
+        backgroundWidget: ListPageHeader(
+            title: "Manage Organizations", titleIcon: Icons.people));
   }
 
   @override
   Widget build(BuildContext context) {
     // get users that are donors
-    Stream<QuerySnapshot> donors = FirebaseFirestore.instance
+    Stream<QuerySnapshot> orginations = FirebaseFirestore.instance
         .collection('users')
-        .where('role', isEqualTo: 'donor')
+        .where('role', isEqualTo: 'organization')
+        .where("isApproved", isEqualTo: true)
         .snapshots();
 
     return Scaffold(
@@ -140,7 +138,7 @@ class _DonorListPageState extends State<DonorListPage> {
             child: SizedBox(height: 10),
           ),
           StreamBuilder<QuerySnapshot>(
-            stream: donors,
+            stream: orginations,
             builder: (context, snapshot) {
               if (snapshot.hasError) {
                 return Center(
@@ -156,7 +154,7 @@ class _DonorListPageState extends State<DonorListPage> {
                 return SliverFillRemaining(
                   child: Center(
                     child: Text(
-                      "No Donors found",
+                      "No Organizations found",
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.bold,
                         color: const Color.fromARGB(255, 247, 129, 139),
@@ -180,7 +178,7 @@ class _DonorListPageState extends State<DonorListPage> {
                   height: 20,
                   child: Center(
                     child: StreamBuilder<QuerySnapshot>(
-                      stream: donors,
+                      stream: orginations,
                       builder: (BuildContext context,
                           AsyncSnapshot<QuerySnapshot> snapshot) {
                         if (snapshot.connectionState ==
@@ -189,10 +187,10 @@ class _DonorListPageState extends State<DonorListPage> {
                         } else if (snapshot.hasError) {
                           return Text("Error: ${snapshot.error}");
                         } else if (!snapshot.hasData) {
-                          return const Text("Donors: 0");
+                          return const Text("Organizations: 0");
                         } else {
                           int count = snapshot.data!.docs.length;
-                          return Text("Donors: $count");
+                          return Text("Organizations: $count");
                         }
                       },
                     ),

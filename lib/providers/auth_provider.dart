@@ -109,7 +109,8 @@ class AuthProvider with ChangeNotifier {
     if (error == null && firebaseUser != null) {
       await _loadUserData(firebaseUser!.uid);
 
-      if (_currentUser.role == "organization" && (_currentUser.isApproved ?? false) == false) {
+      if (_currentUser.role == "organization" &&
+          (_currentUser.isApproved ?? false) == false) {
         await signOut();
         return "Organization account hasn't been approved";
       }
@@ -188,8 +189,6 @@ class AuthProvider with ChangeNotifier {
   Future<void> deleteUser(String userId) async {
     try {
       await FirebaseFirestore.instance.collection('users').doc(userId).delete();
-
-      await FirebaseAuthAPI.auth.currentUser?.delete();
     } catch (e) {
       print("Error deleting user: $e");
       throw e;
