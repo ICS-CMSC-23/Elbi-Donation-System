@@ -280,13 +280,34 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
               } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                 return SliverFillRemaining(
                   child: Center(
-                    child: Text(
-                      "No Donation Drives found",
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.bold,
-                        color: const Color.fromARGB(255, 247, 129, 139),
-                      ),
-                      textAlign: TextAlign.center,
+                    child: Column(
+                      children: [
+                        Text(
+                          "No Donation Drives found",
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.bold,
+                            color: const Color.fromARGB(255, 247, 129, 139),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.pushNamed(
+                                  context, "/add-donation-drive");
+                            },
+                            child: Text(
+                              'Create Donation Drive',
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 );
@@ -297,48 +318,48 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
           ),
           SliverFillRemaining(
             hasScrollBody: false,
-            child: Column(
-              children: [
-                const Expanded(child: SizedBox(height: 1)),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, "/add-donation-drive");
-                    },
-                    child: Text(
-                      'Create Donation Drive',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+            child: StreamBuilder<QuerySnapshot>(
+              stream: donationDrives,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  return Text("Error: ${snapshot.error}");
+                } else if (!snapshot.hasData) {
+                  return const Text("Donation Drives: 0");
+                } else {
+                  int count = snapshot.data!.docs.length;
+                  return Column(
+                    children: [
+                      const Expanded(child: SizedBox(height: 1)),
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: count != 0
+                            ? ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pushNamed(
+                                      context, "/add-donation-drive");
+                                },
+                                child: Text(
+                                  'Create Donation Drive',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              )
+                            : const SizedBox.shrink(),
                       ),
-                    ),
-                  ),
-                ),
-                Container(
-                  color: Theme.of(context).cardColor,
-                  height: 20,
-                  child: Center(
-                    child: StreamBuilder<QuerySnapshot>(
-                      stream: donationDrives,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const CircularProgressIndicator();
-                        } else if (snapshot.hasError) {
-                          return Text("Error: ${snapshot.error}");
-                        } else if (!snapshot.hasData) {
-                          return const Text("Donation Drives: 0");
-                        } else {
-                          int count = snapshot.data!.docs.length;
-                          return Text("Donation Drives: $count");
-                        }
-                      },
-                    ),
-                  ),
-                ),
-              ],
+                      Container(
+                        color: Theme.of(context).cardColor,
+                        height: 20,
+                        child: Center(child: Text("Donation Drives: $count")),
+                      ),
+                    ],
+                  );
+                }
+              },
             ),
           ),
         ],
