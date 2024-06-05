@@ -26,18 +26,29 @@ class _EditDonationState extends State<EditDonation> {
   final _formKey = GlobalKey<FormState>();
   final _categoryController = TextEditingController();
   final _descriptionController = TextEditingController();
-  // final _remarksController = TextEditingController();
+  final _weightController = TextEditingController();
+  final _contactController = TextEditingController();
   bool isLoading = false;
+  bool isForPickup = true;
   List<File> _donationImages = [];
   List<String> _donationImages64 = [];
   String? errorMessage;
+  String? _categoryValue;
+  String? _weightUnit = 'kg';
+  String? _selectedAddress;
+  DateTime _selectedDate = DateTime.now();
 
   @override
   void initState() {
     super.initState();
     Donation currentDonation = context.read<DonationProvider>().selected;
     _categoryController.text = currentDonation.category;
+    // category: _categoryController.text,
     _descriptionController.text = currentDonation.description;
+    _contactController.text = currentDonation.contactNo;
+    _weightController.text = currentDonation.weightInKg.toString();
+    _selectedDate = currentDonation.dateTime;
+    _selectedAddress = currentDonation.addresses as String?;
     _donationImages64 = currentDonation.photos ?? [];
     _convertBase64ToFile(_donationImages64).then((files) {
       setState(() {
@@ -46,15 +57,16 @@ class _EditDonationState extends State<EditDonation> {
     });
   }
 
-  void _clearForm() {
-    _formKey.currentState?.reset();
-    _categoryController.clear();
-    _descriptionController.clear();
-    // _remarksController.clear();
-    setState(() {
-      _donationImages.clear();
-      _donationImages64.clear();
-    });
+   void _cancelEdit() {
+    Navigator.pop(context);
+  }
+
+  void categoryCallback(String? selectedValue){
+    if (selectedValue is String){
+      setState(() {
+        _categoryValue = selectedValue;
+      });
+    }
   }
 
   void _submitForm() async {
@@ -75,14 +87,16 @@ class _EditDonationState extends State<EditDonation> {
         Donation newDonation = Donation(
           donorId: currentUser.id!,
           donationDriveId: context.read<DonationDriveProvider>().selected.id,
-          category: _categoryController.text,
+          category: _categoryValue!,
           description: _descriptionController.text,
           photos: _donationImages64,
-          isForPickup: false,
-          weightInKg: 10,
-          dateTime: DateTime.now(),
-          addresses: [],
-          contactNo: '',
+          isForPickup: isForPickup,
+          weightInKg: _weightUnit == 'kg'
+            ? double.parse(_weightController.text)
+            : double.parse(_weightController.text) * 0.453592,
+          dateTime: _selectedDate,
+          addresses: isForPickup ? [_selectedAddress!] : [],
+          contactNo: isForPickup ? _contactController.text : '',
         );
 
         setState(() {
@@ -301,13 +315,13 @@ class _EditDonationState extends State<EditDonation> {
                   children: <Widget>[
                     ElevatedButton(
                       onPressed: _submitForm,
-                      child: const Text('Submit'),
+                      child: const Text('Save changes'),
                     ),
                     ElevatedButton(
-                      onPressed: _clearForm,
+                      onPressed: _cancelEdit,
                       style:
                           ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                      child: const Text('Clear'),
+                      child: const Text('Cancel'),
                     ),
                   ],
                 ),

@@ -34,7 +34,7 @@ class _AddDonationState extends State<AddDonation> {
   String? errorMessage;
   String? _categoryValue;
   String? _weightUnit = 'kg';
-  String? _selectedAddress;
+  List<String> _selectedAddresses = [];
   DateTime _selectedDate = DateTime.now();
  
   @override
@@ -49,12 +49,14 @@ class _AddDonationState extends State<AddDonation> {
     _formKey.currentState?.reset();
     _categoryController.clear();
     _descriptionController.clear();
-    // _remarksController.clear();
     _weightController.clear();
     _contactController.clear();
     setState(() {
       _donationImages.clear();
       _donationImages64.clear();
+      _selectedAddresses.clear();
+      _categoryValue = null;
+      _selectedDate = DateTime.now();
     });
   }
 
@@ -85,7 +87,7 @@ class _AddDonationState extends State<AddDonation> {
         Donation newDonation = Donation(
           donorId: currentUser.id!,
           donationDriveId: context.read<DonationDriveProvider>().selected.id,
-          category: _categoryController.text,
+          category: _categoryValue!,
           description: _descriptionController.text,
           photos: _donationImages64,
           isForPickup: isForPickup,
@@ -93,7 +95,7 @@ class _AddDonationState extends State<AddDonation> {
             ? double.parse(_weightController.text)
             : double.parse(_weightController.text) * 0.453592,
           dateTime: _selectedDate,
-          addresses: isForPickup ? [_selectedAddress!] : [],
+          addresses: isForPickup ? _selectedAddresses : [],
           contactNo: isForPickup ? _contactController.text : '',
         );
 
@@ -174,7 +176,6 @@ class _AddDonationState extends State<AddDonation> {
   @override
   Widget build(BuildContext context) {
     final addresses = context.read<AuthProvider>().currentUser.address;
-    final contactno = context.read<AuthProvider>().currentUser.contactNo;
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -294,27 +295,47 @@ class _AddDonationState extends State<AddDonation> {
                 ),
                 if (isForPickup) ...[
                   const SizedBox(height: 16.0),
-                  DropdownButtonFormField<String>(
-                    items: addresses.map((address) {
-                      return DropdownMenuItem(
-                        value: address,
-                        child: Text(address),
-                      );
-                    }).toList(),
-                    value: _selectedAddress,
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedAddress = value;
-                      });
-                    },
-                    decoration: const InputDecoration(labelText: 'Select Address'),
-                    validator: (value) {
-                      if (value == null) {
-                        return 'Please select an address';
-                      }
-                      return null;
-                    },
+                  // DropdownButtonFormField<String>(
+                  //   items: addresses.map((address) {
+                  //     return DropdownMenuItem(
+                  //       value: address,
+                  //       child: Text(address),
+                  //     );
+                  //   }).toList(),
+                  //   value: _selectedAddress,
+                  //   onChanged: (value) {
+                  //     setState(() {
+                  //       _selectedAddress = value;
+                  //     });
+                  //   },
+                  //   decoration: const InputDecoration(labelText: 'Select Address'),
+                  //   validator: (value) {
+                  //     if (value == null) {
+                  //       return 'Please select an address';
+                  //     }
+                  //     return null;
+                  //   },
+                  // ),
+                  const Text(
+                    'Select Address/es',
+                    style: TextStyle(fontSize: 16.0),
                   ),
+                  const SizedBox(height: 8.0),
+                  ...addresses.map((address) {
+                    return CheckboxListTile(
+                      title: Text(address),
+                      value: _selectedAddresses.contains(address),
+                      onChanged: (bool? selected) {
+                        setState(() {
+                          if (selected == true) {
+                            _selectedAddresses.add(address);
+                          } else {
+                            _selectedAddresses.remove(address);
+                          }
+                        });
+                      },
+                    );
+                  }),
                   const SizedBox(height: 16.0),
                   TextFormField(
                     controller: _contactController,
@@ -428,13 +449,13 @@ class _AddDonationState extends State<AddDonation> {
                   children: <Widget>[
                     ElevatedButton(
                       onPressed: _submitForm,
-                      child: const Text('Submit'),
+                      child: const Text('Add'),
                     ),
                     ElevatedButton(
                       onPressed: _clearForm,
                       style:
                           ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                      child: const Text('Clear'),
+                      child: const Text('Reset'),
                     ),
                   ],
                 ),
