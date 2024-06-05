@@ -20,6 +20,8 @@ import 'package:elbi_donation_system/screens/org_acc_approval_page.dart';
 import 'package:elbi_donation_system/screens/org_home_page.dart';
 import 'package:elbi_donation_system/screens/org_list_page.dart';
 import 'package:elbi_donation_system/screens/org_profile_page.dart';
+import 'package:elbi_donation_system/screens/qr_code_generator.dart';
+import 'package:elbi_donation_system/screens/qr_code_scanner.dart';
 import 'package:elbi_donation_system/screens/sign_up_page.dart';
 import 'package:elbi_donation_system/screens/donation_details_page.dart';
 import 'package:elbi_donation_system/screens/donation_drive_details_page.dart';
@@ -92,7 +94,9 @@ class MyApp extends StatelessWidget {
         '/add-donation-drive': (context) => AddDonationDrive(),
         '/add-donation': (context) => AddDonation(),
         '/edit-donation': (context) => EditDonation(),
-        "/org-list-page": (context) => const OrgListPage()
+        "/org-list-page": (context) => const OrgListPage(),
+        "/qr-code-scanner": (context) => const QrCodeScanner(),
+        "/qr-code-generator": (context) => const QrCodeGenerator(),
       },
     );
   }
