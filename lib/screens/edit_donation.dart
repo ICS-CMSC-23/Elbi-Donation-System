@@ -377,15 +377,6 @@ class _EditDonationState extends State<EditDonation> {
                       return null;
                     },
                   ),
-                ] else ...[
-                  const SizedBox(height: 16.0),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Generate QR code functionality
-                      // OR remove this button and generate QR code after submit
-                    },
-                    child: const Text('Generate QR Code'),
-                  ),
                 ],
                 const SizedBox(height: 16),
                 ElevatedButton(

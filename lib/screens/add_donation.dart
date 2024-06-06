@@ -36,7 +36,7 @@ class _AddDonationState extends State<AddDonation> {
   String? _weightUnit = 'kg';
   List<String> _selectedAddresses = [];
   DateTime _selectedDate = DateTime.now();
- 
+
   @override
   void initState() {
     super.initState();
@@ -60,8 +60,8 @@ class _AddDonationState extends State<AddDonation> {
     });
   }
 
-  void categoryCallback(String? selectedValue){
-    if (selectedValue is String){
+  void categoryCallback(String? selectedValue) {
+    if (selectedValue is String) {
       setState(() {
         _categoryValue = selectedValue;
       });
@@ -74,76 +74,75 @@ class _AddDonationState extends State<AddDonation> {
     }
 
     if (_formKey.currentState!.validate()) {
-        if (_donationImages.isEmpty) {
+      if (_donationImages.isEmpty) {
+        setState(() {
+          errorMessage = 'Please upload at least one image';
+        });
+        return;
+      }
+
+      final currentUser = context.read<AuthProvider>().currentUser;
+      // final currentDrive = FirebaseDonationDriveAPI;
+
+      Donation newDonation = Donation(
+        donorId: currentUser.id!,
+        donationDriveId: context.read<DonationDriveProvider>().selected.id,
+        category: _categoryValue!,
+        description: _descriptionController.text,
+        photos: _donationImages64,
+        isForPickup: isForPickup,
+        weightInKg: _weightUnit == 'kg'
+            ? double.parse(_weightController.text)
+            : double.parse(_weightController.text) * 0.453592,
+        dateTime: _selectedDate,
+        addresses: isForPickup ? _selectedAddresses : [],
+        contactNo: isForPickup ? _contactController.text : '',
+      );
+
+      setState(() {
+        isLoading = true;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Adding donation... please wait...")),
+      );
+
+      try {
+        String result =
+            await FirebaseDonationAPI().addDonation(newDonation).timeout(
+          const Duration(seconds: 20), // specify the duration you want to wait
+          onTimeout: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                  content: Text("Request timed out. Please try again.")),
+            );
+            return 'timeout'; // Return a default value or handle the timeout case appropriately
+          },
+        );
+
+        if (result == 'timeout') {
+          // Handle the timeout case, possibly return or break out
           setState(() {
-            errorMessage = 'Please upload at least one image';
+            isLoading = false;
           });
           return;
         }
 
-        final currentUser = context.read<AuthProvider>().currentUser;
-        // final currentDrive = FirebaseDonationDriveAPI;
-        
-        Donation newDonation = Donation(
-          donorId: currentUser.id!,
-          donationDriveId: context.read<DonationDriveProvider>().selected.id,
-          category: _categoryValue!,
-          description: _descriptionController.text,
-          photos: _donationImages64,
-          isForPickup: isForPickup,
-          weightInKg: _weightUnit == 'kg'
-            ? double.parse(_weightController.text)
-            : double.parse(_weightController.text) * 0.453592,
-          dateTime: _selectedDate,
-          addresses: isForPickup ? _selectedAddresses : [],
-          contactNo: isForPickup ? _contactController.text : '',
-        );
-
-        setState(() {
-          isLoading = true;
-        });
-
+        // Handle the result as usual
+      } on TimeoutException catch (_) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Adding donation... please wait...")),
+          const SnackBar(content: Text("Request timed out. Please try again.")),
         );
+      } finally {
+        setState(() {
+          isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Successfully added donation!")),
+        );
+        Navigator.pop(context);
+      }
 
-        try {
-          String result =
-            await FirebaseDonationAPI().addDonation(newDonation).timeout(
-              const Duration(seconds: 20), // specify the duration you want to wait
-              onTimeout: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                      content: Text("Request timed out. Please try again.")),
-                );
-                return 'timeout'; // Return a default value or handle the timeout case appropriately
-              },
-            );
-
-          if (result == 'timeout') {
-            // Handle the timeout case, possibly return or break out
-            setState(() {
-              isLoading = false;
-            });
-            return;
-          }
-
-          // Handle the result as usual
-        } on TimeoutException catch (_) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text("Request timed out. Please try again.")),
-          );
-        } finally {
-          setState(() {
-            isLoading = false;
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Successfully added donation!")),
-          );
-          Navigator.pop(context);
-        }
-      
       //   ScaffoldMessenger.of(context)
       //       .showSnackBar(const SnackBar(content: Text('Donation Submitted')));
       //   _clearForm();
@@ -167,7 +166,8 @@ class _AddDonationState extends State<AddDonation> {
 
       if (pickedTime != null) {
         setState(() {
-          _selectedDate = DateTime(pickedDate.year, pickedDate.month, pickedDate.day, pickedTime.hour, pickedTime.minute);
+          _selectedDate = DateTime(pickedDate.year, pickedDate.month,
+              pickedDate.day, pickedTime.hour, pickedTime.minute);
         });
       }
     }
@@ -184,16 +184,16 @@ class _AddDonationState extends State<AddDonation> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                ChoiceChip(
+                    ChoiceChip(
                       label: const Text('For Pickup'),
                       selected: isForPickup,
                       onSelected: (selected) {
@@ -220,7 +220,8 @@ class _AddDonationState extends State<AddDonation> {
                     DropdownMenuItem(value: "Food", child: Text("Food")),
                     DropdownMenuItem(value: "Clothes", child: Text("Clothes")),
                     DropdownMenuItem(value: "Cash", child: Text("Cash")),
-                    DropdownMenuItem(value: "Necessities", child: Text("Necessities")),
+                    DropdownMenuItem(
+                        value: "Necessities", child: Text("Necessities")),
                     DropdownMenuItem(value: "Others", child: Text("Others")),
                   ],
                   value: _categoryValue,
@@ -246,7 +247,7 @@ class _AddDonationState extends State<AddDonation> {
                   },
                 ),
                 const SizedBox(height: 16.0),
-                 Row(
+                Row(
                   children: [
                     Expanded(
                       flex: 3,
@@ -254,7 +255,9 @@ class _AddDonationState extends State<AddDonation> {
                         controller: _weightController,
                         decoration: const InputDecoration(labelText: 'Weight'),
                         keyboardType: TextInputType.number,
-                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
                         validator: (value) {
                           if (value!.isEmpty) {
                             return 'Please enter the weight';
@@ -318,7 +321,8 @@ class _AddDonationState extends State<AddDonation> {
                   const SizedBox(height: 16.0),
                   TextFormField(
                     controller: _contactController,
-                    decoration: const InputDecoration(labelText: 'Contact Number'),
+                    decoration:
+                        const InputDecoration(labelText: 'Contact Number'),
                     keyboardType: TextInputType.phone,
                     validator: (value) {
                       if (value!.isEmpty) {
@@ -326,15 +330,6 @@ class _AddDonationState extends State<AddDonation> {
                       }
                       return null;
                     },
-                  ),
-                ] else ...[
-                  const SizedBox(height: 16.0),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Generate QR code functionality 
-                      // OR remove this button and generate QR code after submit
-                    },
-                    child: const Text('Generate QR Code'),
                   ),
                 ],
                 const SizedBox(height: 16),
