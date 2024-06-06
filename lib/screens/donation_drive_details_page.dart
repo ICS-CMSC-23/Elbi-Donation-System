@@ -332,9 +332,16 @@ class _DonationDriveDetailsState extends State<DonationDriveDetails> {
 
   Future<void> handleViewDonation(
       BuildContext context, Donation donation) async {
-    context.read<DonationProvider>().changeSelectedDonation(donation);
-    context.read<DonationProvider>().changeSelectedDonor(
-        await context.read<UserProvider>().fetchUserById(donation.donorId));
+    final donationProvider = context.read<DonationProvider>();
+    final userProvider = context.read<UserProvider>();
+
+    // Fetch the user before making changes to the context
+    final donor = await userProvider.fetchUserById(donation.donorId);
+
+    // Safely use the context after all async calls are completed
+    donationProvider.changeSelectedDonation(donation);
+    donationProvider.changeSelectedDonor(donor);
+
     Navigator.pushNamed(context, "/donation-details");
   }
 }
