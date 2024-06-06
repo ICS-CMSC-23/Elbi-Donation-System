@@ -34,7 +34,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
         title: Text(
           'Organization Home Page',
           style: GoogleFonts.poppins(
-            fontSize: 20,
+            fontSize: 16,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
@@ -59,7 +59,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
               style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF9C27B0),
+                color: Theme.of(context).textTheme.titleLarge?.color,
               ),
               textAlign: TextAlign.center,
             ),
@@ -105,6 +105,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
+                      color: Theme.of(context).cardColor,
                       child: ListTile(
                         contentPadding: const EdgeInsets.all(10),
                         title: AutoSizeText(
@@ -112,6 +113,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
                           style: GoogleFonts.poppins(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
+                            color: Theme.of(context).textTheme.titleLarge?.color,
                           ),
                           maxLines: 1,
                           minFontSize: 10,
@@ -121,6 +123,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
                           donation.status,
                           style: GoogleFonts.poppins(
                             fontSize: 12,
+                            color: Theme.of(context).textTheme.bodyLarge?.color,
                           ),
                         ),
                         leading: ClipRRect(

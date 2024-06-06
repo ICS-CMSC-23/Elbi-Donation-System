@@ -51,7 +51,7 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                   style: GoogleFonts.poppins(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFF9C27B0),
+                    color: Theme.of(context).textTheme.titleLarge?.color,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -98,6 +98,7 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
+                        color: Theme.of(context).cardColor,
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Column(
