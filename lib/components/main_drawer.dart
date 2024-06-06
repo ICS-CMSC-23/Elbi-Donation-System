@@ -3,6 +3,7 @@ import 'package:elbi_donation_system/providers/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/route_model.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class MainDrawer extends StatefulWidget {
   final List<RouteModel> routes;
@@ -21,20 +22,29 @@ class _MainDrawerState extends State<MainDrawer> {
         children: [
           DrawerHeader(
             decoration: BoxDecoration(color: Theme.of(context).primaryColor),
-            child: const Text(
+            child: Text(
               "Elbi GenerosiTree",
-              style: TextStyle(fontSize: 40, color: Colors.white),
+              style: GoogleFonts.poppins(
+                fontSize: 36,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           Row(
             children: [
-              const Padding(
-                padding: EdgeInsets.only(top: 8, left: 15),
-                child: Text("Dark Mode: "),
+              Padding(
+                padding: const EdgeInsets.only(top: 8, left: 15),
+                child: Text(
+                  "Dark Mode: ",
+                  style: GoogleFonts.poppins(
+                    fontSize: 14,
+                  ),
+                ),
               ),
               Switch(
                   inactiveTrackColor: Theme.of(context).primaryColor,
-                  activeColor: Theme.of(context).primaryColor,
+                  activeColor: Theme.of(context).toggleButtonsTheme.color,
                   value: context.watch<ThemeProvider>().isDarkTheme,
                   onChanged: (e) {
                     context.read<ThemeProvider>().toggleDarkTheme();
@@ -47,7 +57,12 @@ class _MainDrawerState extends State<MainDrawer> {
               itemCount: widget.routes.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                    title: Text(widget.routes[index].name),
+                    title: Text(
+                      widget.routes[index].name,
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                      ),
+                    ),
                     onTap: () {
                       if (widget.routes[index].path == "/login") {
                         context.read<AuthProvider>().signOut();

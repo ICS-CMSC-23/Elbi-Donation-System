@@ -43,7 +43,7 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
           key: _formKey,
           child: Column(
             children: [
-              Image.asset('assets/images/banner_biggertext_1.png'),
+              Image.asset('assets/images/transbg.png'),
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: Text(
@@ -51,7 +51,7 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                   style: GoogleFonts.poppins(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFF9C27B0),
+                    color: Theme.of(context).textTheme.titleLarge?.color,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -98,6 +98,7 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
+                        color: Theme.of(context).cardColor,
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Column(

@@ -59,7 +59,7 @@ class _DonorHomePageState extends State<DonorHomePage> {
           key: _formKey,
           child: Column(
             children: [
-              Image.asset('assets/images/banner_biggertext_1.png'),
+              Image.asset('assets/images/transbg.png'),
               Padding(
                 padding: const EdgeInsets.all(30),
                 child: Center(
@@ -68,7 +68,7 @@ class _DonorHomePageState extends State<DonorHomePage> {
                     style: GoogleFonts.poppins(
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFF9C27B0),
+                      color: Theme.of(context).textTheme.titleLarge?.color,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -83,7 +83,7 @@ class _DonorHomePageState extends State<DonorHomePage> {
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
-                      color: const Color.fromARGB(255, 83, 21, 94),
+                      color: Theme.of(context).textTheme.bodyLarge?.color,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -132,6 +132,7 @@ class _DonorHomePageState extends State<DonorHomePage> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
+                        color: Theme.of(context).cardColor,
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Column(

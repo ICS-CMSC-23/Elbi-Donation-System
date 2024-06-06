@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:elbi_donation_system/api/firebase_donation_drive_api.dart';
 import 'package:elbi_donation_system/components/header_with_pic.dart';
 import 'package:elbi_donation_system/components/main_drawer.dart';
 import 'package:elbi_donation_system/components/rounded_image.dart';
@@ -52,252 +53,279 @@ class _DonationDriveDetailsState extends State<DonationDriveDetails> {
     Stream<QuerySnapshot> openOrgsStream =
         context.watch<UserProvider>().openOrgs;
 
-    Widget actionButtons;
-    if (userType == User.organization) {
-      actionButtons = Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Flexible(
-            child: TextButton.icon(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          EditDonationDrive(donationDrive: donationDrive),
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.edit),
-                label: const Text("Edit Donation Drive")),
-          ),
-          Flexible(
-            child: TextButton.icon(
-              onPressed: () async {
-                print("Deleting");
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Deleting donation drive...")),
-                );
-                await context
-                    .read<DonationDriveProvider>()
-                    .deleteDonationDrive();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                      content: Text("Successfully deleted donation drive!")),
-                );
-                Navigator.pop(context);
-              },
-              icon: const Icon(Icons.delete_rounded),
-              label: const Text("Delete Donation Drive"),
-              style: ButtonStyle(
-                  foregroundColor: MaterialStatePropertyAll(
-                      Theme.of(context).colorScheme.error)),
-            ),
-          )
-        ],
-      );
-    } else if (userType == "donor") {
-      actionButtons = StreamBuilder(
-        stream: openOrgsStream,
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            print("Error encountered: ${snapshot.error}");
-            return Center(
-              child: Text("Error encountered! ${snapshot.error}"),
-            );
-          } else if (snapshot.connectionState == ConnectionState.waiting) {
-            print("Loading open orgs...");
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            print("No donations found.");
-            return const Center(
-              child: Text("No Donations Found"),
-            );
-          }
-
-          List<String> openOrgIds =
-              snapshot.data!.docs.map((doc) => doc.id).toList();
-
-          if (openOrgIds.contains(donationDrive.organizationId)) {
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton.icon(
-                  onPressed: () {
-                    Navigator.pushNamed(
-                      context,
-                      "/add-donation",
-                    );
-                  },
-                  icon: const Icon(Icons.add),
-                  label: const Text("Add Donation"),
-                  style: ButtonStyle(
-                      foregroundColor: MaterialStatePropertyAll(
-                          Theme.of(context).colorScheme.primary)),
-                ),
-              ],
-            );
-          } else {
-            return const Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text(
-                    "Closed for Donation",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ],
-            );
-          }
-        },
-      );
-    } else {
-      actionButtons = const Row(
-        children: [],
-      );
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Donation Drive Details"),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              HeaderWithPic(
-                  imageUrl: donationDrive.photos![0],
-                  title: donationDrive.name,
-                  subtitle: donationDrive.isCompleted
-                      ? "Event Finished"
-                      : "Event Ongoing",
-                  description:
-                      "Organization: ${context.watch<DonationDriveProvider>().selectedDonationDriveUser.name}"),
-              TitleDetail(
-                title: "Description",
-                detail: donationDrive.description,
-              ),
-              Row(
+      body: StreamBuilder(
+        stream: FirebaseDonationDriveAPI()
+            .getDonationDriveStreamById(donationDrive.id!),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(
+              child: Text("Error: ${snapshot.error}"),
+            );
+          } else if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (!snapshot.hasData) {
+            return const Center(
+              child: Text("No donation drive detail found."),
+            );
+          }
+          DonationDrive donationDrive =
+              DonationDrive.fromJson(snapshot.data!.data()!);
+
+          Widget actionButtons;
+          if (userType == User.organization) {
+            actionButtons = Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child: TextButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                EditDonationDrive(donationDrive: donationDrive),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.edit),
+                      label: const Text("Edit Donation Drive")),
+                ),
+                Flexible(
+                  child: TextButton.icon(
+                    onPressed: () async {
+                      print("Deleting");
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text("Deleting donation drive...")),
+                      );
+                      await context
+                          .read<DonationDriveProvider>()
+                          .deleteDonationDrive();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content:
+                                Text("Successfully deleted donation drive!")),
+                      );
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(Icons.delete_rounded),
+                    label: const Text("Delete Donation Drive"),
+                    style: ButtonStyle(
+                        foregroundColor: MaterialStatePropertyAll(
+                            Theme.of(context).colorScheme.error)),
+                  ),
+                )
+              ],
+            );
+          } else if (userType == "donor") {
+            actionButtons = StreamBuilder(
+              stream: openOrgsStream,
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  print("Error encountered: ${snapshot.error}");
+                  return Center(
+                    child: Text("Error encountered! ${snapshot.error}"),
+                  );
+                } else if (snapshot.connectionState ==
+                    ConnectionState.waiting) {
+                  print("Loading open orgs...");
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  print("No donations found.");
+                  return const Center(
+                    child: Text("No Donations Found"),
+                  );
+                }
+
+                List<String> openOrgIds =
+                    snapshot.data!.docs.map((doc) => doc.id).toList();
+
+                if (openOrgIds.contains(donationDrive.organizationId)) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton.icon(
+                        onPressed: () {
+                          Navigator.pushNamed(
+                            context,
+                            "/add-donation",
+                          );
+                        },
+                        icon: const Icon(Icons.add),
+                        label: const Text("Add Donation"),
+                        style: ButtonStyle(
+                            foregroundColor: MaterialStatePropertyAll(
+                                Theme.of(context).colorScheme.primary)),
+                      ),
+                    ],
+                  );
+                } else {
+                  return const Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          "Closed for Donation",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+              },
+            );
+          } else {
+            actionButtons = const Row(
+              children: [],
+            );
+          }
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Expanded(
-                    flex: 1,
-                    child: TitleDetail(
-                        title: "Start Date",
-                        detail: DateFormat("yy-MM-dd")
-                            .format(donationDrive.startDate)),
+                  HeaderWithPic(
+                      imageUrl: donationDrive.photos![0],
+                      title: donationDrive.name,
+                      subtitle: donationDrive.isCompleted
+                          ? "Event Finished"
+                          : "Event Ongoing",
+                      description:
+                          "Organization: ${context.watch<DonationDriveProvider>().selectedDonationDriveUser.name}"),
+                  TitleDetail(
+                    title: "Description",
+                    detail: donationDrive.description,
                   ),
-                  Expanded(
-                    flex: 1,
-                    child: TitleDetail(
-                        title: "End Date",
-                        detail: DateFormat("yy-MM-dd")
-                            .format(donationDrive.endDate)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child: TitleDetail(
+                            title: "Start Date",
+                            detail: DateFormat("yy-MM-dd")
+                                .format(donationDrive.startDate)),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: TitleDetail(
+                            title: "End Date",
+                            detail: DateFormat("yy-MM-dd")
+                                .format(donationDrive.endDate)),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 8.0),
-                child: Text(
-                  "Photo Details",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3),
-                  itemCount: donationDrive.photos!.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Padding(
-                        padding: const EdgeInsets.all(5.00),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(10.0),
-                          child: SquareImage(
-                              source: donationDrive.photos![index], size: 80),
-                        ));
-                  }),
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 8.0),
-                child: Text(
-                  "Donations",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              StreamBuilder(
-                stream: donationsStream,
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) {
-                    print("Error encountered: ${snapshot.error}");
-                    return Center(
-                      child: Text("Error encountered! ${snapshot.error}"),
-                    );
-                  } else if (snapshot.connectionState ==
-                      ConnectionState.waiting) {
-                    print("Loading donations...");
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    print("No donations found.");
-                    return const Center(
-                      child: Text("No Donations Found"),
-                    );
-                  }
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text(
+                      "Photo Details",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3),
+                      itemCount: donationDrive.photos!.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Padding(
+                            padding: const EdgeInsets.all(5.00),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10.0),
+                              child: SquareImage(
+                                  source: donationDrive.photos![index],
+                                  size: 80),
+                            ));
+                      }),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text(
+                      "Donations",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  StreamBuilder(
+                    stream: donationsStream,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        print("Error encountered: ${snapshot.error}");
+                        return Center(
+                          child: Text("Error encountered! ${snapshot.error}"),
+                        );
+                      } else if (snapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        print("Loading donations...");
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      } else if (!snapshot.hasData ||
+                          snapshot.data!.docs.isEmpty) {
+                        print("No donations found.");
+                        return const Center(
+                          child: Text("No Donations Found"),
+                        );
+                      }
 
-                  var filteredDonations = snapshot.data!.docs.where((doc) {
-                    Map<String, dynamic> docMap =
-                        doc.data() as Map<String, dynamic>;
-                    docMap["id"] = doc.id;
-                    Donation donation = Donation.fromJson(docMap);
-                    return donation.donationDriveId == donationDrive.id;
-                  }).toList();
+                      var filteredDonations = snapshot.data!.docs.where((doc) {
+                        Map<String, dynamic> docMap =
+                            doc.data() as Map<String, dynamic>;
+                        docMap["id"] = doc.id;
+                        Donation donation = Donation.fromJson(docMap);
+                        return donation.donationDriveId == donationDrive.id;
+                      }).toList();
 
-                  if (filteredDonations.isEmpty) {
-                    print("No donations for this drive.");
-                    return const Center(
-                      child: Text(
-                          "This donation drive doesn't have a donation yet"),
-                    );
-                  }
+                      if (filteredDonations.isEmpty) {
+                        print("No donations for this drive.");
+                        return const Center(
+                          child: Text(
+                              "This donation drive doesn't have a donation yet"),
+                        );
+                      }
 
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: filteredDonations.length,
-                    itemBuilder: (context, index) {
-                      Map<String, dynamic> docMap = filteredDonations[index]
-                          .data() as Map<String, dynamic>;
-                      docMap["id"] = filteredDonations[index].id;
-                      Donation donation = Donation.fromJson(docMap);
-                      return ListTile(
-                        leading:
-                            RoundedImage(source: donation.photos![0], size: 50),
-                        title: Text(donation.category),
-                        subtitle: Text(donation.status),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.more_vert),
-                          onPressed: () {
-                            handleViewDonation(context, donation);
-                          },
-                        ),
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: filteredDonations.length,
+                        itemBuilder: (context, index) {
+                          Map<String, dynamic> docMap = filteredDonations[index]
+                              .data() as Map<String, dynamic>;
+                          docMap["id"] = filteredDonations[index].id;
+                          Donation donation = Donation.fromJson(docMap);
+                          return ListTile(
+                            leading: RoundedImage(
+                                source: donation.photos![0], size: 50),
+                            title: Text(donation.category),
+                            subtitle: Text(donation.status),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.more_vert),
+                              onPressed: () {
+                                handleViewDonation(context, donation);
+                              },
+                            ),
+                          );
+                        },
                       );
                     },
-                  );
-                },
+                  ),
+                  actionButtons,
+                ],
               ),
-              actionButtons,
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }

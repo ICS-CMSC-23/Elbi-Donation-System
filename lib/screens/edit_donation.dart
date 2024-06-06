@@ -87,8 +87,10 @@ class _EditDonationState extends State<EditDonation> {
         final currentUser = context.read<AuthProvider>().currentUser;
         // final currentDrive = FirebaseDonationDriveAPI;
         Donation newDonation = Donation(
+          id: context.read<DonationProvider>().selected.id,
           donorId: currentUser.id!,
-          donationDriveId: context.read<DonationDriveProvider>().selected.id,
+          donationDriveId:
+              context.read<DonationProvider>().selected.donationDriveId,
           category: _categoryValue!,
           description: _descriptionController.text,
           photos: _donationImages64,
@@ -376,15 +378,6 @@ class _EditDonationState extends State<EditDonation> {
                       }
                       return null;
                     },
-                  ),
-                ] else ...[
-                  const SizedBox(height: 16.0),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Generate QR code functionality
-                      // OR remove this button and generate QR code after submit
-                    },
-                    child: const Text('Generate QR Code'),
                   ),
                 ],
                 const SizedBox(height: 16),

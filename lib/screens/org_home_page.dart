@@ -1,15 +1,9 @@
-import 'dart:developer';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elbi_donation_system/api/firebase_donation_api.dart';
 import 'package:elbi_donation_system/components/main_drawer.dart';
 import 'package:elbi_donation_system/components/square_image.dart';
-import 'package:elbi_donation_system/models/donation_drive_model.dart';
 import 'package:elbi_donation_system/models/donation_model.dart';
 import 'package:elbi_donation_system/models/route_model.dart';
-import 'package:elbi_donation_system/models/user_model.dart';
 import 'package:elbi_donation_system/providers/auth_provider.dart';
-import 'package:elbi_donation_system/providers/donation_drive_provider.dart';
 import 'package:elbi_donation_system/providers/donation_provider.dart';
 import 'package:elbi_donation_system/providers/user_provider.dart';
 import 'package:elbi_donation_system/screens/donation_drive_list_page.dart';
@@ -40,7 +34,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
         title: Text(
           'Organization Home Page',
           style: GoogleFonts.poppins(
-            fontSize: 20,
+            fontSize: 16,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
@@ -57,7 +51,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Image.asset('assets/images/banner_biggertext_1.png'),
+          Image.asset('assets/images/transbg.png'),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text(
@@ -65,7 +59,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
               style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF9C27B0),
+                color: Theme.of(context).textTheme.titleLarge?.color,
               ),
               textAlign: TextAlign.center,
             ),
@@ -111,6 +105,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
+                      color: Theme.of(context).cardColor,
                       child: ListTile(
                         contentPadding: const EdgeInsets.all(10),
                         title: AutoSizeText(
@@ -118,15 +113,17 @@ class _OrgHomePageState extends State<OrgHomePage> {
                           style: GoogleFonts.poppins(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
+                            color: Theme.of(context).textTheme.titleLarge?.color,
                           ),
                           maxLines: 1,
                           minFontSize: 10,
                           overflow: TextOverflow.ellipsis,
                         ),
                         subtitle: Text(
-                          donation.status!,
+                          donation.status,
                           style: GoogleFonts.poppins(
                             fontSize: 12,
+                            color: Theme.of(context).textTheme.bodyLarge?.color,
                           ),
                         ),
                         leading: ClipRRect(
