@@ -79,7 +79,6 @@ class _EditDonationDriveState extends State<EditDonationDrive> {
           SnackBar(content: Text(result)),
         );
         Navigator.pop(context); // Close the form page
-        Navigator.pop(context); //to go back one step further
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(result)),

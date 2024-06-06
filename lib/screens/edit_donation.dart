@@ -87,8 +87,10 @@ class _EditDonationState extends State<EditDonation> {
         final currentUser = context.read<AuthProvider>().currentUser;
         // final currentDrive = FirebaseDonationDriveAPI;
         Donation newDonation = Donation(
+          id: context.read<DonationProvider>().selected.id,
           donorId: currentUser.id!,
-          donationDriveId: context.read<DonationDriveProvider>().selected.id,
+          donationDriveId:
+              context.read<DonationProvider>().selected.donationDriveId,
           category: _categoryValue!,
           description: _descriptionController.text,
           photos: _donationImages64,
