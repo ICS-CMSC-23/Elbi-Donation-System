@@ -13,6 +13,8 @@ import 'package:elbi_donation_system/providers/dummy_providers/donation_list_pro
 import 'package:elbi_donation_system/providers/donation_provider.dart';
 import 'package:elbi_donation_system/providers/dummy_providers/user_list_provider.dart';
 import 'package:elbi_donation_system/providers/user_provider.dart';
+import 'package:elbi_donation_system/screens/qr_code_generator.dart';
+import 'package:elbi_donation_system/screens/qr_code_scanner.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -44,6 +46,24 @@ class _DonationDetailsState extends State<DonationDetails> {
 
     Widget cancelButton;
     Widget editButton;
+    Widget qrButton;
+
+    // add a button to scan the QR code
+    Widget qrScanButton = TextButton.icon(
+        onPressed: () {
+          Navigator.pushNamed(context, QrCodeScanner.route.path);
+        },
+        icon: const Icon(Icons.qr_code_scanner),
+        label: const Text("Scan QR Code"));
+
+    // button for generating QR code
+    Widget qrGenerateButton = TextButton.icon(
+        onPressed: () {
+          Navigator.pushNamed(context, QrCodeGenerator.route.path);
+        },
+        icon: const Icon(Icons.qr_code),
+        label: const Text("Generate QR Code"));
+
     if (donation.status != Donation.STATUS_CANCELED &&
         donation.status != Donation.STATUS_COMPLETE) {
       cancelButton = TextButton.icon(
@@ -71,16 +91,29 @@ class _DonationDetailsState extends State<DonationDetails> {
           },
           icon: const Icon(Icons.edit),
           label: const Text("Edit Donation"));
+      if (donation.isForPickup == true &&
+          donation.status == Donation.STATUS_SCHEDULED_FOR_PICKUP) {
+        if (userType == User.donor) {
+          qrButton = qrGenerateButton;
+        } else if (userType == User.organization) {
+          qrButton = qrScanButton;
+        } else {
+          qrButton = SizedBox.shrink();
+        }
+      } else {
+        qrButton = SizedBox.shrink();
+      }
     } else {
       cancelButton = SizedBox.shrink();
       editButton = SizedBox.shrink();
+      qrButton = SizedBox.shrink();
     }
 
     Widget actionButtons;
     if (userType == User.donor) {
       actionButtons = Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [editButton, cancelButton],
+        children: [qrButton, editButton, cancelButton],
       );
     } else if (userType == User.organization) {
       actionButtons =
@@ -240,7 +273,12 @@ class _DonationDetailsState extends State<DonationDetails> {
                           ),
                         ));
                   }),
-              actionButtons
+              qrButton is SizedBox
+                  ? actionButtons
+                  : SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: actionButtons,
+                    ),
             ],
           ),
         ),
