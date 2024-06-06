@@ -59,12 +59,12 @@ class _EditDonationState extends State<EditDonation> {
     });
   }
 
-   void _cancelEdit() {
+  void _cancelEdit() {
     Navigator.pop(context);
   }
 
-  void categoryCallback(String? selectedValue){
-    if (selectedValue is String){
+  void categoryCallback(String? selectedValue) {
+    if (selectedValue is String) {
       setState(() {
         _categoryValue = selectedValue;
       });
@@ -94,8 +94,8 @@ class _EditDonationState extends State<EditDonation> {
           photos: _donationImages64,
           isForPickup: isForPickup,
           weightInKg: _weightUnit == 'kg'
-            ? double.parse(_weightController.text)
-            : double.parse(_weightController.text) * 0.453592,
+              ? double.parse(_weightController.text)
+              : double.parse(_weightController.text) * 0.453592,
           dateTime: _selectedDate,
           addresses: isForPickup ? _selectedAddresses : [],
           contactNo: isForPickup ? _contactController.text : '',
@@ -196,7 +196,8 @@ class _EditDonationState extends State<EditDonation> {
 
       if (pickedTime != null) {
         setState(() {
-          _selectedDate = DateTime(pickedDate.year, pickedDate.month, pickedDate.day, pickedTime.hour, pickedTime.minute);
+          _selectedDate = DateTime(pickedDate.year, pickedDate.month,
+              pickedDate.day, pickedTime.hour, pickedTime.minute);
         });
       }
     }
@@ -209,9 +210,18 @@ class _EditDonationState extends State<EditDonation> {
     super.dispose();
   }
 
+  void _validateCategoryValue() {
+    const validValues = ["Food", "Clothes", "Cash", "Necessities", "Others"];
+    if (!validValues.contains(_categoryValue)) {
+      _categoryValue = "Others";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final addresses = context.read<AuthProvider>().currentUser.address;
+
+    _validateCategoryValue();
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -220,16 +230,16 @@ class _EditDonationState extends State<EditDonation> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                ChoiceChip(
+                    ChoiceChip(
                       label: const Text('For Pickup'),
                       selected: isForPickup,
                       onSelected: (selected) {
@@ -256,7 +266,8 @@ class _EditDonationState extends State<EditDonation> {
                     DropdownMenuItem(value: "Food", child: Text("Food")),
                     DropdownMenuItem(value: "Clothes", child: Text("Clothes")),
                     DropdownMenuItem(value: "Cash", child: Text("Cash")),
-                    DropdownMenuItem(value: "Necessities", child: Text("Necessities")),
+                    DropdownMenuItem(
+                        value: "Necessities", child: Text("Necessities")),
                     DropdownMenuItem(value: "Others", child: Text("Others")),
                   ],
                   value: _categoryValue,
@@ -282,7 +293,7 @@ class _EditDonationState extends State<EditDonation> {
                   },
                 ),
                 const SizedBox(height: 16.0),
-                 Row(
+                Row(
                   children: [
                     Expanded(
                       flex: 3,
@@ -290,7 +301,9 @@ class _EditDonationState extends State<EditDonation> {
                         controller: _weightController,
                         decoration: const InputDecoration(labelText: 'Weight'),
                         keyboardType: TextInputType.number,
-                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
                         validator: (value) {
                           if (value!.isEmpty) {
                             return 'Please enter the weight';
@@ -354,7 +367,8 @@ class _EditDonationState extends State<EditDonation> {
                   const SizedBox(height: 16.0),
                   TextFormField(
                     controller: _contactController,
-                    decoration: const InputDecoration(labelText: 'Contact Number'),
+                    decoration:
+                        const InputDecoration(labelText: 'Contact Number'),
                     keyboardType: TextInputType.phone,
                     validator: (value) {
                       if (value!.isEmpty) {
@@ -367,7 +381,7 @@ class _EditDonationState extends State<EditDonation> {
                   const SizedBox(height: 16.0),
                   ElevatedButton(
                     onPressed: () {
-                      // Generate QR code functionality 
+                      // Generate QR code functionality
                       // OR remove this button and generate QR code after submit
                     },
                     child: const Text('Generate QR Code'),

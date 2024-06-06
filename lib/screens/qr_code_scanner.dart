@@ -89,6 +89,7 @@ class _QrCodeScannerState extends State<QrCodeScanner> {
 
       // navigate back after scanning
       Navigator.pop(context, qrCodeResult);
+      Navigator.pop(context);
     } on PlatformException {
       qrCodeResult = "Failed to get the QR Code";
     }

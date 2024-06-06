@@ -81,6 +81,7 @@ class _DonationDetailsState extends State<DonationDetails> {
             foregroundColor:
                 MaterialStatePropertyAll(Theme.of(context).colorScheme.error)),
       );
+
       editButton = TextButton.icon(
           onPressed: () async {
             context.read<DonationProvider>().changeSelectedDonation(donation);
@@ -91,8 +92,9 @@ class _DonationDetailsState extends State<DonationDetails> {
           },
           icon: const Icon(Icons.edit),
           label: const Text("Edit Donation"));
-      if (donation.isForPickup == true &&
-          donation.status == Donation.STATUS_SCHEDULED_FOR_PICKUP) {
+
+      if (donation.isForPickup == false &&
+          donation.status == Donation.STATUS_SCHEDULED_FOR_DROPOFF) {
         if (userType == User.donor) {
           qrButton = qrGenerateButton;
         } else if (userType == User.organization) {
@@ -111,9 +113,17 @@ class _DonationDetailsState extends State<DonationDetails> {
 
     Widget actionButtons;
     if (userType == User.donor) {
-      actionButtons = Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [qrButton, editButton, cancelButton],
+      actionButtons = SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: donation.status == Donation.STATUS_SCHEDULED_FOR_DROPOFF
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [qrButton, editButton, cancelButton],
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [editButton, cancelButton],
+              ),
       );
     } else if (userType == User.organization) {
       actionButtons =
@@ -127,6 +137,16 @@ class _DonationDetailsState extends State<DonationDetails> {
         ),
         Column(
           children: Donation.statuses.map((status) {
+            if (donation.isForPickup == true) {
+              if (status == Donation.STATUS_SCHEDULED_FOR_DROPOFF) {
+                return const SizedBox.shrink();
+              }
+            } else {
+              if (status == Donation.STATUS_SCHEDULED_FOR_PICKUP) {
+                return const SizedBox.shrink();
+              }
+            }
+
             return Column(
               children: [
                 RadioListTile<String>(
@@ -153,6 +173,18 @@ class _DonationDetailsState extends State<DonationDetails> {
               ],
             );
           }).toList(),
+        ),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: donation.status == Donation.STATUS_SCHEDULED_FOR_DROPOFF
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [qrButton, editButton, cancelButton],
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [editButton, cancelButton],
+                ),
         )
       ]);
     } else {
@@ -273,12 +305,7 @@ class _DonationDetailsState extends State<DonationDetails> {
                           ),
                         ));
                   }),
-              qrButton is SizedBox
-                  ? actionButtons
-                  : SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: actionButtons,
-                    ),
+              actionButtons
             ],
           ),
         ),
