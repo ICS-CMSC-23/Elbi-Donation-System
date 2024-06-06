@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:elbi_donation_system/providers/donation_provider.dart';
+import 'package:elbi_donation_system/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -29,10 +31,12 @@ class DonationDriveListPage extends StatefulWidget {
 }
 
 class _DonationDriveListPageState extends State<DonationDriveListPage> {
-  Widget displayDonationDriveList(donationDrives) {
+  Widget displayDonationDriveList(List<QueryDocumentSnapshot> donationDrives) {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
+          DonationDrive donationDrive = DonationDrive.fromJson(
+              donationDrives[index].data() as Map<String, dynamic>);
           bool hasPhotos = donationDrives[index]['photos'] != null &&
               donationDrives[index]['photos'] is List &&
               donationDrives[index]['photos'].isNotEmpty;
@@ -184,12 +188,7 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
                     style: ButtonStyle(
                       elevation: WidgetStateProperty.all(0),
                     ),
-                    onPressed: () {
-                      // convert donation drive map to donation drive object
-                      DonationDrive donationDrive =
-                          DonationDrive.fromJson(donationDrives[index].data());
-
-                      // Implement view full details functionality
+                    onPressed: () async {
                       context
                           .read<DonationDriveProvider>()
                           .changeSelectedDonationDrive(donationDrive);
@@ -197,10 +196,8 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
                           .read<DonationDriveProvider>()
                           .changeSelectedDonationDriveUser(
                               context.read<AuthProvider>().currentUser);
-                      Navigator.pushNamed(
-                        context,
-                        DonationDriveDetails.route.path,
-                      );
+                      context.read<DonationProvider>().fetchDonations();
+                      Navigator.pushNamed(context, "/donation-drive-details");
                     },
                     child: const Text('View Full Details'),
                   ),
@@ -212,6 +209,23 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
         childCount: donationDrives.length,
       ),
     );
+  }
+
+  void handleOnViewed(
+      List<QueryDocumentSnapshot> donationDrives, int index) async {
+    // convert donation drive map to donation drive object
+    Map<String, dynamic> docMap =
+        donationDrives[index].data() as Map<String, dynamic>;
+    docMap["id"] = donationDrives[index].id;
+    DonationDrive donationDrive = DonationDrive.fromJson(docMap);
+
+    // Implement view full details functionality
+    context
+        .read<DonationDriveProvider>()
+        .changeSelectedDonationDrive(donationDrive);
+    context.read<DonationDriveProvider>().changeSelectedDonationDriveUser(
+        context.read<AuthProvider>().currentUser);
+    Navigator.pushNamed(context, "/donation-drive-details");
   }
 
   Widget displayAppBar() {
@@ -266,13 +280,34 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
               } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                 return SliverFillRemaining(
                   child: Center(
-                    child: Text(
-                      "No Donation Drives found",
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.bold,
-                        color: const Color.fromARGB(255, 247, 129, 139),
-                      ),
-                      textAlign: TextAlign.center,
+                    child: Column(
+                      children: [
+                        Text(
+                          "No Donation Drives found",
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.bold,
+                            color: const Color.fromARGB(255, 247, 129, 139),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.pushNamed(
+                                  context, "/add-donation-drive");
+                            },
+                            child: Text(
+                              'Create Donation Drive',
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 );
@@ -283,33 +318,48 @@ class _DonationDriveListPageState extends State<DonationDriveListPage> {
           ),
           SliverFillRemaining(
             hasScrollBody: false,
-            child: Column(
-              children: [
-                const Expanded(child: SizedBox(height: 1)),
-                Container(
-                  color: Theme.of(context).cardColor,
-                  height: 20,
-                  child: Center(
-                    child: StreamBuilder<QuerySnapshot>(
-                      stream: donationDrives,
-                      builder: (BuildContext context,
-                          AsyncSnapshot<QuerySnapshot> snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const CircularProgressIndicator();
-                        } else if (snapshot.hasError) {
-                          return Text("Error: ${snapshot.error}");
-                        } else if (!snapshot.hasData) {
-                          return const Text("Donation Drives: 0");
-                        } else {
-                          int count = snapshot.data!.docs.length;
-                          return Text("Donation Drives: $count");
-                        }
-                      },
-                    ),
-                  ),
-                ),
-              ],
+            child: StreamBuilder<QuerySnapshot>(
+              stream: donationDrives,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  return Text("Error: ${snapshot.error}");
+                } else if (!snapshot.hasData) {
+                  return const Text("Donation Drives: 0");
+                } else {
+                  int count = snapshot.data!.docs.length;
+                  return Column(
+                    children: [
+                      const Expanded(child: SizedBox(height: 1)),
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: count != 0
+                            ? ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pushNamed(
+                                      context, "/add-donation-drive");
+                                },
+                                child: Text(
+                                  'Create Donation Drive',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              )
+                            : const SizedBox.shrink(),
+                      ),
+                      Container(
+                        color: Theme.of(context).cardColor,
+                        height: 20,
+                        child: Center(child: Text("Donation Drives: $count")),
+                      ),
+                    ],
+                  );
+                }
+              },
             ),
           ),
         ],

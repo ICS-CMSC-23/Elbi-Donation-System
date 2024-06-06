@@ -46,6 +46,11 @@ class DonationProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void fetchDonationsByOrgId(String orgId) {
+    _donationsStream = firebaseService.getDonationsByOrgId(orgId);
+    notifyListeners();
+  }
+
   void addDonation(Donation donation) async {
     try {
       String message = await firebaseService.addDonation(donation);

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:elbi_donation_system/providers/donation_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -95,6 +96,9 @@ class _DonorListPageState extends State<DonorListPage> {
                       User user = User.fromJson(docMap);
 
                       // Navigate to donor's profile page
+                      context
+                          .read<DonationProvider>()
+                          .fetchDonationsByDonorId(user.id!);
                       context.read<UserProvider>().changeSelectedUser(user);
                       Navigator.pushNamed(context, DonorProfilePage.route.path);
                       // Navigator.pushNamed(context, '/donation-list-page'); // for testing
@@ -152,7 +156,7 @@ class _DonorListPageState extends State<DonorListPage> {
                 return SliverFillRemaining(
                   child: Center(
                     child: Text(
-                      "No Donation Drives found",
+                      "No Donors found",
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.bold,
                         color: const Color.fromARGB(255, 247, 129, 139),

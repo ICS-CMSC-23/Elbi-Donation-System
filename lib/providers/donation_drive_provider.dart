@@ -43,6 +43,14 @@ class DonationDriveProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<DonationDrive> getDonationDriveById(String id) async {
+    DocumentSnapshot<Map<String, dynamic>> driveSnap =
+        await firebaseService.getDonationDriveById(id);
+    Map<String, dynamic> docMap = driveSnap.data()!;
+    docMap["id"] = id;
+    return DonationDrive.fromJson(docMap);
+  }
+
   void addDonationDrive(DonationDrive donationDrive) async {
     try {
       String message = await firebaseService.addDonationDrive(donationDrive);

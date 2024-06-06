@@ -44,10 +44,23 @@ dependencies:
   google_fonts: ^6.2.1
   auto_size_text: ^3.0.0
   path_provider: ^2.1.3
+  rxdart: ^0.27.7
+  flutter_sms:
+    git:
+      url: https://github.com/fluttercommunity/flutter_sms.git
+      ref: master
+  qr_flutter:
+    git:
+      url: https://github.com/theyakka/qr.flutter.git
+  flutter_barcode_scanner: ^2.0.0
+  share_plus: ^9.0.0
+  screenshot: ^3.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+  flutter_launcher_icons: "^0.13.1"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -99,3 +112,21 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/logo_icon.ico"
+  min_sdk_android: 21 # android min sdk min:16, default 21
+  web:
+    generate: true
+    image_path: "assets/images/logo_icon.ico"
+    background_color: "#FFFFFF"
+    theme_color: "#FFFFFF"
+  windows:
+    generate: true
+    image_path: "assets/images/logo_icon.ico"
+    icon_size: 48 # min:48, max:256, default: 48
+  macos:
+    generate: true
+    image_path: "assets/images/logo_icon.ico"

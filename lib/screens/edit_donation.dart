@@ -6,7 +6,9 @@ import 'package:elbi_donation_system/providers/auth_provider.dart';
 import 'package:elbi_donation_system/providers/donation_drive_provider.dart';
 import 'package:elbi_donation_system/providers/donation_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'dart:io';
@@ -26,18 +28,29 @@ class _EditDonationState extends State<EditDonation> {
   final _formKey = GlobalKey<FormState>();
   final _categoryController = TextEditingController();
   final _descriptionController = TextEditingController();
-  // final _remarksController = TextEditingController();
+  final _weightController = TextEditingController();
+  final _contactController = TextEditingController();
   bool isLoading = false;
+  bool isForPickup = true;
   List<File> _donationImages = [];
   List<String> _donationImages64 = [];
   String? errorMessage;
+  String? _categoryValue;
+  String? _weightUnit = 'kg';
+  List<String> _selectedAddresses = [];
+  DateTime _selectedDate = DateTime.now();
 
   @override
   void initState() {
     super.initState();
     Donation currentDonation = context.read<DonationProvider>().selected;
-    _categoryController.text = currentDonation.category;
+    _categoryValue = currentDonation.category;
+    // category: _categoryController.text,
     _descriptionController.text = currentDonation.description;
+    _contactController.text = currentDonation.contactNo;
+    _weightController.text = currentDonation.weightInKg.toString();
+    _selectedDate = currentDonation.dateTime;
+    _selectedAddresses = currentDonation.addresses;
     _donationImages64 = currentDonation.photos ?? [];
     _convertBase64ToFile(_donationImages64).then((files) {
       setState(() {
@@ -46,15 +59,16 @@ class _EditDonationState extends State<EditDonation> {
     });
   }
 
-  void _clearForm() {
-    _formKey.currentState?.reset();
-    _categoryController.clear();
-    _descriptionController.clear();
-    // _remarksController.clear();
-    setState(() {
-      _donationImages.clear();
-      _donationImages64.clear();
-    });
+  void _cancelEdit() {
+    Navigator.pop(context);
+  }
+
+  void categoryCallback(String? selectedValue) {
+    if (selectedValue is String) {
+      setState(() {
+        _categoryValue = selectedValue;
+      });
+    }
   }
 
   void _submitForm() async {
@@ -75,14 +89,16 @@ class _EditDonationState extends State<EditDonation> {
         Donation newDonation = Donation(
           donorId: currentUser.id!,
           donationDriveId: context.read<DonationDriveProvider>().selected.id,
-          category: _categoryController.text,
+          category: _categoryValue!,
           description: _descriptionController.text,
           photos: _donationImages64,
-          isForPickup: false,
-          weightInKg: 10,
-          dateTime: DateTime.now(),
-          addresses: [],
-          contactNo: '',
+          isForPickup: isForPickup,
+          weightInKg: _weightUnit == 'kg'
+              ? double.parse(_weightController.text)
+              : double.parse(_weightController.text) * 0.453592,
+          dateTime: _selectedDate,
+          addresses: isForPickup ? _selectedAddresses : [],
+          contactNo: isForPickup ? _contactController.text : '',
         );
 
         setState(() {
@@ -164,6 +180,29 @@ class _EditDonationState extends State<EditDonation> {
     return file;
   }
 
+  Future<void> _updateDateTime(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+
+    if (pickedDate != null && pickedDate != _selectedDate) {
+      final TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.fromDateTime(_selectedDate),
+      );
+
+      if (pickedTime != null) {
+        setState(() {
+          _selectedDate = DateTime(pickedDate.year, pickedDate.month,
+              pickedDate.day, pickedTime.hour, pickedTime.minute);
+        });
+      }
+    }
+  }
+
   @override
   void dispose() {
     _categoryController.dispose();
@@ -171,25 +210,72 @@ class _EditDonationState extends State<EditDonation> {
     super.dispose();
   }
 
+  void _validateCategoryValue() {
+    const validValues = ["Food", "Clothes", "Cash", "Necessities", "Others"];
+    if (!validValues.contains(_categoryValue)) {
+      _categoryValue = "Others";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final addresses = context.read<AuthProvider>().currentUser.address;
+
+    _validateCategoryValue();
+
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Text('Add Donation'),
+        title: const Text('Edit Donation'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
             child: Column(
-              children: <Widget>[
-                TextFormField(
-                  controller: _categoryController,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ChoiceChip(
+                      label: const Text('For Pickup'),
+                      selected: isForPickup,
+                      onSelected: (selected) {
+                        setState(() {
+                          isForPickup = true;
+                        });
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    ChoiceChip(
+                      label: const Text('For Drop-off'),
+                      selected: !isForPickup,
+                      onSelected: (selected) {
+                        setState(() {
+                          isForPickup = false;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16.0),
+                DropdownButtonFormField(
+                  items: const [
+                    DropdownMenuItem(value: "Food", child: Text("Food")),
+                    DropdownMenuItem(value: "Clothes", child: Text("Clothes")),
+                    DropdownMenuItem(value: "Cash", child: Text("Cash")),
+                    DropdownMenuItem(
+                        value: "Necessities", child: Text("Necessities")),
+                    DropdownMenuItem(value: "Others", child: Text("Others")),
+                  ],
+                  value: _categoryValue,
+                  onChanged: categoryCallback,
                   decoration: const InputDecoration(labelText: 'Category'),
                   validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Please enter a donation name';
+                    if (value == null) {
+                      return 'Please choose a category';
                     }
                     return null;
                   },
@@ -206,12 +292,101 @@ class _EditDonationState extends State<EditDonation> {
                     return null;
                   },
                 ),
-                // const SizedBox(height: 16.0),
-                // TextFormField(
-                //   controller: _remarksController,
-                //   decoration:
-                //       const InputDecoration(labelText: 'Remarks/Message'),
-                // ),
+                const SizedBox(height: 16.0),
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: TextFormField(
+                        controller: _weightController,
+                        decoration: const InputDecoration(labelText: 'Weight'),
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Please enter the weight';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 16.0),
+                    Expanded(
+                      flex: 1,
+                      child: DropdownButtonFormField(
+                        value: _weightUnit,
+                        items: const [
+                          DropdownMenuItem(value: "kg", child: Text("kg")),
+                          DropdownMenuItem(value: "lbs", child: Text("lbs")),
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            _weightUnit = value;
+                          });
+                        },
+                        decoration: const InputDecoration(labelText: 'Unit'),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16.0),
+                Row(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () => _updateDateTime(context),
+                      child: const Text('Select Date and Time'),
+                    ),
+                    const SizedBox(width: 16.0),
+                    Text(DateFormat('yyyy-MM-dd HH:mm').format(_selectedDate)),
+                  ],
+                ),
+                if (isForPickup) ...[
+                  const SizedBox(height: 16.0),
+                  const Text(
+                    'Select Address/es',
+                    style: TextStyle(fontSize: 16.0),
+                  ),
+                  const SizedBox(height: 8.0),
+                  ...addresses.map((address) {
+                    return CheckboxListTile(
+                      title: Text(address),
+                      value: _selectedAddresses.contains(address),
+                      onChanged: (bool? selected) {
+                        setState(() {
+                          if (selected == true) {
+                            _selectedAddresses.add(address);
+                          } else {
+                            _selectedAddresses.remove(address);
+                          }
+                        });
+                      },
+                    );
+                  }),
+                  const SizedBox(height: 16.0),
+                  TextFormField(
+                    controller: _contactController,
+                    decoration:
+                        const InputDecoration(labelText: 'Contact Number'),
+                    keyboardType: TextInputType.phone,
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter a contact number';
+                      }
+                      return null;
+                    },
+                  ),
+                ] else ...[
+                  const SizedBox(height: 16.0),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Generate QR code functionality
+                      // OR remove this button and generate QR code after submit
+                    },
+                    child: const Text('Generate QR Code'),
+                  ),
+                ],
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () async {
@@ -301,13 +476,13 @@ class _EditDonationState extends State<EditDonation> {
                   children: <Widget>[
                     ElevatedButton(
                       onPressed: _submitForm,
-                      child: const Text('Submit'),
+                      child: const Text('Save changes'),
                     ),
                     ElevatedButton(
-                      onPressed: _clearForm,
+                      onPressed: _cancelEdit,
                       style:
                           ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                      child: const Text('Clear'),
+                      child: const Text('Cancel'),
                     ),
                   ],
                 ),

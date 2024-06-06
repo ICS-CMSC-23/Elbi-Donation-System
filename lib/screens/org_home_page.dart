@@ -1,26 +1,35 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:elbi_donation_system/api/firebase_donation_api.dart';
 import 'package:elbi_donation_system/components/main_drawer.dart';
 import 'package:elbi_donation_system/components/square_image.dart';
 import 'package:elbi_donation_system/models/donation_drive_model.dart';
+import 'package:elbi_donation_system/models/donation_model.dart';
 import 'package:elbi_donation_system/models/route_model.dart';
+import 'package:elbi_donation_system/models/user_model.dart';
 import 'package:elbi_donation_system/providers/auth_provider.dart';
 import 'package:elbi_donation_system/providers/donation_drive_provider.dart';
+import 'package:elbi_donation_system/providers/donation_provider.dart';
+import 'package:elbi_donation_system/providers/user_provider.dart';
 import 'package:elbi_donation_system/screens/donation_drive_list_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 
-class OrgHomePage extends StatelessWidget {
+class OrgHomePage extends StatefulWidget {
   const OrgHomePage({super.key, this.detailList});
 
   final List<String>? detailList;
 
   @override
-  Widget build(BuildContext context) {
-    Stream<QuerySnapshot> donationDriveStream =
-        context.watch<DonationDriveProvider>().donationDrives;
+  State<OrgHomePage> createState() => _OrgHomePageState();
+}
 
+class _OrgHomePageState extends State<OrgHomePage> {
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       drawer: MainDrawer(routes: [
         RouteModel("Logout", "/login"),
@@ -52,7 +61,7 @@ class OrgHomePage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text(
-              'Manage your donation drives below.',
+              'Manage your donations below.',
               style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -63,7 +72,8 @@ class OrgHomePage extends StatelessWidget {
           ),
           Expanded(
             child: StreamBuilder(
-              stream: donationDriveStream,
+              stream: FirebaseDonationAPI().getDonationsByOrgId(
+                  context.read<AuthProvider>().currentUser.id!),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
                   return Center(
@@ -74,31 +84,10 @@ class OrgHomePage extends StatelessWidget {
                   return const Center(
                     child: CircularProgressIndicator(),
                   );
-                } else if (!snapshot.hasData) {
+                } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                   return Center(
                     child: Text(
-                      "No Donation Drives found",
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.bold,
-                        color: const Color.fromARGB(255, 247, 129, 139),
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  );
-                }
-
-                var filteredDonationDrives = snapshot.data!.docs.where((doc) {
-                  DonationDrive donationDrive = DonationDrive.fromJson(
-                      doc.data() as Map<String, dynamic>);
-                  print(donationDrive.organizationId);
-                  return donationDrive.organizationId ==
-                      context.read<AuthProvider>().currentUser.id;
-                }).toList();
-
-                if (filteredDonationDrives.isEmpty) {
-                  return Center(
-                    child: Text(
-                      "No Donation Drives found",
+                      "No Donations found",
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.bold,
                         color: const Color.fromARGB(255, 247, 129, 139),
@@ -109,11 +98,12 @@ class OrgHomePage extends StatelessWidget {
                 }
 
                 return ListView.builder(
-                  itemCount: filteredDonationDrives.length,
+                  itemCount: snapshot.data!.docs.length,
                   itemBuilder: (context, index) {
-                    DonationDrive donationDrive = DonationDrive.fromJson(
-                        filteredDonationDrives[index].data()
-                            as Map<String, dynamic>);
+                    Map<String, dynamic> docMap = snapshot.data!.docs[index]
+                        .data() as Map<String, dynamic>;
+                    docMap["id"] = snapshot.data!.docs[index].id;
+                    Donation donation = Donation.fromJson(docMap);
                     return Card(
                       margin: const EdgeInsets.symmetric(
                           vertical: 10, horizontal: 20),
@@ -124,7 +114,7 @@ class OrgHomePage extends StatelessWidget {
                       child: ListTile(
                         contentPadding: const EdgeInsets.all(10),
                         title: AutoSizeText(
-                          donationDrive.name,
+                          donation.category,
                           style: GoogleFonts.poppins(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -134,7 +124,7 @@ class OrgHomePage extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                         subtitle: Text(
-                          donationDrive.description,
+                          donation.status!,
                           style: GoogleFonts.poppins(
                             fontSize: 12,
                           ),
@@ -142,19 +132,11 @@ class OrgHomePage extends StatelessWidget {
                         leading: ClipRRect(
                             borderRadius: BorderRadius.circular(10),
                             child: SquareImage(
-                                source: donationDrive.photos![0], size: 80)),
+                                source: donation.photos![0], size: 80)),
                         trailing: IconButton(
                           icon: const Icon(Icons.more_vert),
                           onPressed: () {
-                            context
-                                .read<DonationDriveProvider>()
-                                .changeSelectedDonationDrive(donationDrive);
-                            context
-                                .read<DonationDriveProvider>()
-                                .changeSelectedDonationDriveUser(
-                                    context.read<AuthProvider>().currentUser);
-                            Navigator.pushNamed(
-                                context, "/donation-drive-details");
+                            _handleDonationDetails(context, donation);
                           },
                         ),
                       ),
@@ -168,7 +150,7 @@ class OrgHomePage extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
               onPressed: () {
-                Navigator.pushNamed(context, "/add-donation-drive");
+                Navigator.pushNamed(context, DonationDriveListPage.route.path);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF9C27B0),
@@ -178,7 +160,7 @@ class OrgHomePage extends StatelessWidget {
                 ),
               ),
               child: Text(
-                'Create Donation Drive',
+                'Manage Donation Drives',
                 style: GoogleFonts.poppins(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -190,5 +172,19 @@ class OrgHomePage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void _handleDonationDetails(BuildContext context, Donation donation) async {
+    final donationProvider = context.read<DonationProvider>();
+    final userProvider = context.read<UserProvider>();
+
+    donationProvider.changeSelectedDonation(donation);
+
+    final selectedDonor = await userProvider.fetchUserById(donation.donorId);
+
+    if (context.mounted) {
+      donationProvider.changeSelectedDonor(selectedDonor);
+      Navigator.pushNamed(context, "/donation-details");
+    }
   }
 }

@@ -1,3 +1,4 @@
+import 'package:elbi_donation_system/api/firebase_users_api.dart';
 import 'package:elbi_donation_system/dummy_data/dummy_users.dart';
 import 'package:elbi_donation_system/models/user_model.dart' as user_model;
 import 'package:flutter/material.dart';
@@ -37,11 +38,13 @@ class AuthProvider with ChangeNotifier {
   user_model.User get currentUser => _currentUser;
 
   late FirebaseAuthAPI authService;
+  late FirebaseUsersAPI firebaseService;
   late Stream<firebase_auth.User?> uStream;
   firebase_auth.User? firebaseUser;
 
   AuthProvider() {
     authService = FirebaseAuthAPI();
+    firebaseService = FirebaseUsersAPI();
     fetchAuthentication();
   }
 
@@ -105,6 +108,12 @@ class AuthProvider with ChangeNotifier {
     String? error = await authService.signIn(email, password);
     if (error == null && firebaseUser != null) {
       await _loadUserData(firebaseUser!.uid);
+
+      if (_currentUser.role == "organization" &&
+          (_currentUser.isApproved ?? false) == false) {
+        await signOut();
+        return "Organization account hasn't been approved";
+      }
     }
     notifyListeners();
     return error;
@@ -163,5 +172,26 @@ class AuthProvider with ChangeNotifier {
     _setHomeElementBasedOnRole();
     notifyListeners();
     return _currentUser;
+  }
+
+  void updateUser(user_model.User user) async {
+    try {
+      String message =
+          await firebaseService.updateUser(user.id!, user.toJson());
+      _loadUserData(user.id!);
+      print(message);
+      notifyListeners();
+    } on FirebaseException catch (e) {
+      print("Failed to update user");
+    }
+  }
+
+  Future<void> deleteUser(String userId) async {
+    try {
+      await FirebaseFirestore.instance.collection('users').doc(userId).delete();
+    } catch (e) {
+      print("Error deleting user: $e");
+      throw e;
+    }
   }
 }

@@ -3,8 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_model.dart' as user_model;
 
 class FirebaseAuthAPI {
-  static final firebase_auth.FirebaseAuth auth =
-      firebase_auth.FirebaseAuth.instance;
+  static final firebase_auth.FirebaseAuth auth = firebase_auth.FirebaseAuth.instance;
   static final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   Stream<firebase_auth.User?> getUser() {
@@ -90,5 +89,16 @@ class FirebaseAuthAPI {
 
   Future<void> signOut() async {
     await auth.signOut();
+  }
+
+  Future<void> deleteCurrentUser() async {
+    try {
+      firebase_auth.User? user = auth.currentUser;
+      if (user != null) {
+        await user.delete();
+      }
+    } catch (e) {
+      print("Error deleting FirebaseAuth user: $e");
+    }
   }
 }

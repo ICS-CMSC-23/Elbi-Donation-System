@@ -3,6 +3,7 @@ import 'package:elbi_donation_system/components/main_drawer.dart';
 import 'package:elbi_donation_system/components/square_image.dart';
 import 'package:elbi_donation_system/models/route_model.dart';
 import 'package:elbi_donation_system/models/user_model.dart';
+import 'package:elbi_donation_system/providers/donation_drive_provider.dart';
 import 'package:elbi_donation_system/providers/user_provider.dart';
 import 'package:elbi_donation_system/screens/donation_list_page.dart';
 import 'package:flutter/material.dart';
@@ -175,6 +176,10 @@ class _DonorHomePageState extends State<DonorHomePage> {
                                           .changeSelectedUser(
                                             organization,
                                           );
+                                      context
+                                          .read<DonationDriveProvider>()
+                                          .fetchDonationDrivesByOrganizationId(
+                                              organization.id!);
                                       Navigator.pushNamed(
                                         context,
                                         "/org-profile",
@@ -190,7 +195,7 @@ class _DonorHomePageState extends State<DonorHomePage> {
                                     ),
                                   ),
                                   child: Text(
-                                    "View Org",
+                                    "View Organization",
                                     style: GoogleFonts.poppins(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,

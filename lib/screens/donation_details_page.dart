@@ -4,17 +4,22 @@ import 'package:elbi_donation_system/components/square_image.dart';
 import 'package:elbi_donation_system/components/title_detail.dart';
 import 'package:elbi_donation_system/components/title_detail_list.dart';
 import 'package:elbi_donation_system/dummy_data/dummy_donations.dart';
+import 'package:elbi_donation_system/models/donation_drive_model.dart';
 import 'package:elbi_donation_system/models/donation_model.dart';
 import 'package:elbi_donation_system/models/user_model.dart';
 import 'package:elbi_donation_system/providers/auth_provider.dart';
-import 'package:elbi_donation_system/providers/donation_list_provider.dart';
+import 'package:elbi_donation_system/providers/donation_drive_provider.dart';
+import 'package:elbi_donation_system/providers/dummy_providers/donation_list_provider.dart';
 import 'package:elbi_donation_system/providers/donation_provider.dart';
-import 'package:elbi_donation_system/providers/user_list_provider.dart';
+import 'package:elbi_donation_system/providers/dummy_providers/user_list_provider.dart';
 import 'package:elbi_donation_system/providers/user_provider.dart';
+import 'package:elbi_donation_system/screens/qr_code_generator.dart';
+import 'package:elbi_donation_system/screens/qr_code_scanner.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../models/route_model.dart';
+import "package:flutter_sms/flutter_sms.dart";
 
 class DonationDetails extends StatefulWidget {
   const DonationDetails({super.key});
@@ -41,6 +46,24 @@ class _DonationDetailsState extends State<DonationDetails> {
 
     Widget cancelButton;
     Widget editButton;
+    Widget qrButton;
+
+    // add a button to scan the QR code
+    Widget qrScanButton = TextButton.icon(
+        onPressed: () {
+          Navigator.pushNamed(context, QrCodeScanner.route.path);
+        },
+        icon: const Icon(Icons.qr_code_scanner),
+        label: const Text("Scan QR Code"));
+
+    // button for generating QR code
+    Widget qrGenerateButton = TextButton.icon(
+        onPressed: () {
+          Navigator.pushNamed(context, QrCodeGenerator.route.path);
+        },
+        icon: const Icon(Icons.qr_code),
+        label: const Text("Generate QR Code"));
+
     if (donation.status != Donation.STATUS_CANCELED &&
         donation.status != Donation.STATUS_COMPLETE) {
       cancelButton = TextButton.icon(
@@ -58,6 +81,7 @@ class _DonationDetailsState extends State<DonationDetails> {
             foregroundColor:
                 MaterialStatePropertyAll(Theme.of(context).colorScheme.error)),
       );
+
       editButton = TextButton.icon(
           onPressed: () async {
             context.read<DonationProvider>().changeSelectedDonation(donation);
@@ -68,16 +92,38 @@ class _DonationDetailsState extends State<DonationDetails> {
           },
           icon: const Icon(Icons.edit),
           label: const Text("Edit Donation"));
+
+      if (donation.isForPickup == false &&
+          donation.status == Donation.STATUS_SCHEDULED_FOR_DROPOFF) {
+        if (userType == User.donor) {
+          qrButton = qrGenerateButton;
+        } else if (userType == User.organization) {
+          qrButton = qrScanButton;
+        } else {
+          qrButton = SizedBox.shrink();
+        }
+      } else {
+        qrButton = SizedBox.shrink();
+      }
     } else {
       cancelButton = SizedBox.shrink();
       editButton = SizedBox.shrink();
+      qrButton = SizedBox.shrink();
     }
 
     Widget actionButtons;
     if (userType == User.donor) {
-      actionButtons = Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [editButton, cancelButton],
+      actionButtons = SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: donation.status == Donation.STATUS_SCHEDULED_FOR_DROPOFF
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [qrButton, editButton, cancelButton],
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [editButton, cancelButton],
+              ),
       );
     } else if (userType == User.organization) {
       actionButtons =
@@ -91,6 +137,16 @@ class _DonationDetailsState extends State<DonationDetails> {
         ),
         Column(
           children: Donation.statuses.map((status) {
+            if (donation.isForPickup == true) {
+              if (status == Donation.STATUS_SCHEDULED_FOR_DROPOFF) {
+                return const SizedBox.shrink();
+              }
+            } else {
+              if (status == Donation.STATUS_SCHEDULED_FOR_PICKUP) {
+                return const SizedBox.shrink();
+              }
+            }
+
             return Column(
               children: [
                 RadioListTile<String>(
@@ -100,6 +156,15 @@ class _DonationDetailsState extends State<DonationDetails> {
                   onChanged: (value) {
                     donation.status = value!;
                     context.read<DonationProvider>().updateDonation(donation);
+
+                    _sendSMS(
+                        "The status of your donation, ${donation.category} which was donated at ${donation.dateTime.toString()} has been updated to $value.",
+                        [
+                          context
+                              .watch<DonationProvider>()
+                              .selectedDonor
+                              .contactNo
+                        ]);
                   },
                   controlAffinity: ListTileControlAffinity.leading,
                   dense: true,
@@ -108,6 +173,18 @@ class _DonationDetailsState extends State<DonationDetails> {
               ],
             );
           }).toList(),
+        ),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: donation.status == Donation.STATUS_SCHEDULED_FOR_DROPOFF
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [qrButton, editButton, cancelButton],
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [editButton, cancelButton],
+                ),
         )
       ]);
     } else {
@@ -157,12 +234,45 @@ class _DonationDetailsState extends State<DonationDetails> {
                   ),
                   Expanded(
                     flex: 1,
-                    child: TitleDetail(
-                      title: "Contact Number",
-                      detail: context
-                          .watch<DonationProvider>()
-                          .selectedDonor
-                          .contactNo,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TitleDetail(
+                          title: "Contact Number",
+                          detail: context
+                              .watch<DonationProvider>()
+                              .selectedDonor
+                              .contactNo,
+                        ),
+                        FutureBuilder(
+                            future: context
+                                .read<DonationDriveProvider>()
+                                .getDonationDriveById(
+                                    donation.donationDriveId!),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasError) {
+                                print("Error encountered: ${snapshot.error}");
+                                return Center(
+                                  child: Text(
+                                      "Error encountered! ${snapshot.error}"),
+                                );
+                              } else if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                print("Loading donations...");
+                                return const Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              } else if (!snapshot.hasData) {
+                                print("No drive found.");
+                                return const Center(
+                                  child: Text("No Donations Found"),
+                                );
+                              }
+                              return TitleDetail(
+                                  title: "Donation Drive",
+                                  detail: snapshot.data!.name);
+                            }),
+                      ],
                     ),
                   ),
                 ],
@@ -170,7 +280,7 @@ class _DonationDetailsState extends State<DonationDetails> {
               TitleDetailList(
                   title: "Address",
                   detailList:
-                      context.watch<DonationProvider>().selectedDonor.address),
+                      context.watch<DonationProvider>().selected.addresses),
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 8.0),
                 child: Text(
@@ -202,4 +312,12 @@ class _DonationDetailsState extends State<DonationDetails> {
       ),
     );
   }
+}
+
+void _sendSMS(String message, List<String> recipents) async {
+  String _result = await sendSMS(message: message, recipients: recipents)
+      .catchError((onError) {
+    print(onError);
+  });
+  print(_result);
 }

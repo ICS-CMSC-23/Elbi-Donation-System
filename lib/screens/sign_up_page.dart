@@ -20,7 +20,8 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController aboutController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController addressController = TextEditingController();
+  // final TextEditingController addressController = TextEditingController();
+  List<TextEditingController> addressControllers = [TextEditingController()];
   final TextEditingController contactNumberController = TextEditingController();
   final TextEditingController orgNameController = TextEditingController();
   bool isDonor = true;
@@ -36,13 +37,27 @@ class _SignUpPageState extends State<SignUpPage> {
     aboutController.clear();
     emailController.clear();
     passwordController.clear();
-    addressController.clear();
     contactNumberController.clear();
     orgNameController.clear();
+    for (var controller in addressControllers) {
+      controller.clear();
+    }
     setState(() {
       _imagePath = null;
       _orgImages.clear();
       errorMessage = null;
+    });
+  }
+
+  void _addAddressField() {
+    setState(() {
+      addressControllers.add(TextEditingController());
+    });
+  }
+
+  void _removeAddressField(int index) {
+    setState(() {
+      addressControllers.removeAt(index);
     });
   }
 
@@ -255,20 +270,19 @@ class _SignUpPageState extends State<SignUpPage> {
                   },
                 ),
                 const SizedBox(height: 16),
-                TextFormField(
-                  controller: addressController,
-                  decoration: const InputDecoration(
-                    labelText: 'Address',
-                    prefixIcon: Icon(Icons.home),
-                  ),
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Please enter your address';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
+                // TextFormField(
+                //   controller: addressController,
+                //   decoration: const InputDecoration(
+                //     labelText: 'Address',
+                //     prefixIcon: Icon(Icons.home),
+                //   ),
+                //   validator: (value) {
+                //     if (value!.isEmpty) {
+                //       return 'Please enter your address';
+                //     }
+                //     return null;
+                //   },
+                // ),
                 TextFormField(
                   controller: contactNumberController,
                   decoration: const InputDecoration(
@@ -281,6 +295,44 @@ class _SignUpPageState extends State<SignUpPage> {
                     }
                     return null;
                   },
+                ),
+                const SizedBox(height: 16),
+                for (int i = 0; i < addressControllers.length; i++)
+                Column(
+                  children: [
+                    TextFormField(
+                      controller: addressControllers[i],
+                      decoration: InputDecoration(
+                        labelText: 'Address ${i + 1}',
+                        prefixIcon: Icon(Icons.home),
+                        suffixIcon: i == addressControllers.length - 1
+                            ? IconButton(
+                                icon: Icon(Icons.add),
+                                onPressed: () {
+                                  setState(() {
+                                    addressControllers
+                                        .add(TextEditingController());
+                                  });
+                                },
+                              )
+                            : IconButton(
+                                icon: Icon(Icons.remove),
+                                onPressed: () {
+                                  setState(() {
+                                    addressControllers.removeAt(i);
+                                  });
+                                },
+                              ),
+                      ),
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Please enter your address';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                  ],
                 ),
                 if (!isDonor) ...[
                   const SizedBox(height: 16),
@@ -391,6 +443,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         });
                         return;
                       }
+                      List<String> addresses = addressControllers.map((controller) => controller.text.trim()).toList();
                       List<String> proofsOfLegitimacy = _orgImages64;
                       user_model.User newUser = user_model.User(
                         name: isDonor
@@ -401,7 +454,8 @@ class _SignUpPageState extends State<SignUpPage> {
                             : orgNameController.text,
                         email: emailController.text,
                         password: passwordController.text,
-                        address: [addressController.text],
+                        // address: addressControllers.map((controller) => controller.text).toList(),
+                        address: addresses,
                         contactNo: contactNumberController.text,
                         role: isDonor ? "donor" : "organization",
                         profilePhoto: _imagePath != null

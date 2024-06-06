@@ -1,4 +1,5 @@
-import 'package:elbi_donation_system/providers/user_list_provider.dart';
+import 'package:elbi_donation_system/providers/donation_provider.dart';
+import 'package:elbi_donation_system/providers/dummy_providers/user_list_provider.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -52,20 +53,28 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
-      String? error = await context
-          .read<AuthProvider>()
-          .signIn(_emailController.text, _passwordController.text);
+      final authProvider = context.read<AuthProvider>();
+      final userListProvider = context.read<UserListProvider>();
+      final donationProvider = context.read<DonationProvider>();
+      final navigator = Navigator.of(context);
+      final scaffoldMessenger = ScaffoldMessenger.of(context);
 
-      if (error == null) {
-        if (context.read<AuthProvider>().currentUser.role != "guest") {
-          User currentUser = context.read<AuthProvider>().currentUser;
-          context.read<UserListProvider>().changeCurrentUser(currentUser.email);
-          Navigator.pushNamed(context, "/");
-        }
-      } else {
-        setState(() {
-          errorMessage = "Incorrect email/password";
-        });
+      String? error = await authProvider.signIn(_emailController.text, _passwordController.text);
+
+      if (error != null) {
+      scaffoldMessenger.showSnackBar(
+        SnackBar(content: Text(error)),
+        );
+        return;
+      }
+
+      User currentUser = authProvider.currentUser;
+      if (currentUser.role != "guest") {
+        userListProvider.changeCurrentUser(currentUser.email);
+        navigator.pushNamed("/");
+      }
+      if (currentUser.role == "donor") {
+        donationProvider.fetchDonationsByDonorId(currentUser.id!);
       }
     }
   }
@@ -131,13 +140,6 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                if (errorMessage != null) ...[
-                  Text(
-                    errorMessage!,
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                  const SizedBox(height: 10),
-                ],
                 Container(
                   height: 50,
                   width: 250,

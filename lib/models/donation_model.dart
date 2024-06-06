@@ -19,6 +19,7 @@ class Donation {
   static const String STATUS_PENDING = "Pending";
   static const String STATUS_CONFIRMED = "Confirmed";
   static const String STATUS_SCHEDULED_FOR_PICKUP = "Scheduled for Pickup";
+  static const String STATUS_SCHEDULED_FOR_DROPOFF = "Scheduled for Drop-off";
   static const String STATUS_COMPLETE = "Completed";
   static const String STATUS_CANCELED = "Canceled";
 
@@ -26,6 +27,7 @@ class Donation {
     STATUS_PENDING,
     STATUS_CONFIRMED,
     STATUS_SCHEDULED_FOR_PICKUP,
+    STATUS_SCHEDULED_FOR_DROPOFF,
     STATUS_COMPLETE,
     STATUS_CANCELED,
   ];

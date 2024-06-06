@@ -1,11 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elbi_donation_system/components/square_image.dart';
 import 'package:elbi_donation_system/models/user_model.dart';
+import 'package:elbi_donation_system/providers/donation_drive_provider.dart';
 import 'package:elbi_donation_system/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:elbi_donation_system/themes/purple_theme.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:elbi_donation_system/providers/auth_provider.dart';
 
 class OrgAccApprovalPage extends StatefulWidget {
   const OrgAccApprovalPage({super.key});
@@ -131,6 +133,10 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                                   context
                                       .read<UserProvider>()
                                       .changeSelectedUser(organization);
+                                  context
+                                      .read<DonationDriveProvider>()
+                                      .fetchDonationDrivesByOrganizationId(
+                                          organization.id!);
                                   Navigator.pushNamed(
                                     context,
                                     '/org-profile',
@@ -153,20 +159,7 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                                           context,
                                           organization.name,
                                           "approve",
-                                          () {
-                                            FirebaseFirestore.instance
-                                                .collection('users')
-                                                .doc(organization.id)
-                                                .update({'isApproved': true});
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              SnackBar(
-                                                content: Text(
-                                                    "${organization.name} approved"),
-                                              ),
-                                            );
-                                            Navigator.of(context).pop();
-                                          },
+                                          organization, // Pass the organization object here
                                         );
                                       },
                                       style: ElevatedButton.styleFrom(
@@ -186,20 +179,7 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                                           context,
                                           organization.name,
                                           "disapprove",
-                                          () {
-                                            FirebaseFirestore.instance
-                                                .collection('users')
-                                                .doc(organization.id)
-                                                .update({'isApproved': false});
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              SnackBar(
-                                                content: Text(
-                                                    "${organization.name} disapproved"),
-                                              ),
-                                            );
-                                            Navigator.of(context).pop();
-                                          },
+                                          organization, // Pass the organization object here
                                         );
                                       },
                                       style: ElevatedButton.styleFrom(
@@ -229,8 +209,8 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
     );
   }
 
-  void _showConfirmationDialog(BuildContext context, String orgName,
-      String action, VoidCallback onConfirm) {
+  void _showConfirmationDialog(
+      BuildContext context, String orgName, String action, User organization) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -261,7 +241,36 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                 ),
               ),
               TextButton(
-                onPressed: onConfirm,
+                onPressed: () async {
+                  if (!mounted) return;
+                  final messenger = ScaffoldMessenger.of(context);
+                  final navigator = Navigator.of(context);
+                  if (action == "approve") {
+                    await FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(organization.id)
+                        .update({'isApproved': true});
+                    Navigator.of(context).pop();
+                    if (!mounted) return;
+                    messenger.showSnackBar(
+                      SnackBar(
+                        content: Text("${organization.name} approved"),
+                      ),
+                    );
+                  } else {
+                    await Provider.of<AuthProvider>(context, listen: false)
+                        .deleteUser(organization.id!);
+                    navigator.pop();
+                    if (!mounted) return;
+                    messenger.showSnackBar(
+                      SnackBar(
+                        content: Text(
+                            "${organization.name} disapproved and deleted"),
+                      ),
+                    );
+                  }
+                  if (!mounted) return;
+                },
                 child: const Text(
                   "Confirm",
                   style: TextStyle(
