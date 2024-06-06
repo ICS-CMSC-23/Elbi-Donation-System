@@ -36,7 +36,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
           style: GoogleFonts.poppins(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: Theme.of(context).appBarTheme.titleTextStyle?.color,
           ),
         ),
       ),
@@ -61,7 +61,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
                     children: [
                       _buildFeatureCard(
                         icon: Icons.business,
-                        title: "View All Organizations",
+                        title: "View All Organization",
                         description: "View all approved organizations",
                         onPressed: () {
                           Navigator.pushNamed(
@@ -90,9 +90,9 @@ class _AdminHomePageState extends State<AdminHomePage> {
                             Text(
                               "Welcome, Admin",
                               style: GoogleFonts.poppins(
-                                fontSize: 30,
+                                fontSize: 25,
                                 fontWeight: FontWeight.bold,
-                                color: const Color(0xFF9C27B0),
+                                color: Theme.of(context).textTheme.bodyLarge?.color,
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -101,7 +101,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
                               "Manage operations efficiently",
                               style: GoogleFonts.poppins(
                                 fontSize: 14,
-                                color: const Color(0xFF9C27B0),
+                                color: Theme.of(context).textTheme.bodyLarge?.color,
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -146,7 +146,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          // shadowColor: Colors.grey.withOpacity(0.9),
+          color: Theme.of(context).cardColor,
           child: Padding(
             padding: const EdgeInsets.all(15.0),
             child: Column(
@@ -155,7 +155,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
                 Icon(
                   icon,
                   size: 100,
-                  color: const Color(0xFF9C27B0),
+                  color: Theme.of(context).iconTheme.color,
                 ),
                 const SizedBox(height: 15),
                 Text(
@@ -163,7 +163,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
                   style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFF9C27B0),
+                    color: Theme.of(context).textTheme.titleLarge?.color,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -174,7 +174,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
                     style: GoogleFonts.poppins(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: const Color(0xFF9C27B0),
+                      color: Theme.of(context).textTheme.bodyLarge?.color,
                     ),
                     textAlign: TextAlign.center,
                   ),
