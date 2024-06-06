@@ -20,6 +20,8 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../models/route_model.dart';
 import "package:flutter_sms/flutter_sms.dart";
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class DonationDetails extends StatefulWidget {
   const DonationDetails({super.key});
@@ -36,6 +38,52 @@ class DonationDetails extends StatefulWidget {
 }
 
 class _DonationDetailsState extends State<DonationDetails> {
+  Future<void> _sendEmail({
+    required String donorName,
+    required String donorEmail,
+    required String donationCategory,
+    required String donationWeight,
+    required String donationDateTime,
+    required String newStatus,
+    required String organizationName,
+  }) async {
+    const serviceId = 'service_pct82j9';
+    const templateId = 'template_pu5t2dp';
+    const userId = 'FRSsKAVv_SMXAD7bo';
+
+    const subject = 'Donation Status Update';
+
+    final url = Uri.parse('https://api.emailjs.com/api/v1.0/email/send');
+    final response = await http.post(
+      url,
+      headers: {
+        'origin': 'http://localhost',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'service_id': serviceId,
+        'template_id': templateId,
+        'user_id': userId,
+        'template_params': {
+          'subject': subject,
+          'donor_email': donorEmail,
+          'donor_name': donorName,
+          'donation_category': donationCategory,
+          'donation_weight': donationWeight,
+          'donation_date_time': donationDateTime,
+          'new_status': newStatus,
+          'organization_name': organizationName,
+        },
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print('Email sent successfully');
+    } else {
+      print('Failed to send email');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Donation donation = context.watch<DonationProvider>().selected;
@@ -157,14 +205,21 @@ class _DonationDetailsState extends State<DonationDetails> {
                     donation.status = value!;
                     context.read<DonationProvider>().updateDonation(donation);
 
-                    _sendSMS(
-                        "The status of your donation, ${donation.category} which was donated at ${donation.dateTime.toString()} has been updated to $value.",
-                        [
-                          context
-                              .watch<DonationProvider>()
-                              .selectedDonor
-                              .contactNo
-                        ]);
+                    print("Sending email");
+                    _sendEmail(
+                      donorName:
+                          context.read<DonationProvider>().selectedDonor.name,
+                      donorEmail:
+                          context.read<DonationProvider>().selectedDonor.email,
+                      donationCategory: donation.category,
+                      donationWeight: donation.weightInKg.toString(),
+                      donationDateTime: DateFormat.yMMMMd()
+                          .add_jm()
+                          .format(donation.dateTime),
+                      newStatus: value,
+                      organizationName:
+                          context.read<AuthProvider>().currentUser.name,
+                    );
                   },
                   controlAffinity: ListTileControlAffinity.leading,
                   dense: true,
@@ -312,12 +367,4 @@ class _DonationDetailsState extends State<DonationDetails> {
       ),
     );
   }
-}
-
-void _sendSMS(String message, List<String> recipents) async {
-  String _result = await sendSMS(message: message, recipients: recipents)
-      .catchError((onError) {
-    print(onError);
-  });
-  print(_result);
 }
