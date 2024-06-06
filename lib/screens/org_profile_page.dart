@@ -152,73 +152,68 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
         context.watch<DonationDriveProvider>().donationDrives;
 
     Widget donationDrives;
-    if (authUser.role == User.donor) {
-      donationDrives = Expanded(
-          child: StreamBuilder(
-        stream: donationDrivesStream,
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(
-              child: Text("Error encountered! ${snapshot.error}"),
-            );
-          } else if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (!snapshot.hasData) {
-            return const Center(
-              child: Text("No Donations Drives Found"),
-            );
-          }
+    donationDrives = Expanded(
+        child: StreamBuilder(
+      stream: donationDrivesStream,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(
+            child: Text("Error encountered! ${snapshot.error}"),
+          );
+        } else if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (!snapshot.hasData) {
+          return const Center(
+            child: Text("No Donations Drives Found"),
+          );
+        }
 
-          // Filter donations Drives by donorId
-          var filteredDonationDrives = snapshot.data!.docs.where((doc) {
-            Map<String, dynamic> docMap = doc.data() as Map<String, dynamic>;
-            docMap["id"] = doc.id;
-            DonationDrive donationDrive = DonationDrive.fromJson(docMap);
-            return donationDrive.organizationId == user.id;
-          }).toList();
+        // Filter donations Drives by donorId
+        var filteredDonationDrives = snapshot.data!.docs.where((doc) {
+          Map<String, dynamic> docMap = doc.data() as Map<String, dynamic>;
+          docMap["id"] = doc.id;
+          DonationDrive donationDrive = DonationDrive.fromJson(docMap);
+          return donationDrive.organizationId == user.id;
+        }).toList();
 
-          if (filteredDonationDrives.isEmpty) {
-            return const Center(
-              child:
-                  Text("This organization doesn't have a donation drive yet"),
-            );
-          }
+        if (filteredDonationDrives.isEmpty) {
+          return const Center(
+            child: Text("This organization doesn't have a donation drive yet"),
+          );
+        }
 
-          return ListView.builder(
-              itemCount: filteredDonationDrives.length,
-              itemBuilder: (context, index) {
-                Map<String, dynamic> mapData = filteredDonationDrives[index]
-                    .data() as Map<String, dynamic>;
-                mapData["id"] = filteredDonationDrives[index].id;
-                DonationDrive donationDrive = DonationDrive.fromJson(mapData);
-                return ListTile(
-                  leading:
-                      RoundedImage(source: donationDrive.photos![0], size: 50),
-                  title: Text(donationDrive.name),
-                  subtitle: Text(donationDrive.description),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.more_vert),
-                    onPressed: () async {
-                      context
-                          .read<DonationDriveProvider>()
-                          .changeSelectedDonationDrive(donationDrive);
-                      context
-                          .read<DonationDriveProvider>()
-                          .changeSelectedDonationDriveUser(await context
-                              .read<UserProvider>()
-                              .fetchUserById(donationDrive.organizationId));
-                      Navigator.pushNamed(context, "/donation-drive-details");
-                    },
-                  ),
-                );
-              });
-        },
-      ));
-    } else {
-      donationDrives = const SizedBox.shrink();
-    }
+        return ListView.builder(
+            itemCount: filteredDonationDrives.length,
+            itemBuilder: (context, index) {
+              Map<String, dynamic> mapData =
+                  filteredDonationDrives[index].data() as Map<String, dynamic>;
+              mapData["id"] = filteredDonationDrives[index].id;
+              DonationDrive donationDrive = DonationDrive.fromJson(mapData);
+              return ListTile(
+                leading:
+                    RoundedImage(source: donationDrive.photos![0], size: 50),
+                title: Text(donationDrive.name),
+                subtitle: Text(donationDrive.description),
+                trailing: IconButton(
+                  icon: const Icon(Icons.more_vert),
+                  onPressed: () async {
+                    context
+                        .read<DonationDriveProvider>()
+                        .changeSelectedDonationDrive(donationDrive);
+                    context
+                        .read<DonationDriveProvider>()
+                        .changeSelectedDonationDriveUser(await context
+                            .read<UserProvider>()
+                            .fetchUserById(donationDrive.organizationId));
+                    Navigator.pushNamed(context, "/donation-drive-details");
+                  },
+                ),
+              );
+            });
+      },
+    ));
 
     return Scaffold(
         appBar: AppBar(
@@ -242,15 +237,13 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
                 detail: user.contactNo,
               ),
               proofList,
-              authUser.role == User.donor
-                  ? const Padding(
-                      padding: EdgeInsets.only(top: 20),
-                      child: Text(
-                        "Donation Drives",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    )
-                  : const SizedBox.shrink(),
+              const Padding(
+                padding: EdgeInsets.only(top: 20),
+                child: Text(
+                  "Donation Drives",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
               donationDrives,
               actionButtons,
             ],

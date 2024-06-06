@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elbi_donation_system/components/square_image.dart';
 import 'package:elbi_donation_system/models/user_model.dart';
+import 'package:elbi_donation_system/providers/donation_drive_provider.dart';
 import 'package:elbi_donation_system/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -132,6 +133,10 @@ class _OrgAccApprovalPageState extends State<OrgAccApprovalPage> {
                                   context
                                       .read<UserProvider>()
                                       .changeSelectedUser(organization);
+                                  context
+                                      .read<DonationDriveProvider>()
+                                      .fetchDonationDrivesByOrganizationId(
+                                          organization.id!);
                                   Navigator.pushNamed(
                                     context,
                                     '/org-profile',

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:elbi_donation_system/providers/donation_provider.dart';
 import 'package:elbi_donation_system/screens/org_profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -97,6 +98,9 @@ class _DonorListPageState extends State<OrgListPage> {
 
                       // Navigate to donor's profile page
                       context.read<UserProvider>().changeSelectedUser(user);
+                      context
+                          .read<DonationProvider>()
+                          .fetchDonationsByOrgId(user.id!);
                       Navigator.pushNamed(context, "/org-profile");
                       // Navigator.pushNamed(context, '/donation-list-page'); // for testing
                     },
