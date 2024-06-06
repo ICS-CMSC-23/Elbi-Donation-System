@@ -59,7 +59,7 @@ class _DonorHomePageState extends State<DonorHomePage> {
           key: _formKey,
           child: Column(
             children: [
-              Image.asset('assets/images/banner_biggertext_1.png'),
+              Image.asset('assets/images/transbg.png'),
               Padding(
                 padding: const EdgeInsets.all(30),
                 child: Center(
