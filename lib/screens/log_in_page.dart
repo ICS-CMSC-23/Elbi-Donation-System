@@ -1,5 +1,6 @@
 import 'package:elbi_donation_system/providers/donation_provider.dart';
 import 'package:elbi_donation_system/providers/dummy_providers/user_list_provider.dart';
+import 'package:elbi_donation_system/providers/theme_provider.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -59,11 +60,12 @@ class _LoginPageState extends State<LoginPage> {
       final navigator = Navigator.of(context);
       final scaffoldMessenger = ScaffoldMessenger.of(context);
 
-      String? error = await authProvider.signIn(_emailController.text, _passwordController.text);
+      String? error = await authProvider.signIn(
+          _emailController.text, _passwordController.text);
 
       if (error != null) {
-      scaffoldMessenger.showSnackBar(
-        SnackBar(content: Text(error)),
+        scaffoldMessenger.showSnackBar(
+          SnackBar(content: Text(error)),
         );
         return;
       }
@@ -169,10 +171,12 @@ class _LoginPageState extends State<LoginPage> {
                 RichText(
                   text: TextSpan(
                     children: [
-                      const TextSpan(
-                        text: 'New User? ',
-                        style: TextStyle(color: Colors.black),
-                      ),
+                      TextSpan(
+                          text: 'New User? ',
+                          style: TextStyle(
+                              color: context.watch<ThemeProvider>().isDarkTheme
+                                  ? Colors.white
+                                  : Colors.black)),
                       TextSpan(
                         text: 'Create Account',
                         style: TextStyle(

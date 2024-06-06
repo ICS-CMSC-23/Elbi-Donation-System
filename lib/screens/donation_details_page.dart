@@ -235,10 +235,7 @@ class _DonationDetailsState extends State<DonationDetails> {
                               RadioListTile<String>(
                                 title: Text(status),
                                 value: status,
-                                groupValue: context
-                                    .watch<DonationProvider>()
-                                    .selected
-                                    .status,
+                                groupValue: donation.status,
                                 onChanged: (value) {
                                   donation.status = value!;
                                   context
