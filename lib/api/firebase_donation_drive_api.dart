@@ -28,6 +28,11 @@ class FirebaseDonationDriveAPI {
     return db.collection("donationDrives").doc(id).get();
   }
 
+  Stream<DocumentSnapshot<Map<String, dynamic>>> getDonationDriveStreamById(
+      String id) {
+    return db.collection("donationDrives").doc(id).snapshots();
+  }
+
   Stream<QuerySnapshot> getDonationDrivesByOrganizationId(
       String organizationId) {
     return db

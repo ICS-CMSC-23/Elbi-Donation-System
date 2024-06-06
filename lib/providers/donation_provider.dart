@@ -35,6 +35,10 @@ class DonationProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Stream<DocumentSnapshot<Map<String, dynamic>>> getDonationById(String id) {
+    return firebaseService.getDonationById(id);
+  }
+
   void fetchDonationsByDonorId(String donorId) {
     _donationsStream = firebaseService.getDonationsByDonorId(donorId);
     notifyListeners();

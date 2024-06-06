@@ -41,6 +41,10 @@ class FirebaseDonationAPI {
     return db.collection("donations").snapshots();
   }
 
+  Stream<DocumentSnapshot<Map<String, dynamic>>> getDonationById(String id) {
+    return db.collection("donations").doc(id).snapshots();
+  }
+
   Stream<QuerySnapshot> getDonationsByDonorId(String donorId) {
     return db
         .collection("donations")
