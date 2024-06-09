@@ -72,6 +72,7 @@ class MyApp extends StatelessWidget {
     print(currentUser.password);
 
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Elbi Donation System',
       initialRoute: '/',
       theme: context.watch<ThemeProvider>().isDarkTheme
